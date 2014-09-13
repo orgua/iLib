@@ -5,7 +5,8 @@
 #include "i2c_Sensor.h"
 
 
-/*
+/** ######################################################################
+
 Driver for the MPL3115A2-Sensor
 
  CONSUMPTION: standby 2µA, measure 260-2000µA
@@ -13,9 +14,13 @@ Driver for the MPL3115A2-Sensor
  ONE-TIME-MEASURE: disable sensor, [start measurement, wait, read ] ...
  AUTO-Measure: enable sensor, start measurement, [read, read ] ...
 
-*/
 
-class MPL3115A2 : public i2cSensor {
+########################################################################  */
+
+class MPL3115A2 : public i2cSensor
+{
+
+/** ######### Register-Map ################################################################# */
 
 #define MPL_ADDRESS 	        0x60
 
@@ -84,147 +89,216 @@ class MPL3115A2 : public i2cSensor {
 #define REG_OFF_T 	            0x2C  // registers not preserved in standby
 #define REG_OFF_H 	            0x2D  // registers not preserved in standby
 
+/** ######### function definition ################################################################# */
+
 public:
 
-MPL3115A2(void) {
-    //_address = MPL_ADDRESS;
+    MPL3115A2(void)
+    {
+        //_address = MPL_ADDRESS;
     };
 
-//Clears then sets the OST bit which causes the sensor to immediately take another reading
-//Needed to sample faster than 1Hz
-void startMeasurement(void)
-{
-  byte setting = i2c.readByte(MPL_ADDRESS,REG_CTRL1); //Read current settings
-  if (setting&2) {
-    setting &= ~(1<<1); //Clear OST bit
-    i2c.writeByte(MPL_ADDRESS,REG_CTRL1, setting);
-    setting = i2c.readByte(MPL_ADDRESS,REG_CTRL1); //Read current settings to be safe
-  }
-  setting |= (1<<1); //Set OST bit
-  i2c.writeByte(MPL_ADDRESS,REG_CTRL1, setting);
+    /**< Clears and sets the OST bit --> immediately take another reading */
+    /**< Needed to sample faster than 1Hz */
+    void startMeasurement(void)
+    {
+        byte setting = i2c.readByte(MPL_ADDRESS,REG_CTRL1); //Read current settings
+        if (setting&2)
+        {
+            setting &= ~(1<<1); //Clear OST bit
+            i2c.writeByte(MPL_ADDRESS,REG_CTRL1, setting);
+            setting = i2c.readByte(MPL_ADDRESS,REG_CTRL1); //Read current settings to be safe
+        }
+        setting |= (1<<1); //Set OST bit
+        i2c.writeByte(MPL_ADDRESS,REG_CTRL1, setting);
+    };
+
+    /**<  if you started a measurement and want to actively wait for it to finish */
+    uint8_t waitMeasurement(void)
+    {
+        uint16_t counter = 0;
+        //Wait for PDR bit, indicates we have new pressure data
+        while( (i2c.readByte(MPL_ADDRESS,REG_STATUS) & (1<<1)) == 0)
+        {
+            if(++counter > 600) return 0; //Error out after max of 512ms for a read
+            delay(1);
+        }
+        return 1;
+    };
+
+    /**<  gives the number of meters above sea level */
+    void getAltitude(float& meter)
+    {
+        // Read pressure registers
+        uint8_t value[3];
+        i2c.read(MPL_ADDRESS, REG_OUT_P_MSB, value, 3);  // meter in Q16.4 signed in 3x8bit left
+        float tempcsb = (value[2]>>4)/16.0;
+        meter = (float)( (value[0] << 8) | value[1]) + tempcsb;
+    };
+
+
+    /**<  gives airpressure in Pascal */
+    void getPressure(float& pascal)
+    {
+        // Read pressure registers
+        uint8_t value[3];
+        i2c.read(MPL_ADDRESS, REG_OUT_P_MSB, value, 3);  // pascal in Q18.2 unsigned in 3x8bit left
+
+        float tempcsb = (value[2]>>4)/4.0;
+        pascal = (float)( (value[0] << 8) | value[1]) + tempcsb;
+    };
+
+    /**<  gives raw registers of pressure-values */
+    void getValue(uint8_t buffer[])
+    {
+        i2c.read(MPL_ADDRESS, REG_OUT_P_MSB, buffer, 3);  // pascal in Q18.2 unsigned in 3x8bit left
+    };
+
+    /**<  gives temperature in degree celsius */
+    void getTemperature(float& celsius)
+    {
+        // Read temperature registers
+        byte value[2];
+        i2c.read(MPL_ADDRESS, REG_OUT_T_MSB, value, 2); // °C in Q8.4 signed in 2x
+
+        uint16_t foo;
+        bool negSign = false;
+        if(value[0] > 0x7F) //Check for 2s compliment
+        {
+            foo = ~((value[0] << 8) + value[1]) + 1;
+            negSign = true;
+        }
+        else
+        {
+            foo = ((value[0] << 8) + value[1]);
+        }
+        celsius = ((float)(foo))/256.0;
+        if (negSign) celsius = 0 - celsius;
+
+    };
+
+
+    /**< Enable Altimeter / Barometer MODE */
+    void setAltimeter(uint8_t enable)
+    {
+        if (enable) enable=(1<<7);
+        i2c.setRegister(MPL_ADDRESS,REG_CTRL1, MSK_ALT, enable);
+    };
+
+    /**< Enable / Disable the Sensor */
+    void    setEnabled(uint8_t enable)
+    {
+        if (enable) enable=1;
+        i2c.setRegister(MPL_ADDRESS,REG_CTRL1, MSK_SBYB, enable);
+    };
+
+    /**< read Enable / Disable - Status */
+    uint8_t getEnabled()
+    {
+        return (1 & i2c.readByte(MPL_ADDRESS,REG_SYSMOD));
+    };
+
+    /**< do a software reset */
+    void    reset()
+    {
+        i2c.writeByte(MPL_ADDRESS,REG_CTRL1, MSK_RST);
+    };
+
+    /**<  */
+    uint8_t setOversampleRatio(uint8_t sampleRatio)
+    {
+        uint8_t ratio;
+        if (sampleRatio > 127)
+        {
+            sampleRatio = 7;    // takes 512ms
+            ratio = 128;
+        }
+        else if (sampleRatio > 63)
+        {
+            sampleRatio = 6;    // takes 258ms
+            ratio = 64;
+        }
+        else if (sampleRatio > 31)
+        {
+            sampleRatio = 5;    // takes 130ms
+            ratio = 32;
+        }
+        else if (sampleRatio > 15)
+        {
+            sampleRatio = 4;    // takes  66ms
+            ratio = 16;
+        }
+        else if (sampleRatio > 7)
+        {
+            sampleRatio = 3;    // takes  34ms
+            ratio = 8;
+        }
+        else if (sampleRatio > 3)
+        {
+            sampleRatio = 2;    // takes  18ms
+            ratio = 4;
+        }
+        else if (sampleRatio > 1)
+        {
+            sampleRatio = 1;    // takes  10ms
+            ratio = 2;
+        }
+        else
+        {
+            sampleRatio = 0;    // takes   6ms
+            ratio = 1;
+        }
+        sampleRatio <<= 3; //Align it for the CTRL_REG1 register
+        i2c.setRegister(MPL_ADDRESS,REG_CTRL1, MSK_OS, sampleRatio); //Read current settings
+        return ratio;
+    };
+
+
+
+    /**< Enables the measurement event flags */
+    /**< This is recommended in datasheet during setup. */
+    void setEventFlags(uint8_t flags)
+    {
+        flags = flags & 0x07;
+        i2c.writeByte(MPL_ADDRESS,REG_PT_DATA_CFG, flags); // Enable all three pressure and temp event flags
+    };
+
+    /**< set to recommended mode */
+    void setEventFlags()
+    {
+        setEventFlags(MSK_DATA_READY | MSK_PRES_READY | MSK_TEMP_READY);
+    };
+
+    /**< initialize */
+    uint8_t initialize()
+    {
+
+        if (i2c.probe(MPL_ADDRESS))
+        {
+            reset();
+            delay(2);
+            setEnabled(0);
+            setEventFlags();
+            setOversampleRatio(128);
+            setAltimeter(1);
+            setEnabled(1);
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    };
+
+
+
 };
 
-// if you started a measurement and want to actively want to wait for it to finish
-uint8_t waitMeasurement(void) {
-  uint16_t counter = 0;
-  //Wait for PDR bit, indicates we have new pressure data
-  while( (i2c.readByte(MPL_ADDRESS,REG_STATUS) & (1<<1)) == 0)
-  {
-    if(++counter > 600) return 0; //Error out after max of 512ms for a read
-    delay(1);
-  }
-  return 1;
-};
-
-// gives the number of meters above sea level
-void getAltitude(float& height)
-{
-  // Read pressure registers
-  uint8_t value[3];
-  i2c.read(MPL_ADDRESS, REG_OUT_P_MSB, value, 3);  // meter in Q16.4 signed in 3x8bit left
-  float tempcsb = (value[2]>>4)/16.0;
-  height = (float)( (value[0] << 8) | value[1]) + tempcsb;
-};
-
-
-//Returns -1 if no new data is available
-void getPressure(float& pascal)
-{
-  // Read pressure registers
-  uint8_t value[3];
-  i2c.read(MPL_ADDRESS, REG_OUT_P_MSB, value, 3);  // pascal in Q18.2 unsigned in 3x8bit left
-
-  float tempcsb = (value[2]>>4)/4.0;
-  pascal = (float)( (value[0] << 8) | value[1]) + tempcsb;
-};
-
-void getValue(uint8_t buffer[]) {
-    i2c.read(MPL_ADDRESS, REG_OUT_P_MSB, buffer, 3);  // pascal in Q18.2 unsigned in 3x8bit left
-};
-
-
-void getTemperature(float& temperature)
-{
-  // Read temperature registers
-  byte value[2];
-  i2c.read(MPL_ADDRESS, REG_OUT_T_MSB, value, 2); // °C in Q8.4 signed in 2x
-
-  uint16_t foo;
-  bool negSign = false;
-  if(value[0] > 0x7F) //Check for 2s compliment
-  {
-    foo = ~((value[0] << 8) + value[1]) + 1;
-    negSign = true;
-  } else {
-    foo = ((value[0] << 8) + value[1]);
-  }
-  temperature = ((float)(foo))/256.0;
-  if (negSign) temperature = 0 - temperature;
-
-};
-
-
-// Enable Altimeter / Barometer MODE
-void setAltimeter(uint8_t enable)  { if (enable) enable=(1<<7); i2c.setRegister(MPL_ADDRESS,REG_CTRL1, MSK_ALT, enable); };
-
-// Enable / Disable the Sensor
-void    setEnabled(uint8_t enable) { if (enable) enable=1; i2c.setRegister(MPL_ADDRESS,REG_CTRL1, MSK_SBYB, enable); };
-uint8_t getEnabled()               { return (1 & i2c.readByte(MPL_ADDRESS,REG_SYSMOD)); };
-
-void    reset()      { i2c.writeByte(MPL_ADDRESS,REG_CTRL1, MSK_RST); };
-
-
-uint8_t setOversampleRatio(uint8_t sampleRatio)
-{
-  uint8_t ratio;
-  if (sampleRatio > 127)     { sampleRatio = 7; ratio = 128; } // takes 512ms
-  else if (sampleRatio > 63) { sampleRatio = 6; ratio = 64;  } // takes 258ms
-  else if (sampleRatio > 31) { sampleRatio = 5; ratio = 32; }  // takes 130ms
-  else if (sampleRatio > 15) { sampleRatio = 4; ratio = 16; }  // takes  66ms
-  else if (sampleRatio > 7)  { sampleRatio = 3; ratio = 8; }   // takes  34ms
-  else if (sampleRatio > 3)  { sampleRatio = 2; ratio = 4; }   // takes  18ms
-  else if (sampleRatio > 1)  { sampleRatio = 1; ratio = 2; }   // takes  10ms
-  else                       { sampleRatio = 0; ratio = 1; }   // takes   6ms
-  sampleRatio <<= 3; //Align it for the CTRL_REG1 register
-  i2c.setRegister(MPL_ADDRESS,REG_CTRL1, MSK_OS, sampleRatio); //Read current settings
-  return ratio;
-};
-
-
-
-//Enables the pressure and temp measurement event flags so that we can
-//test against them. This is recommended in datasheet during setup.
-void setEventFlags(uint8_t flags) {
-  flags = flags & 0x07;
-  i2c.writeByte(MPL_ADDRESS,REG_PT_DATA_CFG, flags); // Enable all three pressure and temp event flags
-};
-
-void setEventFlags() { setEventFlags(0x07); };
-
-uint8_t initialize() {
-
-  if (i2c.probe(MPL_ADDRESS)) {
-    reset();
-    delay(2);
-    setEnabled(0);
-    setEventFlags();
-    setOversampleRatio(128);
-    setAltimeter(1);
-    setEnabled(1);
-    return 1;
-  } else {
-    return 0;
-  }
-};
-
-
-
-};
-
-// Preinstantiate Objects //////////////////////////////////////////////////////
+/** ######### Preinstantiate Object ################################################################# */
+/** < it's better when this is done by the user */
 //MPL3115 mpl3115 = MPL3115();
 
-#endif // i2c_mpl3115a2_h
+#endif
 
 
 

@@ -10,13 +10,13 @@ class WirePlus
 
 	WirePlus();
 
-	uint8_t probe(uint8_t);
-	uint8_t probeAddress(uint8_t);
-	void    writeByte(uint8_t, uint8_t, uint8_t);
-	uint8_t readByte(uint8_t , uint8_t );
-	void    read(uint8_t , uint8_t , uint8_t *, uint8_t );
-	void    setRegister(uint8_t , uint8_t , uint8_t , uint8_t );
-	uint8_t getRegister(uint8_t , uint8_t , uint8_t );
+	uint8_t probe(const uint8_t);
+	uint8_t probeAddress(const uint8_t);
+	void    writeByte(const uint8_t, const uint8_t, const uint8_t);
+	uint8_t readByte(const uint8_t , const uint8_t );
+	void    read(const uint8_t , const uint8_t , uint8_t *, const uint8_t );
+	void    setRegister(const uint8_t, const uint8_t, const uint8_t, const uint8_t);
+	uint8_t getRegister(const uint8_t, const uint8_t, const uint8_t);
 
 };
 

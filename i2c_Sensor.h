@@ -1,14 +1,14 @@
 #ifndef i2c_interface_h
 #define i2c_interface_h
 
-// Abstract Class as Interface for sensor-libs
-// with basic functions that have to be implemented
+/**<  Abstract Class as Interface for sensor-libs */
+/**<  with basic functions that have to be implemented */
 
 class i2cSensor
 {
     public:
-        virtual void    setEnabled(uint8_t) = 0;            // Enable Sensor or set it to Standby (1 or 0)
-        //void            setEnabled(void) {setEnabled(1);};  // just Enable Sensor and don't care for more
+        /**< declaring prototypes */
+        virtual void    setEnabled(const uint8_t enable=1) = 0;     // Enable Sensor or set it to Standby (1 or 0)
 
         virtual void    reset(void) = 0;                    // trigger a software-reboot of the sensor
 
