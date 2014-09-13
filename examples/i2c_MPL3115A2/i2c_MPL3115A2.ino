@@ -14,7 +14,7 @@ void setup()
   else                      { Serial.println("Sensor missing"); while (1) {} }
 
   // onetime-measure:
-  mpl3115.setEnabled(1);
+  mpl3115.setEnabled(0);
   mpl3115.startMeasurement();
 }
 

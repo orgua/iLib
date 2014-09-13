@@ -148,10 +148,10 @@ public:
         pascal = (float)( (value[0] << 8) | value[1]) + tempcsb;
     };
 
-    /**<  gives raw registers of pressure-values */
-    void getValue(uint8_t buffer[])
+    /**<  gives pressure-values */
+    void getValue(float& pascal)
     {
-        i2c.read(MPL_ADDRESS, REG_OUT_P_MSB, buffer, 3);  // pascal in Q18.2 unsigned in 3x8bit left
+        getPressure(pascal);
     };
 
     /**<  gives temperature in degree celsius */
@@ -179,14 +179,14 @@ public:
 
 
     /**< Enable Altimeter / Barometer MODE */
-    void setAltimeter(uint8_t enable)
+    void setAltimeter(uint8_t enable = 1)
     {
         if (enable) enable=(1<<7);
         i2c.setRegister(MPL_ADDRESS,REG_CTRL1, MSK_ALT, enable);
     };
 
     /**< Enable / Disable the Sensor */
-    void    setEnabled(uint8_t enable)
+    void    setEnabled(uint8_t enable = 1)
     {
         if (enable) enable=1;
         i2c.setRegister(MPL_ADDRESS,REG_CTRL1, MSK_SBYB, enable);
@@ -205,7 +205,7 @@ public:
     };
 
     /**<  */
-    uint8_t setOversampleRatio(uint8_t sampleRatio)
+    uint8_t setOversampleRatio(uint8_t sampleRatio = 128)
     {
         uint8_t ratio;
         if (sampleRatio > 127)
@@ -257,16 +257,10 @@ public:
 
     /**< Enables the measurement event flags */
     /**< This is recommended in datasheet during setup. */
-    void setEventFlags(uint8_t flags)
+    void setEventFlags(uint8_t flags = (MSK_DATA_READY | MSK_PRES_READY | MSK_TEMP_READY))
     {
         flags = flags & 0x07;
         i2c.writeByte(MPL_ADDRESS,REG_PT_DATA_CFG, flags); // Enable all three pressure and temp event flags
-    };
-
-    /**< set to recommended mode */
-    void setEventFlags()
-    {
-        setEventFlags(MSK_DATA_READY | MSK_PRES_READY | MSK_TEMP_READY);
     };
 
     /**< initialize */
