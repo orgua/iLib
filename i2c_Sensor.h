@@ -19,7 +19,7 @@ class i2cSensor
 
     protected:
         // instance gets control over
-        //uint8_t address;
+        //uint8_t _address;
     private:
         // instance has no control over these
 };

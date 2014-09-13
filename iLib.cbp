@@ -23,7 +23,13 @@
 				<Option createStaticLib="1" />
 			</Target>
 		</Build>
-		<Unit filename="main.cpp" />
+		<Unit filename="i2c.cpp" />
+		<Unit filename="i2c.h" />
+		<Unit filename="i2c_MPL3115A2.h" />
+		<Unit filename="i2c_Sensor.h">
+			<Option compile="1" />
+			<Option link="1" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<envvars />

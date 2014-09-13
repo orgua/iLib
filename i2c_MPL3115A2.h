@@ -15,7 +15,7 @@ Driver for the MPL3115A2-Sensor
 
 */
 
-class MPL3115 : public i2cSensor {
+class MPL3115A2 : public i2cSensor {
 
 #define MPL_ADDRESS 	        0x60
 
@@ -86,7 +86,9 @@ class MPL3115 : public i2cSensor {
 
 public:
 
-MPL3115() { };
+MPL3115A2(void) {
+    //_address = MPL_ADDRESS;
+    };
 
 //Clears then sets the OST bit which causes the sensor to immediately take another reading
 //Needed to sample faster than 1Hz
@@ -220,7 +222,7 @@ uint8_t initialize() {
 };
 
 // Preinstantiate Objects //////////////////////////////////////////////////////
-MPL3115 mpl3115 = MPL3115();
+//MPL3115 mpl3115 = MPL3115();
 
 #endif // i2c_mpl3115a2_h
 
