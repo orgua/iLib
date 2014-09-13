@@ -20,7 +20,7 @@ Driver for the MPL3115A2-Sensor
 class MPL3115A2 : public i2cSensor
 {
 
-/** ######### Register-Map ################################################################# */
+    /** ######### Register-Map ################################################################# */
 
 #define MPL_ADDRESS 	        0x60
 
@@ -89,7 +89,7 @@ class MPL3115A2 : public i2cSensor
 #define REG_OFF_T 	            0x2C  // registers not preserved in standby
 #define REG_OFF_H 	            0x2D  // registers not preserved in standby
 
-/** ######### function definition ################################################################# */
+    /** ######### function definition ################################################################# */
 
 public:
 
