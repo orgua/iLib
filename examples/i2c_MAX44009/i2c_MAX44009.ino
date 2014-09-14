@@ -1,4 +1,3 @@
-// I2C
 #include <Wire.h>
 #include "i2c.h"
 #include "i2c_MAX44009.h"
