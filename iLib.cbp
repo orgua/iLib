@@ -23,9 +23,15 @@
 				<Option createStaticLib="1" />
 			</Target>
 		</Build>
+		<Unit filename="examples/i2c_MAX44009/i2c_MAX44009.ino" />
+		<Unit filename="examples/i2c_MPL3115A2/i2c_MPL3115A2.ino" />
 		<Unit filename="i2c.cpp" />
 		<Unit filename="i2c.h" />
+		<Unit filename="i2c_MAX44009.h" />
+		<Unit filename="i2c_MAX44009.h" />
 		<Unit filename="i2c_MPL3115A2.h" />
+		<Unit filename="i2c_PRESET.h" />
+		<Unit filename="i2c_SI7021.h" />
 		<Unit filename="i2c_Sensor.h">
 			<Option compile="1" />
 			<Option link="1" />

@@ -13,8 +13,10 @@ WirePlus::WirePlus()
     bitSet(PORTC, 5); 	// as per note from atmega8 manual pg167
     // switch to 400KHz I2C - eheheh
     TWBR = ((F_CPU / 400000L) - 16) / 2; // see twi_init in Wire/utility/twi.c
-}
+};
 /** ######### Public Methods ################################################################# */
+
+/**< TODO: "const" is only usefull when a reference given as the functionparameter  */
 
 uint8_t WirePlus::probe(const uint8_t address)
 {
@@ -27,12 +29,14 @@ uint8_t WirePlus::probe(const uint8_t address)
     {
         return 0;
     }
-}
+};
 
 uint8_t WirePlus::probeAddress(const uint8_t address)
 {
     return probe(address);
-}
+};
+
+/**< TODO: insert a general write( , , , );  */
 
 void WirePlus::writeByte(const uint8_t address, const uint8_t register_address, const uint8_t write_value)
 {
@@ -40,14 +44,20 @@ void WirePlus::writeByte(const uint8_t address, const uint8_t register_address, 
     Wire.write(register_address);
     Wire.write(write_value);
     Wire.endTransmission(true);
-}
+};
+
+void WirePlus::writeCMD(uint8_t address, uint8_t cmd) {
+  Wire.beginTransmission(address);
+  Wire.write(cmd);
+  Wire.endTransmission();
+};
 
 uint8_t WirePlus::readByte(const uint8_t address, const uint8_t register_address)
 {
     uint8_t _readvalue;
     read(address, register_address, &_readvalue, 1);
     return _readvalue;
-}
+};
 
 
 void WirePlus::read(const uint8_t address, const uint8_t registeraddress, uint8_t buff[], const uint8_t length=1)
@@ -67,7 +77,7 @@ void WirePlus::read(const uint8_t address, const uint8_t registeraddress, uint8_
         }
         Wire.endTransmission(true); 		// Stop Condition
     }
-}
+};
 
 
 void WirePlus::setRegister(const uint8_t address, const uint8_t registeraddress, const uint8_t mask, const uint8_t writevalue)
@@ -77,14 +87,14 @@ void WirePlus::setRegister(const uint8_t address, const uint8_t registeraddress,
     _setting     &= ~mask;
     _setting     |= (writevalue&mask);
     writeByte(address, registeraddress, _setting);
-}
+};
 
 uint8_t WirePlus::getRegister(const uint8_t address, const uint8_t registeraddress, const uint8_t mask)
 {
     uint8_t _setting;
     read(address, registeraddress, &_setting, (uint8_t)1 );
     return (_setting & mask);
-}
+};
 
 /** ######### Preinstantiate Object ################################################################# */
 WirePlus i2c = WirePlus();

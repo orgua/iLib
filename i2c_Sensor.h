@@ -7,6 +7,8 @@
 class i2cSensor
 {
 public:
+    /**< constructur is not usefull */
+
     /**< declaring prototypes */
     virtual void    setEnabled(const uint8_t enable=1) = 0;     // Enable Sensor or set it to Standby (1 or 0)
 

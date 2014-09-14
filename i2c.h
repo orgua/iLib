@@ -14,6 +14,7 @@ public:
     uint8_t probe(const uint8_t);
     uint8_t probeAddress(const uint8_t);
     void    writeByte(const uint8_t, const uint8_t, const uint8_t);
+    void    writeCMD(const uint8_t, const uint8_t);
     uint8_t readByte(const uint8_t , const uint8_t );
     void    read(const uint8_t , const uint8_t , uint8_t *, const uint8_t );
     void    setRegister(const uint8_t, const uint8_t, const uint8_t, const uint8_t);
