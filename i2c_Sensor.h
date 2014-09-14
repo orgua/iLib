@@ -7,7 +7,7 @@
 class i2cSensor
 {
 public:
-    /**< constructur is not usefull */
+    /**< TODO: constructur is not usefull? */
 
     /**< TODO: Try const functions */
 

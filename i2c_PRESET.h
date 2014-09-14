@@ -27,7 +27,7 @@ class PRESET : public i2cSensor
     /** ######### function definition ################################################################# */
 
 public:
-
+    /**< TODO: do i need a constructor? */
     PRESET(void)
     {
         //_address = MPL_ADDRESS;
