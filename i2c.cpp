@@ -18,17 +18,11 @@ WirePlus::WirePlus()
 
 /**< TODO: "const" is only usefull when a reference given as the functionparameter  */
 
-uint8_t WirePlus::probe(const uint8_t address)
+uint8_t WirePlus::probe(uint8_t address)
 {
     Wire.beginTransmission(address);
-    if (Wire.endTransmission(true)==0)
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
+    if (Wire.endTransmission(true)==0) return 1; // found something
+    else                               return 0; // no response
 };
 
 uint8_t WirePlus::probeAddress(const uint8_t address)
