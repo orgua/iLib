@@ -6,10 +6,16 @@
 
 class i2cSensor
 {
+
+#define BITMASK(a)      (1<<a)
+#define BIT(a)          (1<<a)
+
 public:
     /**< TODO: constructur is not usefull? */
 
     /**< TODO: Try const functions */
+
+    /**< TODO: new functions: wait for value, check for new value */
 
     /**< declaring prototypes */
     virtual void    setEnabled(uint8_t enable=1) = 0;     // Enable Sensor or set it to Standby (1 or 0)

@@ -23,11 +23,20 @@
 				<Option createStaticLib="1" />
 			</Target>
 		</Build>
+		<Unit filename="examples/i2c_L3G/i2c_L3G.ino" />
+		<Unit filename="examples/i2c_LPS331/i2c_LPS331.ino" />
+		<Unit filename="examples/i2c_MAG3110/i2c_MAG3110.ino" />
 		<Unit filename="examples/i2c_MAX44009/i2c_MAX44009.ino" />
+		<Unit filename="examples/i2c_MMA8451/i2c_MMA8451.ino" />
 		<Unit filename="examples/i2c_MPL3115A2/i2c_MPL3115A2.ino" />
+		<Unit filename="examples/i2c_SI7021/i2c_SI7021.ino" />
+		<Unit filename="examples/i2c_TCS3772/i2c_TCS3772.ino" />
+		<Unit filename="examples/i2c_probeBus/i2c_probeBus.ino" />
 		<Unit filename="i2c.cpp" />
 		<Unit filename="i2c.h" />
-		<Unit filename="i2c_MAX44009.h" />
+		<Unit filename="i2c_L3G.h" />
+		<Unit filename="i2c_LPS331.h" />
+		<Unit filename="i2c_MAG3110.h" />
 		<Unit filename="i2c_MAX44009.h" />
 		<Unit filename="i2c_MPL3115A2.h" />
 		<Unit filename="i2c_PRESET.h" />
@@ -36,6 +45,7 @@
 			<Option compile="1" />
 			<Option link="1" />
 		</Unit>
+		<Unit filename="i2c_TCS3772.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
