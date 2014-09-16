@@ -22,7 +22,7 @@ void loop()
 {
     float xyz_dps[3];
 
-    l3g.getValue(xyz_dps);
+    l3g.getMeasurement(xyz_dps);
 
     Serial.print(" X: ");
     Serial.print(xyz_dps[0],2);

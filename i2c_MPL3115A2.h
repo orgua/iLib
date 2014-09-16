@@ -17,7 +17,7 @@ Driver for the MPL3115A2-Sensor
 
 ########################################################################  */
 
-class MPL3115A2 : public i2cSensor
+class MPL3115A2 : public i2cSensor, public manualSensor
 {
 
     /** ######### Register-Map ################################################################# */
@@ -100,7 +100,7 @@ public:
 
     /**< Clears and sets the OST bit --> immediately take another reading */
     /**< Needed to sample faster than 1Hz */
-    void startMeasurement(void)
+    void triggerMeasurement(void)
     {
         byte setting = i2c.readByte(MPL_ADDRESS,REG_CTRL1); //Read current settings
         if (setting&2)
@@ -253,8 +253,6 @@ public:
         return ratio;
     };
 
-
-
     /**< Enables the measurement event flags */
     /**< This is recommended in datasheet during setup. */
     void setEventFlags(uint8_t flags = (MSK_DATA_READY | MSK_PRES_READY | MSK_TEMP_READY))
@@ -263,25 +261,34 @@ public:
         i2c.writeByte(MPL_ADDRESS,REG_PT_DATA_CFG, flags); // Enable all three pressure and temp event flags
     };
 
+    /**< check for new data, return 1 when Measurement is ready */
+    uint8_t checkMeasurement(void)
+    {
+        /**< TODO: Implement */
+        return 1; // Measurement finished
+    };
+
+    /**<  wait for new data*/
+    uint8_t awaitMeasurement(void)
+    {
+        /**< TODO: Implement */
+        return 1; // Measurement finished
+    };
+
+
     /**< initialize */
     uint8_t initialize()
     {
+        if (i2c.probe(MPL_ADDRESS)==0) return 0;
 
-        if (i2c.probe(MPL_ADDRESS))
-        {
-            reset();
-            delay(2);
-            setEnabled(0);
-            setEventFlags();
-            setOversampleRatio(128);
-            setAltimeter(1);
-            setEnabled(1);
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
+        reset();
+        delay(2);
+        setEnabled(0);
+        setEventFlags();
+        setOversampleRatio(128);
+        setAltimeter(1);
+        setEnabled(1);
+        return 1;
     };
 
 

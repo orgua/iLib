@@ -233,24 +233,36 @@ public:
 
     uint8_t initialize()
     {
-        if (i2c.probe(TCS_ADDRESS))
-        {
-            byte _sensor_id;
-            _sensor_id = i2c.readByte(TCS_ADDRESS, REG_ID | CMD_INCREMENT);
+        if (i2c.probe(TCS_ADDRESS)==0) return 0;
 
-            setEnabled(1);
-            setATime(2.4*64);
-            setAGain(1);
-            setWaitTime(0);
+        byte _sensor_id;
+        _sensor_id = i2c.readByte(TCS_ADDRESS, REG_ID | CMD_INCREMENT);
 
-            if      (_sensor_id == VAL_DEVICE_ID_A) return 1;
-            else if (_sensor_id == VAL_DEVICE_ID_B) return 1;
-            else                                    return 0;
-        }
-        return 0;
+        setEnabled(1);
+        setATime(2.4*64);
+        setAGain(1);
+        setWaitTime(0);
+
+        if      (_sensor_id == VAL_DEVICE_ID_A) return 1;
+        else if (_sensor_id == VAL_DEVICE_ID_B) return 1;
+        else                                    return 0;
     }
 
-    void getValues(uint16_t value_crgb[])
+    /**< check for new data, return 1 when Measurement is ready */
+    uint8_t checkMeasurement(void)
+    {
+        /**< TODO: Implement */
+        return 1; // Measurement finished
+    };
+
+    /**<  wait for new data*/
+    uint8_t awaitMeasurement(void)
+    {
+        /**< TODO: Implement */
+        return 1; // Measurement finished
+    };
+
+    void getMeasurement(uint16_t value_crgb[])
     {
         uint8_t _content[8];
         i2c.read(TCS_ADDRESS, REG_CLEAR_DATAL | CMD_INCREMENT, _content, 8);

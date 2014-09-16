@@ -9,15 +9,19 @@ void setup()
     Serial.begin(115200);
     Serial.println("READ MAX44009");
 
-    if (max44009.initialize()) { Serial.println("Sensor found"); }
-    else                       { Serial.println("Sensor missing"); while (1) { }; }
+    if (max44009.initialize()) Serial.println("Sensor found");
+    else
+    {
+        Serial.println("Sensor missing");
+        while (1) { };
+    }
 }
 
 void loop()
 {
     static unsigned long mLux_value;
 
-    max44009.getValue(mLux_value);
+    max44009.getMeasurement(mLux_value);
 
     Serial.print("mLUX: ");
     Serial.print(mLux_value);

@@ -19,7 +19,7 @@ You have to trigger the Measurement yourself --> requestHumidity,
 
 ########################################################################  */
 
-class SI7021 : public i2cSensor
+class SI7021 : public i2cSensor, public manualSensor
 {
 
     /** ######### Register-Map ################################################################# */
@@ -112,20 +112,32 @@ public:
     /**< standardvalues */
     byte initialize()
     {
-        if (i2c.probe(SI7021_ADDRESS))
-        {
+        if (i2c.probe(SI7021_ADDRESS)==0) return 0;
+
             setHeater(0);
             setResolution(4);
-            requestMeasurement();   // Manual Mode: Request and Read
+            triggerMeasurement();   // Manual Mode: Request and Read
             return 1;
-        }
-        return 0;
     };
 
     /**< there is also a temperaturemeasurement taken */
-    void requestMeasurement()
+    void triggerMeasurement()
     {
         i2c.writeCMD(SI7021_ADDRESS, CMD_MEASURE_HUMIDITY_HOLD);
+    };
+
+    /**< check for new data, return 1 when Measurement is ready */
+    uint8_t checkMeasurement(void)
+    {
+        /**< TODO: Implement */
+        return 1; // Measurement finished
+    };
+
+    /**<  wait for new data*/
+    uint8_t awaitMeasurement(void)
+    {
+        /**< TODO: Implement */
+        return 1; // Measurement finished
     };
 
     /**< inefficient way to get a value */
@@ -144,6 +156,11 @@ public:
         _rawHumi  = readValue(CMD_MEASURE_HUMIDITY_HOLD);
         rh        = (_rawHumi*125.0/65536) - 6;
     };
+
+    /**< standardcall */
+    void getMeasurement(float& rh) {
+    getHumidity(rh);
+    }
 
     /**< inefficient way to get a value */
     float readTemperature(void)

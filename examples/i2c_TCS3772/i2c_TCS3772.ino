@@ -24,7 +24,7 @@ void loop()
 
     static uint16_t value_crgb[4], scale_factor;
 
-    tcs3772.getValues(value_crgb);
+    tcs3772.getMeasurement(value_crgb);
 
     scale_factor = tcs3772.autoGain(value_crgb[0]);
 

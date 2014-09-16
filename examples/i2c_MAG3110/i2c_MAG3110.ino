@@ -22,7 +22,7 @@ void loop()
 {
     float xyz_uT[3];
 
-    mag3110.getValue(xyz_uT);
+    mag3110.getMeasurement(xyz_uT);
 
     Serial.print(" X: ");
     Serial.print(xyz_uT[0],2);

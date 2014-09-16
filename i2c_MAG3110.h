@@ -16,7 +16,7 @@ Driver for the MAG3310-Sensor
 
 ########################################################################  */
 
-class MAG3110 : public i2cSensor
+class MAG3110 : public i2cSensor, public manualSensor
 {
 
     /** ######### Register-Map ################################################################# */
@@ -129,20 +129,17 @@ public:
 
     uint8_t initialize(uint8_t hzFreq)
     {
-        if (i2c.probe(MAG3110_ADDRESS)) // Sensor found and responding 0b11000100
-        {
+        if (i2c.probe(MAG3110_ADDRESS)==0) return 0;
 
-            setEnabled(0);
+        setEnabled(0);
 
-            setSensorAutoReset(1);
-            setRawMode(1);
-            setDataRate(10);
+        setSensorAutoReset(1);
+        setRawMode(1);
+        setDataRate(10);
 
-            setEnabled(1);
+        setEnabled(1);
 
-            return 1;
-        }
-        return 0;
+        return 1;
     };
 
     /**< only used when in manual/standby mode */
@@ -151,7 +148,7 @@ public:
         i2c.setRegister(MAG3110_ADDRESS, MAG3110_REG_CTRL_REG1, MASK_TM, MASK_TM);
     };
 
-    /**< check for new data, gives 1 when there is any */
+    /**< check for new data, return 1 when Measurement is ready */
     uint8_t checkMeasurement(void)
     {
         /**< TODO: Implement */
@@ -159,13 +156,14 @@ public:
     };
 
     /**<  wait for new data*/
-    void waitMeasurement(void)
+    uint8_t awaitMeasurement(void)
     {
         /**< TODO: Implement */
+        return 1; // Measurement finished
     };
 
     /**< get RAW values */
-    void getValue(int16_t xyz_raw[])
+    void getMeasurement(int16_t xyz_raw[])
     {
         byte buf[6];
         i2c.read(MAG3110_ADDRESS, MAG3110_REG_OUT_X_MSB, buf, 6);
@@ -175,7 +173,7 @@ public:
     };
 
     /**< values scaled to uT */
-    void getValue(float xyz_uT[])
+    void getMeasurement(float xyz_uT[])
     {
         byte buf[6];
         i2c.read(MAG3110_ADDRESS, MAG3110_REG_OUT_X_MSB, buf, 6);

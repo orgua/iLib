@@ -9,12 +9,16 @@ void setup()
     Serial.begin(115200);
     Serial.println("READ MPL3115A2");
 
-    if (mpl3115.initialize()) { Serial.println("Sensor found"); }
-    else                      { Serial.println("Sensor missing"); while (1) {} }
+    if (mpl3115.initialize()) Serial.println("Sensor found");
+    else
+    {
+        Serial.println("Sensor missing");
+        while (1) {}
+    }
 
     // onetime-measure:
     mpl3115.setEnabled(0);
-    mpl3115.startMeasurement();
+    mpl3115.triggerMeasurement();
 }
 
 void loop()
@@ -26,7 +30,7 @@ void loop()
 
     float temperature;
     mpl3115.getTemperature(temperature);
-    mpl3115.startMeasurement();
+    mpl3115.triggerMeasurement();
 
     Serial.print(" Height: ");
     Serial.print(altitude);

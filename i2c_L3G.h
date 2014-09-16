@@ -200,53 +200,63 @@ public:
 
     uint8_t initialize(const uint16_t hzFreq, const uint16_t degScaleRange)
     {
-        if (i2c.probe(L3G_ADDRESS))
-        {
-            reset();
-            setEnabled(0);
-            setDatarate(hzFreq);
+        if (i2c.probe(L3G_ADDRESS)==0) return 0;
 
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG1, L3G_BANDWIDTH_MASK, L3G_BANDWIDTH_HIG);
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG1, L3G_Z_AXIS_EN_MASK, L3G_Z_AXIS_EN_MASK);
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG1, L3G_Y_AXIS_EN_MASK, L3G_Y_AXIS_EN_MASK);
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG1, L3G_X_AXIS_EN_MASK, L3G_X_AXIS_EN_MASK);
+        reset();
+        setEnabled(0);
+        setDatarate(hzFreq);
 
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG2, B11000000, 0); // Just for secure operation
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG2, L3G_HIGH_PASS_MODE_MASK, L3G_HIGH_PASS_MODE_NORM);
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG2, L3G_HIGH_PASS_FREQ_MASK, L3G_HIGH_PASS_FREQ_STP0);
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG1, L3G_BANDWIDTH_MASK, L3G_BANDWIDTH_HIG);
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG1, L3G_Z_AXIS_EN_MASK, L3G_Z_AXIS_EN_MASK);
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG1, L3G_Y_AXIS_EN_MASK, L3G_Y_AXIS_EN_MASK);
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG1, L3G_X_AXIS_EN_MASK, L3G_X_AXIS_EN_MASK);
 
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG3, L3G_INT1_EN_MASK,			0);
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG3, L3G_INT1_BOOTSTAT_MASK,		0);
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG3, L3G_INT1_LOW_ACT_MASK,		0); // 0=HIGH active
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG3, L3G_INT_OPNDRAIN_MASK,		0); // 0=PushPull
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG3, L3G_DRDY_DRDY_MASK,			255);
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG3, L3G_DRDY_FIFO_WTM_MASK,		0);
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG3, L3G_DRDY_FIFO_ORUN_MASK,	0);
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG3, L3G_DRDY_FIFO_EMTY_MASK,	0);
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG2, B11000000, 0); // Just for secure operation
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG2, L3G_HIGH_PASS_MODE_MASK, L3G_HIGH_PASS_MODE_NORM);
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG2, L3G_HIGH_PASS_FREQ_MASK, L3G_HIGH_PASS_FREQ_STP0);
 
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG4, L3G_BLOCK_D_UPDATE_MASK,	0); // 0=continuos update
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG4, L3G_MSB_ON_LOWADD_MASK,		0);
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG3, L3G_INT1_EN_MASK,			0);
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG3, L3G_INT1_BOOTSTAT_MASK,		0);
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG3, L3G_INT1_LOW_ACT_MASK,		0); // 0=HIGH active
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG3, L3G_INT_OPNDRAIN_MASK,		0); // 0=PushPull
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG3, L3G_DRDY_DRDY_MASK,			255);
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG3, L3G_DRDY_FIFO_WTM_MASK,		0);
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG3, L3G_DRDY_FIFO_ORUN_MASK,	0);
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG3, L3G_DRDY_FIFO_EMTY_MASK,	0);
 
-            setSensibility(degScaleRange);
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG4, L3G_BLOCK_D_UPDATE_MASK,	0); // 0=continuos update
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG4, L3G_MSB_ON_LOWADD_MASK,		0);
 
-            //i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG4, L3G_SELFTEST_EN_MASK,	L3G_SELFTEST_DIS); // should not be changed in gd20
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG4, L3G_SPI_TO_3WIRE_MASK,	L3G_SPI_TO_3WIRE_DIS);
+        setSensibility(degScaleRange);
 
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG5, L3G_FIFO_EN_MASK,		0);
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG5, L3G_HIGH_PASS_EN_MASK,	0); 	// Combination - not helpfull, or?
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG5, L3G_INTSEL_LPF_EN_MASK,	0);
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG5, L3G_INTSEL_HPF_EN_MASK,	0);
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG5, L3G_DATA_LPF_EN_MASK,	0);	// Combination
-            i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG5, L3G_DATA_HPF_EN_MASK,	0); 	// Combination
+        //i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG4, L3G_SELFTEST_EN_MASK,	L3G_SELFTEST_DIS); // should not be changed in gd20
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG4, L3G_SPI_TO_3WIRE_MASK,	L3G_SPI_TO_3WIRE_DIS);
 
-            setEnabled(1);
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG5, L3G_FIFO_EN_MASK,		0);
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG5, L3G_HIGH_PASS_EN_MASK,	0); 	// Combination - not helpfull, or?
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG5, L3G_INTSEL_LPF_EN_MASK,	0);
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG5, L3G_INTSEL_HPF_EN_MASK,	0);
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG5, L3G_DATA_LPF_EN_MASK,	0);	// Combination
+        i2c.setRegister(L3G_ADDRESS, L3G_CTRL_REG5, L3G_DATA_HPF_EN_MASK,	0); 	// Combination
 
-            return 1;
-        }
-        return 0;
+        setEnabled(1);
 
+        return 1;
     };
 
+    /**< check for new data, return 1 when Measurement is ready */
+    uint8_t checkMeasurement(void)
+    {
+        /**< TODO: Implement */
+        return 1; // Measurement finished
+    };
+
+    /**<  wait for new data*/
+    uint8_t awaitMeasurement(void)
+    {
+        /**< TODO: Implement */
+        return 1; // Measurement finished
+    };
 
     /**< Reads the 3 gyro channels RAW!!!
 
@@ -255,7 +265,7 @@ public:
             500dps --> 17.5 mdps/digit
             2000dps --> 70.0 mdps/digit
      */
-    void getValue(int16_t xyz_raw[])
+    void getMeasurement(int16_t xyz_raw[])
     {
         byte _byte[6];
 
@@ -268,7 +278,7 @@ public:
     };
 
     /**< with sensitivity in dps */
-    void getValue(float xyz_dps[])
+    void getMeasurement(float xyz_dps[])
     {
         byte _byte[6];
 

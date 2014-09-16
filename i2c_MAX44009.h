@@ -76,20 +76,29 @@ public:
 
     void reset()
     {
-    // nothing to do
+        // nothing to do
     };
 
     uint8_t initialize()
     {
-        if (i2c.probe(MAX_ADDRESS))
-        {
-            setEnabled(1);
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
+        if (i2c.probe(MAX_ADDRESS)==0) return 0;
+
+        setEnabled(1);
+        return 1;
+    };
+
+    /**< check for new data, return 1 when Measurement is ready */
+    uint8_t checkMeasurement(void)
+    {
+        /**< TODO: Implement */
+        return 1; // Measurement finished
+    };
+
+    /**<  wait for new data*/
+    uint8_t awaitMeasurement(void)
+    {
+        /**< TODO: Implement */
+        return 1; // Measurement finished
     };
 
     /**
@@ -103,7 +112,7 @@ public:
      M7–M0: Mantissa byte of lux reading
      Lux = 2(exponent) x mantissa x 0.045
      */
-    void getValue(uint32_t& mLux_value)
+    void getMeasurement(uint32_t& mLux_value)
     {
         uint8_t lux[2], lux_exponent;
 

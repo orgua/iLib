@@ -10,8 +10,12 @@ void setup()
     Serial.begin(115200);
     Serial.println("READ SI7021");
 
-    if (si7021.initialize()) { Serial.println("Sensor found!"); }
-    else                     { Serial.println("Sensor missing"); while(1) {}; }
+    if (si7021.initialize()) Serial.println("Sensor found!");
+    else
+    {
+        Serial.println("Sensor missing");
+        while(1) {};
+    }
 }
 
 void loop()
@@ -20,7 +24,7 @@ void loop()
 
     si7021.getHumidity(humi);
     si7021.getTemperature(temp);
-    si7021.requestMeasurement();
+    si7021.triggerMeasurement();
 
     Serial.print("TEMP: ");
     Serial.print(temp);

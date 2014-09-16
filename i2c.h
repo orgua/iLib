@@ -4,6 +4,18 @@
 #include <Wire.h>
 #include <Arduino.h> // for uint8_t data type
 
+
+#define getmax(a,b) ((a)>(b)?(a):(b))
+#define BITMASK(a)  (1<<a)
+#define BIT(a)      (1<<a)
+
+#ifndef TRUE
+#define TRUE        (1==1)
+#define FALSE       (1==2)
+#endif
+#define LOW         (0)
+#define HIGH        (1)
+
 class WirePlus
 {
 
