@@ -34,4 +34,10 @@ void loop()
 
 }
 
+/**<
 
+Program size:
+A1.0.5: 6896b
+A1.5.7: 6590b
+
+ */

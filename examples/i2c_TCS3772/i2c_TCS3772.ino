@@ -45,3 +45,10 @@ void loop()
     delay(50);
 }
 
+/**<
+
+Program size:
+A1.0.5: 6754b
+A1.5.7: 6454b
+
+ */

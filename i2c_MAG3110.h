@@ -151,14 +151,21 @@ public:
     /**< check for new data, return 1 when Measurement is ready */
     uint8_t checkMeasurement(void)
     {
-        /**< TODO: Implement */
-        return 1; // Measurement finished
+        uint8_t _val;
+        i2c.read(MAG3110_ADDRESS, MAG3110_REG_DR_STATUS, &_val, 1);
+        if (_val & B00001000) return 1; // Measurement finished
+        else                  return 0;
     };
 
     /**<  wait for new data*/
     uint8_t awaitMeasurement(void)
     {
-        /**< TODO: Implement */
+        uint8_t _counter = 0;
+        while (checkMeasurement()==0)
+        {
+            if (_counter++ > 250) return 0; // check took longer than 250ms
+            delay(1);
+        };
         return 1; // Measurement finished
     };
 

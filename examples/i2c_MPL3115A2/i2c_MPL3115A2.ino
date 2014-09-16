@@ -39,4 +39,11 @@ void loop()
     Serial.println("");
 }
 
+/**<
+
+Program size:
+A1.0.5:
+A1.5.7: 6914b
+
+ */
 

@@ -30,4 +30,10 @@ void loop()
     delay(40);
 }
 
+/**<
 
+Program size:
+A1.0.5: 5126b
+A1.5.7: 4860b
+
+ */
