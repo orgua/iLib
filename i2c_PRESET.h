@@ -34,7 +34,7 @@ public:
     };
 
     /**<  gives values */
-    void getValue(uint8_t buffer[])
+    void getMeasurement(uint8_t buffer[])
     {
 
     };

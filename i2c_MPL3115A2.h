@@ -98,87 +98,7 @@ public:
         //_address = MPL_ADDRESS;
     };
 
-    /**< Clears and sets the OST bit --> immediately take another reading */
-    /**< Needed to sample faster than 1Hz */
-    void triggerMeasurement(void)
-    {
-        byte setting = i2c.readByte(MPL_ADDRESS,REG_CTRL1); //Read current settings
-        if (setting&2)
-        {
-            setting &= ~(1<<1); //Clear OST bit
-            i2c.writeByte(MPL_ADDRESS,REG_CTRL1, setting);
-            setting = i2c.readByte(MPL_ADDRESS,REG_CTRL1); //Read current settings to be safe
-        }
-        setting |= (1<<1); //Set OST bit
-        i2c.writeByte(MPL_ADDRESS,REG_CTRL1, setting);
-    };
-
-    /**<  if you started a measurement and want to actively wait for it to finish */
-    uint8_t waitMeasurement(void)
-    {
-        uint16_t counter = 0;
-        //Wait for PDR bit, indicates we have new pressure data
-        while( (i2c.readByte(MPL_ADDRESS,REG_STATUS) & (1<<1)) == 0)
-        {
-            if(++counter > 600) return 0; //Error out after max of 512ms for a read
-            delay(1);
-        }
-        return 1;
-    };
-
-    /**<  gives the number of meters above sea level */
-    void getAltitude(float& meter)
-    {
-        // Read pressure registers
-        uint8_t value[3];
-        i2c.read(MPL_ADDRESS, REG_OUT_P_MSB, value, 3);  // meter in Q16.4 signed in 3x8bit left
-        float tempcsb = (value[2]>>4)/16.0;
-        meter = (float)( (value[0] << 8) | value[1]) + tempcsb;
-    };
-
-
-    /**<  gives airpressure in Pascal */
-    void getPressure(float& pascal)
-    {
-        // Read pressure registers
-        uint8_t value[3];
-        i2c.read(MPL_ADDRESS, REG_OUT_P_MSB, value, 3);  // pascal in Q18.2 unsigned in 3x8bit left
-
-        float tempcsb = (value[2]>>4)/4.0;
-        pascal = (float)( (value[0] << 8) | value[1]) + tempcsb;
-    };
-
-    /**<  gives pressure-values */
-    void getValue(float& pascal)
-    {
-        getPressure(pascal);
-    };
-
-    /**<  gives temperature in degree celsius */
-    void getTemperature(float& celsius)
-    {
-        // Read temperature registers
-        byte value[2];
-        i2c.read(MPL_ADDRESS, REG_OUT_T_MSB, value, 2); // °C in Q8.4 signed in 2x
-
-        uint16_t foo;
-        bool negSign = false;
-        if(value[0] > 0x7F) //Check for 2s compliment
-        {
-            foo = ~((value[0] << 8) + value[1]) + 1;
-            negSign = true;
-        }
-        else
-        {
-            foo = ((value[0] << 8) + value[1]);
-        }
-        celsius = ((float)(foo))/256.0;
-        if (negSign) celsius = 0 - celsius;
-
-    };
-
-
-    /**< Enable Altimeter / Barometer MODE */
+   /**< Enable Altimeter / Barometer MODE */
     void setAltimeter(uint8_t enable = 1)
     {
         if (enable) enable=(1<<7);
@@ -261,20 +181,6 @@ public:
         i2c.writeByte(MPL_ADDRESS,REG_PT_DATA_CFG, flags); // Enable all three pressure and temp event flags
     };
 
-    /**< check for new data, return 1 when Measurement is ready */
-    uint8_t checkMeasurement(void)
-    {
-        /**< TODO: Implement */
-        return 1; // Measurement finished
-    };
-
-    /**<  wait for new data*/
-    uint8_t awaitMeasurement(void)
-    {
-        /**< TODO: Implement */
-        return 1; // Measurement finished
-    };
-
 
     /**< initialize */
     uint8_t initialize()
@@ -292,6 +198,94 @@ public:
     };
 
 
+
+    /**< Clears and sets the OST bit --> immediately take another reading */
+    /**< Needed to sample faster than 1Hz */
+    void triggerMeasurement(void)
+    {
+        byte setting = i2c.readByte(MPL_ADDRESS,REG_CTRL1); //Read current settings
+        if (setting&2)
+        {
+            setting &= ~(1<<1); //Clear OST bit
+            i2c.writeByte(MPL_ADDRESS,REG_CTRL1, setting);
+            setting = i2c.readByte(MPL_ADDRESS,REG_CTRL1); //Read current settings to be safe
+        }
+        setting |= (1<<1); //Set OST bit
+        i2c.writeByte(MPL_ADDRESS,REG_CTRL1, setting);
+    };
+
+    uint8_t checkMeasurement(void)
+    {
+        uint8_t _val;
+        //Wait for PDR bit, indicates we have new pressure data
+        i2c.read(MPL_ADDRESS, REG_STATUS, &_val, 1);
+        if (_val & B00000010) return 1; // Measurement finished
+        else                  return 0;
+    };
+
+    /**<  if you started a measurement and want to actively wait for it to finish */
+    uint8_t awaitMeasurement(void)
+    {
+        uint8_t _counter = 0;
+        while(checkMeasurement()==0)
+        {
+            if(++_counter > 250) return 0; //Error out after max of 500ms for a read
+            delay(2);
+        }
+        return 1; // Measurement finished
+    };
+
+
+
+    /**<  gives the number of meters above sea level */
+    void getAltitude(float& meter)
+    {
+        uint8_t value[3];
+        i2c.read(MPL_ADDRESS, REG_OUT_P_MSB, value, 3);  // meter in Q16.4 signed in 3x8bit left
+        float tempcsb = (value[2]>>4)/16.0;
+        meter = (float)( (value[0] << 8) | value[1]) + tempcsb;
+    };
+
+
+    /**<  gives airpressure in Pascal */
+    void getPressure(float& pascal)
+    {
+        // Read pressure registers
+        uint8_t value[3];
+        i2c.read(MPL_ADDRESS, REG_OUT_P_MSB, value, 3);  // pascal in Q18.2 unsigned in 3x8bit left
+
+        float tempcsb = (value[2]>>4)/4.0;
+        pascal = (float)( (value[0] << 8) | value[1]) + tempcsb;
+    };
+
+    /**<  gives pressure-values */
+    void getMeasurement(float& pascal)
+    {
+        getPressure(pascal);
+    };
+
+    /**<  gives temperature in degree celsius */
+    void getTemperature(float& celsius)
+    {
+        // Read temperature registers
+        byte value[2];
+        i2c.read(MPL_ADDRESS, REG_OUT_T_MSB, value, 2); // °C in Q8.4 signed in 2x
+
+        uint16_t foo;
+        bool negSign = false;
+        if(value[0] > 0x7F) //Check for 2s compliment
+        {
+            foo = ~((value[0] << 8) + value[1]) + 1;
+            negSign = true;
+        }
+        else
+        {
+            foo = ((value[0] << 8) + value[1]);
+        }
+        celsius = ((float)(foo))/256.0;
+        if (negSign) celsius = 0 - celsius;
+
+    };
 
 };
 

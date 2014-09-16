@@ -23,7 +23,7 @@ void setup()
 
 void loop()
 {
-    mpl3115.waitMeasurement();
+    mpl3115.awaitMeasurement();
 
     float altitude;
     mpl3115.getAltitude(altitude);
@@ -43,7 +43,7 @@ void loop()
 
 Program size:
 A1.0.5:
-A1.5.7: 6914b
+A1.5.7: 6980b
 
  */
 

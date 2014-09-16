@@ -163,7 +163,7 @@ public:
         uint8_t _counter = 0;
         while (checkMeasurement()==0)
         {
-            if (_counter++ > 250) return 0; // check took longer than 250ms
+            if (++_counter > 250) return 0; // check took longer than 250ms
             delay(1);
         };
         return 1; // Measurement finished
