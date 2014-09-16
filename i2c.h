@@ -1,9 +1,10 @@
 #ifndef WirePlus_h
 #define WirePlus_h
 
-#include <Wire.h>
+#include "Wire.h"
 #include <Arduino.h> // for uint8_t data type
 
+/** ######### usefull defines ################################################################# */
 
 #define getmax(a,b) ((a)>(b)?(a):(b))
 #define BITMASK(a)  (1<<a)
@@ -31,9 +32,102 @@ public:
     void    read(const uint8_t , const uint8_t , uint8_t *, const uint8_t );
     void    setRegister(const uint8_t, const uint8_t, const uint8_t, const uint8_t);
     uint8_t getRegister(const uint8_t, const uint8_t, const uint8_t);
-
 };
 
+/** ######### Implementation ################################################################# */
+
+ WirePlus::WirePlus()
+{
+    Wire.begin(); 		// I2C as Master
+    bitSet(PORTC, 4); 	// deactivate internal pull-ups for twi
+    bitSet(PORTC, 5); 	// as per note from atmega8 manual pg167
+    // switch to 400KHz I2C - eheheh
+    TWBR = ((F_CPU / 400000L) - 16) / 2; // see twi_init in Wire/utility/twi.c
+};
+/** ######### Public Methods ################################################################# */
+
+
+
+uint8_t WirePlus::probe(uint8_t address)
+{
+    Wire.beginTransmission(address);
+    if (Wire.endTransmission(true)==0) return 1; // found something
+    else                               return 0; // no response
+};
+
+uint8_t WirePlus::probeAddress(uint8_t address)
+{
+    return probe(address);
+};
+
+/**< TODO: insert a general write( , , , );  */
+
+void WirePlus::writeByte( uint8_t address, uint8_t register_address, uint8_t write_value)
+{
+    Wire.beginTransmission(address);
+    Wire.write(register_address);
+    Wire.write(write_value);
+    Wire.endTransmission(true);
+};
+
+void WirePlus::writeCMD(uint8_t address, uint8_t cmd) {
+  Wire.beginTransmission(address);
+  Wire.write(cmd);
+  Wire.endTransmission();
+};
+
+uint8_t WirePlus::readByte(uint8_t address, uint8_t register_address)
+{
+    uint8_t _readvalue;
+    read(address, register_address, &_readvalue, 1);
+    return _readvalue;
+};
+
+
+void WirePlus::read( uint8_t address, uint8_t registeraddress, uint8_t buff[], uint8_t length=1)
+{
+    Wire.beginTransmission(address); 	// Adress + WRITE (0)
+    Wire.write(registeraddress);
+    Wire.endTransmission(false); 		// No Stop Condition, for repeated Talk
+    if (length)
+    {
+        Wire.requestFrom(address, length); 	// Address + READ (1)
+        uint8_t _i;
+        _i=0;
+        while(Wire.available())
+        {
+            buff[_i] = Wire.read();
+            _i++;
+        }
+        Wire.endTransmission(true); 		// Stop Condition
+    }
+};
+
+
+void WirePlus::setRegister(uint8_t address, uint8_t registeraddress, uint8_t mask, uint8_t writevalue)
+{
+    uint8_t _setting;
+    read(address, registeraddress, &_setting, 1 );
+    _setting     &= ~mask;
+    _setting     |= (writevalue&mask);
+    writeByte(address, registeraddress, _setting);
+};
+
+uint8_t WirePlus::getRegister(uint8_t address, uint8_t registeraddress, uint8_t mask)
+{
+    uint8_t _setting;
+    read(address, registeraddress, &_setting, (uint8_t)1 );
+    return (_setting & mask);
+};
+
+
+
+
 extern WirePlus i2c;
+
+/** ######### Preinstantiate Object ################################################################# */
+WirePlus i2c = WirePlus();
+
+//#include "i2c.cpp" // TODO: ugly BUGFIX to get Scripts without i2c down in filesize (i2c.cpp is loaded w/o request)
 
 #endif

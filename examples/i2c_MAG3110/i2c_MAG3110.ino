@@ -38,7 +38,7 @@ void loop()
 /**<
 
 Program size:
-A1.0.5:
+A1.0.5: 7144b
 A1.5.7: 6860b
 
  */
