@@ -13,7 +13,7 @@ Driver for the LPS331-Sensor
 
  Details:
 
-
+///
 ########################################################################  */
 
 class LPS331 : public i2cSensor

@@ -13,7 +13,7 @@ Driver for the L3G-Sensor
 
  Details:
 
-
+///
 ########################################################################  */
 
 class L3G : public i2cSensor

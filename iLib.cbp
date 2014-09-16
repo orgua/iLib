@@ -23,22 +23,35 @@
 				<Option createStaticLib="1" />
 			</Target>
 		</Build>
+		<Unit filename="WS2812B.h" />
+		<Unit filename="examples/WS2812B_Clock_90Led/WS2812B_Clock_90Led.ino" />
+		<Unit filename="examples/firstrun_ledBlink/firstrun_ledBlink.ino" />
 		<Unit filename="examples/i2c_L3G/i2c_L3G.ino" />
 		<Unit filename="examples/i2c_LPS331/i2c_LPS331.ino" />
 		<Unit filename="examples/i2c_MAG3110/i2c_MAG3110.ino" />
 		<Unit filename="examples/i2c_MAX44009/i2c_MAX44009.ino" />
 		<Unit filename="examples/i2c_MMA8451/i2c_MMA8451.ino" />
 		<Unit filename="examples/i2c_MPL3115A2/i2c_MPL3115A2.ino" />
+		<Unit filename="examples/i2c_MPU9250/i2c_MPU9250.ino" />
 		<Unit filename="examples/i2c_SI7021/i2c_SI7021.ino" />
 		<Unit filename="examples/i2c_TCS3772/i2c_TCS3772.ino" />
 		<Unit filename="examples/i2c_probeBus/i2c_probeBus.ino" />
 		<Unit filename="i2c.cpp" />
 		<Unit filename="i2c.h" />
-		<Unit filename="i2c_L3G.h" />
+		<Unit filename="i2c_L3G.h">
+			<Option compile="1" />
+			<Option link="1" />
+		</Unit>
 		<Unit filename="i2c_LPS331.h" />
 		<Unit filename="i2c_MAG3110.h" />
 		<Unit filename="i2c_MAX44009.h" />
+		<Unit filename="i2c_MMA8451.h">
+			<Option compilerVar="CC" />
+			<Option compile="1" />
+			<Option link="1" />
+		</Unit>
 		<Unit filename="i2c_MPL3115A2.h" />
+		<Unit filename="i2c_MPU9250.h" />
 		<Unit filename="i2c_PRESET.h" />
 		<Unit filename="i2c_SI7021.h" />
 		<Unit filename="i2c_Sensor.h">

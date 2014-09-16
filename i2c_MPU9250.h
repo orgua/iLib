@@ -22,7 +22,7 @@ Driver for the MPU9250-Sensor
 
  DMP: Digital Motion Processing
 
-
+///
 ########################################################################  */
 
 class MPU9250 : public i2cSensor
