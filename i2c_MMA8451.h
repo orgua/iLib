@@ -78,7 +78,7 @@ class MMA8451 : public i2cSensor
 
 private:
 
-	int16_t  sensitivity;
+    int16_t  sensitivity;
 
 public:
     /**< TODO: do i need a constructor? */
@@ -87,66 +87,83 @@ public:
         //_address = MPL_ADDRESS;
     };
 
-void setEnabled(uint8_t enable) {
-    if (enable) enable = 255;
-    else        enable = 0;
-    i2c.setRegister(MMA_ADDRESS, REG_CTRL_REG1, 0x01, enable); // deactivate the device
-};
+    void setEnabled(uint8_t enable)
+    {
+        if (enable) enable = 255;
+        else        enable = 0;
+        i2c.setRegister(MMA_ADDRESS, REG_CTRL_REG1, 0x01, enable); // deactivate the device
+    };
 
-void setSensibility(uint8_t gScaleRange=2) {
- 	// figure out the Range
-	if 	   ( gScaleRange <= 3)	{ gScaleRange = FULL_SCALE_RANGE_2g; sensitivity = 4096; } //0-3 = 2g
-	else if( gScaleRange <= 5)	{ gScaleRange = FULL_SCALE_RANGE_4g; sensitivity = 2048; } //4-5 = 4g
-	else 						{ gScaleRange = FULL_SCALE_RANGE_8g; sensitivity = 1024; } // 6-8 = 8g till boundary
-	i2c.setRegister(MMA_ADDRESS,REG_XYZ_DATA_CFG, 0x03, gScaleRange); 	// set Range
-    if (sensitivity >= 2048)    gScaleRange = 255; // Reduced Noise <=4g
-    else                        gScaleRange = 0;
-    i2c.setRegister(MMA_ADDRESS, REG_CTRL_REG1, B00000100, gScaleRange );
-};
+    void setSensibility(uint8_t gScaleRange=2)
+    {
+        // figure out the Range
+        if 	   ( gScaleRange <= 3)
+        {
+            gScaleRange = FULL_SCALE_RANGE_2g;    //0-3 = 2g
+            sensitivity = 4096;
+        }
+        else if( gScaleRange <= 5)
+        {
+            gScaleRange = FULL_SCALE_RANGE_4g;    //4-5 = 4g
+            sensitivity = 2048;
+        }
+        else
+        {
+            gScaleRange = FULL_SCALE_RANGE_8g;    // 6-8 = 8g till boundary
+            sensitivity = 1024;
+        }
+        i2c.setRegister(MMA_ADDRESS,REG_XYZ_DATA_CFG, 0x03, gScaleRange); 	// set Range
+        if (sensitivity >= 2048)    gScaleRange = 255; // Reduced Noise <=4g
+        else                        gScaleRange = 0;
+        i2c.setRegister(MMA_ADDRESS, REG_CTRL_REG1, B00000100, gScaleRange );
+    };
 
-void setDatarate(uint16_t hzFreq=100) {
-	// figure out Frequency
-	if 	   ( hzFreq <= 2)	hzFreq = 7; // 1.56 Hz
-	else if( hzFreq <= 6)	hzFreq = 6; // 6.25 Hz
-	else if( hzFreq <= 13)	hzFreq = 5; // 12.5 Hz
-	else if( hzFreq <= 50) 	hzFreq = 4; // 50 Hz
-	else if( hzFreq <= 100) hzFreq = 3; // 100 Hz
-	else if( hzFreq <= 200)	hzFreq = 2; // 200 Hz
-	else if( hzFreq <= 400)	hzFreq = 1; // 400 Hz
-	else    				hzFreq = 0; // 800 Hz
-	i2c.setRegister(MMA_ADDRESS, REG_CTRL_REG1, B00111000, hzFreq<<3 );  	// set OutputDataRate
-};
+    void setDatarate(uint16_t hzFreq=100)
+    {
+        // figure out Frequency
+        if 	   ( hzFreq <= 2)	hzFreq = 7; // 1.56 Hz
+        else if( hzFreq <= 6)	hzFreq = 6; // 6.25 Hz
+        else if( hzFreq <= 13)	hzFreq = 5; // 12.5 Hz
+        else if( hzFreq <= 50) 	hzFreq = 4; // 50 Hz
+        else if( hzFreq <= 100) hzFreq = 3; // 100 Hz
+        else if( hzFreq <= 200)	hzFreq = 2; // 200 Hz
+        else if( hzFreq <= 400)	hzFreq = 1; // 400 Hz
+        else    				hzFreq = 0; // 800 Hz
+        i2c.setRegister(MMA_ADDRESS, REG_CTRL_REG1, B00111000, hzFreq<<3 );  	// set OutputDataRate
+    };
 
-void reset(void) {
-    i2c.setRegister(MMA_ADDRESS, REG_CTRL_REG2,    B01000000, 255);
-}
+    void reset(void)
+    {
+        i2c.setRegister(MMA_ADDRESS, REG_CTRL_REG2,    B01000000, 255);
+    };
 
-uint8_t initialize() {
-    return initialize(100, 8);
-};
+    uint8_t initialize()
+    {
+        return initialize(100, 8);
+    };
 
-uint8_t initialize(uint16_t hzFreq, uint8_t gScaleRange)
-{
-	if (i2c.probe(MMA_ADDRESS)==0) return 0;
+    uint8_t initialize(uint16_t hzFreq, uint8_t gScaleRange)
+    {
+        if (i2c.probe(MMA_ADDRESS)==0) return 0;
 
-	setEnabled(0);
+        setEnabled(0);
 
-    setSensibility(gScaleRange);
-    setDatarate(hzFreq);
-    /**< TODO: needs some tuning */
-	i2c.setRegister(MMA_ADDRESS, REG_F_SETUP,      B11000000,  0 );  	// disable FIFO
-	i2c.setRegister(MMA_ADDRESS, REG_XYZ_DATA_CFG, B00010000,  0 ); 	// deactivate HighPassFilter
-	i2c.setRegister(MMA_ADDRESS, REG_CTRL_REG2,    0x3,        2 );  	// HighResolution while awake
-	//#define BITRES_14_TO_10
-	#ifdef  BITRES_14_TO_10
-	i2c.setRegister(MMA_ADDRESS, REG_CTRL_REG1,    0x02,       0x02 );  // enable Fast Read Mode
-	#else
-	i2c.setRegister(MMA_ADDRESS, REG_CTRL_REG1,    0x02,       0 );  	// disable Fast Read Mode (FullResolution)
-	#endif
-	setEnabled(1);
+        setSensibility(gScaleRange);
+        setDatarate(hzFreq);
+        /**< TODO: needs some tuning */
+        i2c.setRegister(MMA_ADDRESS, REG_F_SETUP,      B11000000,  0 );  	// disable FIFO
+        i2c.setRegister(MMA_ADDRESS, REG_XYZ_DATA_CFG, B00010000,  0 ); 	// deactivate HighPassFilter
+        i2c.setRegister(MMA_ADDRESS, REG_CTRL_REG2,    0x3,        2 );  	// HighResolution while awake
+        //#define BITRES_14_TO_10
+#ifdef  BITRES_14_TO_10
+        i2c.setRegister(MMA_ADDRESS, REG_CTRL_REG1,    0x02,       0x02 );  // enable Fast Read Mode
+#else
+        i2c.setRegister(MMA_ADDRESS, REG_CTRL_REG1,    0x02,       0 );  	// disable Fast Read Mode (FullResolution)
+#endif
+        setEnabled(1);
 
-	return 1;
-};
+        return 1;
+    };
 
     /**< check for new data, return 1 when Measurement is ready */
     uint8_t checkMeasurement(void)
@@ -169,49 +186,49 @@ uint8_t initialize(uint16_t hzFreq, uint8_t gScaleRange)
         return 1; // Measurement finished
     };
 
-/*************************************************************
-*
-* xyz
-*
-* Get accelerometer readings (x, y, z)
-* by default, standard 10 bits mode is used.
-*
-* This function also convers 2's complement number to
-* signed integer result.
-*
-* If accelerometer is initialized to use low res mode,
-* isHighRes must be passed in as false.
-*
-*************************************************************/
-void inline getMeasurement(int16_t raw_xyz[])
-{
-	uint8_t _buf[6];
-	i2c.read(MMA_ADDRESS, REG_OUT_X_MSB, _buf, 6);
-	#ifdef  BITRES_14_TO_10
-	raw_xyz[0] = (_buf[0] << 2) | ((_buf[1] >> 6) & 0x3); // Only 10 bit of 14 used
-	raw_xyz[1] = (_buf[2] << 2) | ((_buf[3] >> 6) & 0x3);
-	raw_xyz[2] = (_buf[4] << 2) | ((_buf[5] >> 6) & 0x3);
-	if (raw_xyz[0] > 511) raw_xyz[0] -= 1024;
-	if (raw_xyz[1] > 511) raw_xyz[1] -= 1024;
-	if (raw_xyz[2] > 511) raw_xyz[2] -= 1024;
-	#else
-	raw_xyz[0] = (_buf[0] << 6) | ((_buf[1] >> 2) & 0x63); // use all 14 bits
-	raw_xyz[1] = (_buf[2] << 6) | ((_buf[3] >> 2) & 0x63);
-	raw_xyz[2] = (_buf[4] << 6) | ((_buf[5] >> 2) & 0x63);
-	if (raw_xyz[0] > 8191) raw_xyz[0] -= 16384;
-	if (raw_xyz[1] > 8191) raw_xyz[1] -= 16384;
-	if (raw_xyz[2] > 8191) raw_xyz[2] -= 16384;
-	#endif
-}
+    /*************************************************************
+    *
+    * xyz
+    *
+    * Get accelerometer readings (x, y, z)
+    * by default, standard 10 bits mode is used.
+    *
+    * This function also convers 2's complement number to
+    * signed integer result.
+    *
+    * If accelerometer is initialized to use low res mode,
+    * isHighRes must be passed in as false.
+    *
+    *************************************************************/
+    void inline getMeasurement(int16_t raw_xyz[])
+    {
+        uint8_t _buf[6];
+        i2c.read(MMA_ADDRESS, REG_OUT_X_MSB, _buf, 6);
+#ifdef  BITRES_14_TO_10
+        raw_xyz[0] = (_buf[0] << 2) | ((_buf[1] >> 6) & 0x3); // Only 10 bit of 14 used
+        raw_xyz[1] = (_buf[2] << 2) | ((_buf[3] >> 6) & 0x3);
+        raw_xyz[2] = (_buf[4] << 2) | ((_buf[5] >> 6) & 0x3);
+        if (raw_xyz[0] > 511) raw_xyz[0] -= 1024;
+        if (raw_xyz[1] > 511) raw_xyz[1] -= 1024;
+        if (raw_xyz[2] > 511) raw_xyz[2] -= 1024;
+#else
+        raw_xyz[0] = (_buf[0] << 6) | ((_buf[1] >> 2) & 0x63); // use all 14 bits
+        raw_xyz[1] = (_buf[2] << 6) | ((_buf[3] >> 2) & 0x63);
+        raw_xyz[2] = (_buf[4] << 6) | ((_buf[5] >> 2) & 0x63);
+        if (raw_xyz[0] > 8191) raw_xyz[0] -= 16384;
+        if (raw_xyz[1] > 8191) raw_xyz[1] -= 16384;
+        if (raw_xyz[2] > 8191) raw_xyz[2] -= 16384;
+#endif
+    };
 
-void getMeasurement(float acc_xyz[])
-{
-	int16_t _raw_xyz[3];
-	getMeasurement(_raw_xyz);
-	acc_xyz[0] = float(_raw_xyz[0]) / float(sensitivity);
-	acc_xyz[1] = float(_raw_xyz[1]) / float(sensitivity);
-	acc_xyz[2] = float(_raw_xyz[2]) / float(sensitivity);
-}
+    void getMeasurement(float acc_xyz[])
+    {
+        int16_t _raw_xyz[3];
+        getMeasurement(_raw_xyz);
+        acc_xyz[0] = float(_raw_xyz[0]) / float(sensitivity);
+        acc_xyz[1] = float(_raw_xyz[1]) / float(sensitivity);
+        acc_xyz[2] = float(_raw_xyz[2]) / float(sensitivity);
+    };
 
 };
 
