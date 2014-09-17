@@ -1,3 +1,11 @@
+/**<
+
+this is untidy and not very intuitive BUT it works so far
+the code was not refactored once... maybe i have time for this in the future
+
+ */
+
+
 #include "WS2812B.h"
 WS2812B ws2812b = WS2812B();
 
