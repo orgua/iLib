@@ -121,12 +121,12 @@ public:
         }
     };
 
-    void setATime(const uint16_t integrationtime)
+    void setATime(uint16_t integrationtime)
     {
         uint8_t _value;
         if (integrationtime > 614)      _value = VAL_MAX;
         else if (integrationtime < 4)   _value = VAL_MIN;
-        else                            _value = MSEC_TO_ATIME(integrationtime);
+        else                            _value = (uint8_t) MSEC_TO_ATIME(integrationtime);
         i2c.writeByte( TCS_ADDRESS, REG_ATIME  | CMD_INCREMENT, _value);
     };
 
@@ -176,19 +176,19 @@ public:
             if      (val_clear < MARGIN_LOW)
             {
 
-                if (val_gain<3)
+                if (val_gain<3) // first try to raise gain, before raising integrationtime
                 {
                     val_gain++;
                     gain = 1<<(2*val_gain);
                     gain = setAGain(gain);
                     return 0;
                 }
-                else if ( val_time < 2)
+                else if (val_time<2)
                 {
                     val_time++;
                     uint16_t time;
-                    time = 1<<(6+val_time);
-                    setATime(2.4*time);
+                    time = 1<<(val_time);
+                    setATime(2.4*64*time);
                     return 0;
                 }
 
@@ -199,11 +199,11 @@ public:
                 {
                     val_time--;
                     uint16_t time;
-                    time = 1<<(6+val_time);
-                    setATime(2.4*time);
+                    time = 1<<(val_time);
+                    setATime(2.4*64*time);
                     return 0;
                 }
-                else if (val_gain > 0)
+                else if (val_gain>0)
                 {
                     val_gain--;
                     gain = 1<<(2*val_gain);

@@ -7,7 +7,7 @@ WS2812B ws2812b = WS2812B();
 #define LEDS_DIST     30 //(LEDS_SIZE/LEDS_CHANNELS)
 #define LEDS_INCR     1 //12 //(255/(LEDS_SIZE/LEDS_CHANNELS))
 #define LEDS_MAX      LEDS_INCR*LEDS_DIST
-struct cRGB led[LEDS_SIZE];
+struct cRGB led[LEDS_SIZE]; // cGRB
 
 volatile uint8_t selected_led, actual_led, actual_channel, actual_status;
 
