@@ -237,6 +237,9 @@ class MPU9250 : public i2cSensor
 #define REG_FIFO_COUNTL             0x73
 #define REG_FIFO_R_W                0x74
 #define REG_WHO_AM_I                0x75
+#define     VAL_WHOAMI_6500         0x70
+#define     VAL_WHOAMI_9250         0x71
+
 #define REG_XA_OFFSET_H             0x77
 #define REG_XA_OFFSET_L             0x78
 #define REG_YA_OFFSET_H             0x7A
@@ -359,6 +362,8 @@ public:
 
         // Clocksource
         i2c.setRegister(MPU_ADDRESS, REG_PWR_MGMT_1, MSK_CLKSEL, 1); // should be VAL_CLOCK_PLL_XGYRO, is it?
+        // PWR MGMT
+        i2c.setRegister(MPU_ADDRESS, REG_PWR_MGMT_1, MSK_CYCLE | MSK_GYRO_STANDBY_CYCLE | MSK_PD_PTAT, 0); // Normal operation
 
         // INTs
         i2c.setRegister(MPU_ADDRESS, REG_INT_PIN_CFG, MSK_INT_ANYRD_2CLEAR,MSK_INT_ANYRD_2CLEAR); // Clear INT at read
@@ -366,10 +371,14 @@ public:
 
         // I2C-Master
         i2c.setRegister(MPU_ADDRESS, REG_USER_CTRL  , MSK_I2C_MST_EN,      0);                  // disable I2C-Master
+        i2c.setRegister(MPU_ADDRESS, REG_INT_PIN_CFG  , MSK_BYPASS_EN, MSK_BYPASS_EN);      // enable Bypass mode!
 
         setEnabled(1);
 
-        return 1;
+        uint8_t who =  i2c.readByte(MPU_ADDRESS, REG_WHO_AM_I);
+        if      (who == VAL_WHOAMI_6500) return 2;
+        else if (who == VAL_WHOAMI_9250) return 3;
+        else                             return 1;
     };
 
     /**< check for new data, return 1 when Measurement is ready */
@@ -402,7 +411,13 @@ public:
         // TEMP_degC = ((TEMP_OUT – RoomTemp_Offset)/Temp_Sensitivity) + 21degC
         xyz_AccTemGyr[3] = int16_t(_data[6]<<8 | _data[7]);
 
+        xyz_AccTemGyr[4] = int16_t(_data[8]<<8 | _data[9]);
+        xyz_AccTemGyr[5] = int16_t(_data[10]<<8| _data[11]);
+        xyz_AccTemGyr[6] = int16_t(_data[12]<<8| _data[13]);
+
     };
+
+/** ######### Digital Motion Processor ################################################################# */
 
 };
 

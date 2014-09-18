@@ -9,33 +9,16 @@ void setup()
     Serial.begin(115200);
     Serial.println("READ MPU9250");
 
-    if (mpu9250.initialize()) Serial.println("MPU9250 found!");
-    else
+    switch (mpu9250.initialize())
     {
-        Serial.println("MPU9250 missing");
-        while(1) {};
+        case 0: Serial.println("MPU-Sensor missing"); while(1) {};
+        case 1: Serial.println("Found unknown Sensor."); break;
+        case 2: Serial.println("MPU6500 found."); break;
+        case 3: Serial.println("MPU9250 found!"); break;
     }
 
     if (i2c.probe(0x0C)) Serial.println("AK8963 found!");
     else                 Serial.println("AK8963 missing");
-
-
-    Serial.println("Scan I2C-Bus for responses");
-    uint8_t address, result;
-    for(address = 0; address < 128; address++ )
-    {
-        result = i2c.probe(address);
-        if (result)
-        {
-            Serial.print("Found: 0x");
-            if (address < 17) Serial.print("0");
-            Serial.print(address,HEX);
-            Serial.println("");
-        }
-        delay(20);
-    }
-    Serial.println("");
-    Serial.println("DONE");
 
 }
 
@@ -45,12 +28,21 @@ void loop()
 
     mpu9250.getMeasurement(xyz_GyrAccMag);
 
-    Serial.print(" X: ");
+    Serial.print("XYZ ACC [");
     Serial.print(xyz_GyrAccMag[0],2);
-    Serial.print(" \tY: ");
+    Serial.print(";");
     Serial.print(xyz_GyrAccMag[1],2);
-    Serial.print(" \tZ: ");
+    Serial.print(";");
     Serial.print(xyz_GyrAccMag[2],2);
+    Serial.print("]");
+
+    Serial.print(" \t GYR [");
+    Serial.print(xyz_GyrAccMag[4],2);
+    Serial.print(";");
+    Serial.print(xyz_GyrAccMag[5],2);
+    Serial.print(";");
+    Serial.print(xyz_GyrAccMag[6],2);
+    Serial.print("]");
 
     Serial.print(" \t Temp: ");
     Serial.print(xyz_GyrAccMag[3],2);
