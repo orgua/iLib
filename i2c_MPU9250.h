@@ -282,6 +282,9 @@ class MPU9250 : public i2cSensor
 
     /** ######### function definition ################################################################# */
 
+private:
+    float gSensitivity, aSensitivity;
+
 public:
     /**< TODO: do i need a constructor? */
     MPU9250(void)
@@ -298,15 +301,25 @@ public:
     };
 
 /**< takes 0..3 for 250, 500, 1000, 2000 dps */
-    void setGSensibility(uint8_t gScaleRange = VAL_GYRO_FS_0500)
+    void setGSensitivity(uint8_t gScaleRange = VAL_GYRO_FS_0500)
     {
         if (gScaleRange<4) i2c.setRegister(MPU_ADDRESS, REG_GYRO_CONFIG, MSK_GYRO_FS_SEL, gScaleRange<<3);
+
+        if      (gScaleRange==VAL_GYRO_FS_0250) gSensitivity=131.0;
+        else if (gScaleRange==VAL_GYRO_FS_0500) gSensitivity=65.5;
+        else if (gScaleRange==VAL_GYRO_FS_1000) gSensitivity=32.8;
+        else if (gScaleRange==VAL_GYRO_FS_2000) gSensitivity=16.4;
     };
 
     /**< takes 0..3 for 2, 4, 8 and 16g */
-    void setASensibility(uint8_t aScaleRange = VAL_ACCEL_FS_04)
+    void setASensitivity(uint8_t aScaleRange = VAL_ACCEL_FS_04)
     {
         if (aScaleRange<4) i2c.setRegister(MPU_ADDRESS, REG_ACCEL_CONFIG, MSK_ACCEL_FS_SEL, aScaleRange<<3);
+
+        if      (aScaleRange==VAL_ACCEL_FS_02) aSensitivity=16384;
+        else if (aScaleRange==VAL_ACCEL_FS_04) aSensitivity= 8192;
+        else if (aScaleRange==VAL_ACCEL_FS_08) aSensitivity= 4096;
+        else if (aScaleRange==VAL_ACCEL_FS_16) aSensitivity= 2048;
     };
 
 /**< round numbers are: 1 kHz, 500 Hz, 200, 125, 100, 50, 25, 20, 10 ... */
@@ -357,8 +370,8 @@ public:
 
         setBandwidth(20);
         setDatarate(100);
-        setGSensibility(VAL_GYRO_FS_0500);
-        setASensibility(VAL_ACCEL_FS_04);
+        setGSensitivity(VAL_GYRO_FS_0500);
+        setASensitivity(VAL_ACCEL_FS_04);
 
         // Clocksource
         i2c.setRegister(MPU_ADDRESS, REG_PWR_MGMT_1, MSK_CLKSEL, 1); // should be VAL_CLOCK_PLL_XGYRO, is it?
@@ -400,20 +413,32 @@ public:
         return 1; // Measurement finished
     };
 
+/**< TODO: separate RAW and Scaled GET */
     void getMeasurement(float xyz_AccTemGyr[])
     {
         uint8_t _data[14];
         i2c.read(MPU_ADDRESS,REG_ACCEL_XOUT_H, _data, 14);
-        xyz_AccTemGyr[0] = int16_t(_data[0]<<8 | _data[1]);
+        // RAW
+        xyz_AccTemGyr[0] = int16_t(_data[0]<<8 | _data[1]); // ACC
         xyz_AccTemGyr[1] = int16_t(_data[2]<<8 | _data[3]);
         xyz_AccTemGyr[2] = int16_t(_data[4]<<8 | _data[5]);
 
-        // TEMP_degC = ((TEMP_OUT – RoomTemp_Offset)/Temp_Sensitivity) + 21degC
-        xyz_AccTemGyr[3] = int16_t(_data[6]<<8 | _data[7]);
+        xyz_AccTemGyr[3] = int16_t(_data[6]<<8 | _data[7]); // TEMP
 
-        xyz_AccTemGyr[4] = int16_t(_data[8]<<8 | _data[9]);
+        xyz_AccTemGyr[4] = int16_t(_data[8]<<8 | _data[9]); // GYR
         xyz_AccTemGyr[5] = int16_t(_data[10]<<8| _data[11]);
         xyz_AccTemGyr[6] = int16_t(_data[12]<<8| _data[13]);
+
+        // Scale
+        xyz_AccTemGyr[3] = xyz_AccTemGyr[3] / 333.87 + 21; // TEMP_degC = ((TEMP_OUT – RoomTemp_Offset)/Temp_Sensitivity) + 21degC
+
+        xyz_AccTemGyr[0] /= aSensitivity; // ACC
+        xyz_AccTemGyr[1] /= aSensitivity;
+        xyz_AccTemGyr[2] /= aSensitivity;
+
+        xyz_AccTemGyr[4] /= gSensitivity; // GYR
+        xyz_AccTemGyr[5] /= gSensitivity;
+        xyz_AccTemGyr[6] /= gSensitivity;
 
     };
 

@@ -28,7 +28,7 @@ void loop()
 
     mpu9250.getMeasurement(xyz_GyrAccMag);
 
-    Serial.print("XYZ ACC [");
+    Serial.print("XYZ ACC g[");
     Serial.print(xyz_GyrAccMag[0],2);
     Serial.print(";");
     Serial.print(xyz_GyrAccMag[1],2);
@@ -36,7 +36,7 @@ void loop()
     Serial.print(xyz_GyrAccMag[2],2);
     Serial.print("]");
 
-    Serial.print(" \t GYR [");
+    Serial.print(" \t GYR dps[");
     Serial.print(xyz_GyrAccMag[4],2);
     Serial.print(";");
     Serial.print(xyz_GyrAccMag[5],2);
@@ -44,8 +44,9 @@ void loop()
     Serial.print(xyz_GyrAccMag[6],2);
     Serial.print("]");
 
-    Serial.print(" \t Temp: ");
+    Serial.print(" \t T: ");
     Serial.print(xyz_GyrAccMag[3],2);
+    Serial.print(" °C")
 
     Serial.println("");
     delay(20);
