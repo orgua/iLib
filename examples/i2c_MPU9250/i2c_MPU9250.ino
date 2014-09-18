@@ -46,7 +46,7 @@ void loop()
 
     Serial.print(" \t T: ");
     Serial.print(xyz_GyrAccMag[3],2);
-    Serial.print(" °C")
+    Serial.print(" °C");
 
     Serial.println("");
     delay(20);
