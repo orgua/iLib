@@ -46,6 +46,7 @@ class MPU9250 : public i2cSensor
 #define REG_ZG_OFFSET_H             0x17
 #define REG_ZG_OFFSET_L             0x18
 #define REG_SMPLRT_DIV              0x19
+#define     HZ_TO_DIV(hz)           ((1000/hz) - 1)
 
 #define REG_CONFIG                  0x1A
 #define   MSK_FIFO_MODE             0x40
@@ -221,7 +222,6 @@ class MPU9250 : public i2cSensor
 #define   MSK_GYRO_STANDBY_CYCLE    0x10
 #define   MSK_PD_PTAT               0x08
 #define   MSK_CLKSEL                0x07
-#define     VAL_CLOCK_PLL_XGYRO     0x00 // TODO
 
 #define REG_PWR_MGMT_2              0x6C
 #define   MSK_DISABLE_XA            0x20
@@ -291,105 +291,92 @@ public:
         if (enable) enable = 0;
         else        enable = 255;
         i2c.setRegister(MPU_ADDRESS, REG_PWR_MGMT_1, MSK_SLEEP, enable);
+        i2c.setRegister(MPU_ADDRESS, REG_PWR_MGMT_2, B00111111, enable); // enable XYZ of Gyr & Acc
     };
 
+/**< takes 0..3 for 250, 500, 1000, 2000 dps */
     void setGSensibility(uint8_t gScaleRange = VAL_GYRO_FS_0500)
     {
         if (gScaleRange<4) i2c.setRegister(MPU_ADDRESS, REG_GYRO_CONFIG, MSK_GYRO_FS_SEL, gScaleRange<<3);
     };
 
+    /**< takes 0..3 for 2, 4, 8 and 16g */
     void setASensibility(uint8_t aScaleRange = VAL_ACCEL_FS_04)
     {
         if (aScaleRange<4) i2c.setRegister(MPU_ADDRESS, REG_ACCEL_CONFIG, MSK_ACCEL_FS_SEL, aScaleRange<<3);
     };
 
-
-
-//#define REG_ACCEL_CONFIG2           0x1D
-//#define   MSK_ACCEL_FCHOICE_B       0xC0
-//#define   MSK_A_DLPF_CFG            0x03
-//
-//#define REG_LP_ACCEL_ODR            0x1E
-//#define   MSK_LPOSC_CLKSEL          0x0F
+/**< round numbers are: 1 kHz, 500 Hz, 200, 125, 100, 50, 25, 20, 10 ... */
     void setDatarate(uint16_t hzFreq=100)
     {
-
+    /**< with clockratedivider for samplerate 1kHz (Configure FChoice) */
+    i2c.writeByte(MPU_ADDRESS, REG_SMPLRT_DIV, (uint8_t) HZ_TO_DIV(hzFreq));
     };
 
     void setBandwidth(uint16_t hzFreq=100)
     {
-        uint8_t fchoice, dlpf;
-        if (hzFreq>3600)    // 8800 Hz Gyro, 4000 Hz Temp, FS=32kHz
-        {
-            fchoice = 2;
-            dlpf    = 0;
-        }
-        else if (hzFreq>250)    // 3600 Hz Gyro, 4000 Hz Temp, FS=32kHz
-        {
-            fchoice = 1;
-            dlpf    = 0;
-        }
-        else if (hzFreq>184)    // 250 Hz Gyro, 4000 Hz Temp, FS=8kHz
-        {
-            fchoice = 0;
-            dlpf    = 0;
-        }
-        else if (hzFreq>92)    // 184 Hz Gyro, 4000 Hz Temp, FS=1kHz
-        {
-            fchoice = 0;
-            dlpf    = 1;
-        }
-        else if (hzFreq>41)    // 184 Hz Gyro, 4000 Hz Temp, FS=1kHz
-        {
-            fchoice = 0;
-            dlpf    = 2;
-        }
-        else if (hzFreq>20)    // 41 Hz Gyro, 42 Hz Temp, FS=1kHz
-        {
-            fchoice = 0;
-            dlpf    = 3;
-        }
-        else     // 20 Hz Gyro, 20 Hz Temp, FS=32kHz
-        {
-            fchoice = 0;
-            dlpf    = 4;
-        };
-        /**< TODO: Rework, page 15 - FS=1kHz --> Bandbreite einstellen */
+        uint8_t dlpf;
+        if      (hzFreq>184)    dlpf   = 0; // 460 Hz Acc, FS= 1 kHz // 250 Hz Gyro, 4000 Hz Temp, FS=8kHz
+        else if (hzFreq>92)     dlpf   = 1; // 184 Hz Gyro/Acc, 4000 Hz Temp, FS=1kHz
+        else if (hzFreq>41)     dlpf   = 2; // 92 Hz Gyro/Acc, 4000 Hz Temp, FS=1kHz
+        else if (hzFreq>20)     dlpf   = 3; // 41 Hz Gyro/Acc, 42 Hz Temp, FS=1kHz
+        else if (hzFreq>10)     dlpf   = 4; // 20 Hz Gyro/Acc, 20 Hz Temp, FS=1kHz
+        else if (hzFreq>5)      dlpf   = 5; // 10 Hz Gyro/Acc, 10 Hz Temp, FS=1kHz
+        else                    dlpf   = 6; //  5 Hz Gyro/Acc,  5 Hz Temp, FS=1kHz
+
+        /**< Rework, page 15 - FS=1kHz --> Bandbreite einstellen */
         i2c.setRegister(MPU_ADDRESS, REG_CONFIG,      MSK_DLPF_CFG,   dlpf); // 0x1A DLPF p13
-        i2c.setRegister(MPU_ADDRESS, REG_GYRO_CONFIG, MSK_FCHOICE_B, fchoice); // 0x1B FChoice
+        i2c.setRegister(MPU_ADDRESS, REG_GYRO_CONFIG, MSK_FCHOICE_B,  0); // 0x1B gFChoice
+
+        i2c.setRegister(MPU_ADDRESS, REG_ACCEL_CONFIG2, MSK_A_DLPF_CFG,      dlpf);
+        i2c.setRegister(MPU_ADDRESS, REG_ACCEL_CONFIG2, MSK_ACCEL_FCHOICE_B, 0); // aFChoice
     };
-
-
-    void setClockSource(uint8_t source = VAL_CLOCK_PLL_XGYRO)
-    {
-        i2c.setRegister(MPU_ADDRESS, REG_PWR_MGMT_1, MSK_CLKSEL, source);
-    };
-
 
     void reset(void)
     {
-        /**< TODO */
+        uint8_t rVector;
+        rVector = MSK_GYRO_RST | MSK_ACCEL_RST | MSK_TEMP_RST;
+        i2c.setRegister(MPU_ADDRESS, REG_SIGNAL_PATH_RESET, rVector, rVector);           // Registers of Sensors
+        i2c.setRegister(MPU_ADDRESS, REG_USER_CTRL, MSK_SIG_COND_RST, MSK_SIG_COND_RST); // Signal paths of Sensors
+        i2c.setRegister(MPU_ADDRESS, REG_PWR_MGMT_1, MSK_H_RESET, MSK_H_RESET);          // internal Registers
     };
+
 
     uint8_t initialize(void)
     {
         if (i2c.probe(MPU_ADDRESS) == 0) return 0;
 
         // 0x19 Sample Rate Divider - standard = 0 (+1)
-        setBandwidth(10);
+        reset();
+        delay(20);
+
+        //setEnabled(0);
+
+        setBandwidth(20);
         setDatarate(100);
         setGSensibility(VAL_GYRO_FS_0500);
         setASensibility(VAL_ACCEL_FS_04);
 
-        setClockSource(VAL_CLOCK_PLL_XGYRO);
+        // Clocksource
+        i2c.setRegister(MPU_ADDRESS, REG_PWR_MGMT_1, MSK_CLKSEL, 1); // should be VAL_CLOCK_PLL_XGYRO, is it?
+
+        // INTs
+        i2c.setRegister(MPU_ADDRESS, REG_INT_PIN_CFG, MSK_INT_ANYRD_2CLEAR,MSK_INT_ANYRD_2CLEAR); // Clear INT at read
+        i2c.setRegister(MPU_ADDRESS, REG_INT_ENABLE , MSK_RAW_RDY_EN,      MSK_RAW_RDY_EN);     // INT: Raw Data Ready to read
+
+        // I2C-Master
+        i2c.setRegister(MPU_ADDRESS, REG_USER_CTRL  , MSK_I2C_MST_EN,      0);                  // disable I2C-Master
+
+        setEnabled(1);
+
         return 1;
     };
 
     /**< check for new data, return 1 when Measurement is ready */
     uint8_t checkMeasurement(void)
     {
-        /**< TODO */
-        return 1;
+        if (i2c.readByte(MPU_ADDRESS,REG_INT_STATUS)&MSK_RAW_DATA_RDY_INT) return 1;
+        else                                                               return 0;
     };
 
     /**<  if you started a measurement and want to actively wait for it to finish */
@@ -408,6 +395,12 @@ public:
     {
         uint8_t _data[14];
         i2c.read(MPU_ADDRESS,REG_ACCEL_XOUT_H, _data, 14);
+        xyz_AccTemGyr[0] = int16_t(_data[0]<<8 | _data[1]);
+        xyz_AccTemGyr[1] = int16_t(_data[2]<<8 | _data[3]);
+        xyz_AccTemGyr[2] = int16_t(_data[4]<<8 | _data[5]);
+
+        // TEMP_degC = ((TEMP_OUT – RoomTemp_Offset)/Temp_Sensitivity) + 21degC
+        xyz_AccTemGyr[3] = int16_t(_data[6]<<8 | _data[7]);
 
     };
 
