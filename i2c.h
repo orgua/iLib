@@ -17,6 +17,20 @@
 #define LOW         (0)
 #define HIGH        (1)
 
+/**< A way to get around Questions with shifting
+
+    uint8_t value = 250;
+    Serial.println(value);              // --> 250
+    Serial.println(int8_t(value));      // --> -6
+    Serial.println(int8_t(value)<<8);   // --> -1536 = -6*256
+
+    Serial.println(uint8_t(value));      // --> 250
+    Serial.println(uint8_t(value)<<8);   // --> -1536 = -6*256 !!!!!!!!!!!!!!!!!!!!!!
+    Serial.println(uint16_t(value<<8)); // --> 64000
+
+ */
+
+
 class WirePlus
 {
 
