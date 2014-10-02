@@ -284,7 +284,7 @@ public:
     {
         uint32_t iPascal;
         getPressure(iPascal);
-        pascal = float(iPascal)/100;
+        pascal = float(iPascal);
     }
 
     /**<  gives pressure-values */

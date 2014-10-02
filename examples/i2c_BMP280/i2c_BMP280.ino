@@ -7,8 +7,8 @@ BMP280 bmp280 = BMP280();
 void setup()
 {
     Serial.begin(115200);
-    Serial.print("Probe BMP280: ");
 
+    Serial.print("Probe BMP280: ");
     if (bmp280.initialize()) Serial.println("Sensor found");
     else
     {

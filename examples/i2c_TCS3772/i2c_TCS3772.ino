@@ -9,7 +9,7 @@ void setup()
 {
     Serial.begin(115200);
 
-    Serial.println("Probe TCS3772: ");
+    Serial.print("Probe TCS3772: ");
     if (tcs3772.initialize()) Serial.println("Sensor found");
     else
     {

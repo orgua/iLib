@@ -9,7 +9,7 @@ void setup()
 {
     Serial.begin(115200);
 
-    Serial.println("Probe SI7021: ");
+    Serial.print("Probe SI7021: ");
     if (si7021.initialize()) Serial.println("Sensor found!");
     else
     {

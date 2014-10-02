@@ -8,8 +8,8 @@ L3G l3g;
 void setup()
 {
     Serial.begin(115200);
-    Serial.print("Probe L3G: ");
 
+    Serial.print("Probe L3G: ");
     if (l3g.initialize()) Serial.println("Sensor found!");
     else
     {

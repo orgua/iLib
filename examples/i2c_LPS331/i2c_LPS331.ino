@@ -8,6 +8,7 @@ LPS331 lps331 = LPS331();
 void setup()
 {
     Serial.begin(115200);
+
     Serial.print("Probe LPS331: ");
     if (lps331.initialize()) Serial.println("Sensor found!");
     else
