@@ -74,7 +74,13 @@ uint8_t WirePlus::probeAddress(uint8_t address)
     return probe(address);
 };
 
-/**< TODO: insert a general write( , , , );  */
+void WirePlus::write(uint8_t address, uint8_t register_address, uint8_t write_value[], uint8_t length=1)
+{
+    Wire.beginTransmission(address);
+    Wire.write(register_address);
+    for (uint8_t counter = 0; counter < length; counter++) Wire.write(write_value[counter]);
+    Wire.endTransmission(true);
+}
 
 void WirePlus::writeByte( uint8_t address, uint8_t register_address, uint8_t write_value)
 {
