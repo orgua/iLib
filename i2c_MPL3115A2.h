@@ -101,7 +101,7 @@ public:
    /**< Enable Altimeter / Barometer MODE */
     void setAltimeter(uint8_t enable = 1)
     {
-        if (enable) enable=(1<<7);
+        if (enable) enable=MSK_ALT;
         i2c.setRegister(MPL_ADDRESS,REG_CTRL1, MSK_ALT, enable);
     };
 
@@ -242,8 +242,8 @@ public:
     {
         uint8_t value[3];
         i2c.read(MPL_ADDRESS, REG_OUT_P_MSB, value, 3);  // meter in Q16.4 signed in 3x8bit left
-        float tempcsb = (value[2]>>4)/16.0;
-        meter = (float)( (value[0] << 8) | value[1]) + tempcsb;
+        float tempcsb = (float(value[2]>>4))/16.0;
+        meter = (float)( int16_t(value[0] << 8) | int16_t(value[1])) + tempcsb;
     };
 
 
@@ -254,8 +254,17 @@ public:
         uint8_t value[3];
         i2c.read(MPL_ADDRESS, REG_OUT_P_MSB, value, 3);  // pascal in Q18.2 unsigned in 3x8bit left
 
-        float tempcsb = (value[2]>>4)/4.0;
-        pascal = (float)( (value[0] << 8) | value[1]) + tempcsb;
+        float tempcsb = (float(value[2]>>4))/4.0;
+        pascal = (float( uint16_t(value[0] << 8) | value[1]))*4 + tempcsb;
+    };
+
+    /**< not so much precision (2bit), mut much faster (26 instructions) */
+    void getPressure(uint32_t& pascal)
+    {
+        // Read pressure registers
+        uint8_t value[3];
+        i2c.read(MPL_ADDRESS, REG_OUT_P_MSB, value, 3);  // pascal in Q18.2 unsigned in 3x8bit left
+        pascal = uint32_t(( (uint32_t(value[0]<<8) | uint32_t(value[1]))<<2) + (value[2]>>6) );
     };
 
     /**<  gives pressure-values */
