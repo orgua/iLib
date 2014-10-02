@@ -117,7 +117,6 @@ public:
     /**<  */
     void setPressureOversampleRatio(uint8_t sampleRatio = 16)
     {
-        uint8_t ratio;
         if 		(sampleRatio > 15) 	sampleRatio = VAL_CTRL_OSRS_P16;
         else if (sampleRatio > 7)	sampleRatio = VAL_CTRL_OSRS_P08;
         else if (sampleRatio > 3)	sampleRatio = VAL_CTRL_OSRS_P04;
@@ -129,7 +128,6 @@ public:
 
     void setTemperatureOversampleRatio(uint8_t sampleRatio = 2)
     {
-        uint8_t ratio;
         if 		(sampleRatio > 15) 	sampleRatio = VAL_CTRL_OSRS_T16;
         else if (sampleRatio > 7)	sampleRatio = VAL_CTRL_OSRS_T08;
         else if (sampleRatio > 3)	sampleRatio = VAL_CTRL_OSRS_T04; // more isn't better
@@ -139,6 +137,29 @@ public:
         i2c.setRegister(BMP_ADDRESS,REG_CTRL_MEAS, MSK_CTRL_OSRS_T, sampleRatio);
     };
 
+    void setFilterRatio(uint8_t filterRatio = 0)
+    {
+        if 		(filterRatio > 15) 	filterRatio = VAL_FILTER_16;
+        else if (filterRatio > 7)	filterRatio = VAL_FILTER_08;
+        else if (filterRatio > 3)	filterRatio = VAL_FILTER_04;
+        else if (filterRatio > 1)	filterRatio = VAL_FILTER_02;
+        else  						filterRatio = VAL_FILTER_00; // disable!!!
+        i2c.setRegister(BMP_ADDRESS,REG_CONFIG, MSK_CONFIG_FILTER, filterRatio);
+    };
+
+    void setStandby(uint16_t ms = 0)
+    {
+        uint8_t valueSB;
+        if 		(ms > 3000) valueSB = VAL_SB_4000;
+        else if (ms > 1500)	valueSB = VAL_SB_2000;
+        else if (ms >  750)	valueSB = VAL_SB_1000;
+        else if (ms >  350)	valueSB = VAL_SB_0500;
+        else if (ms >  180)	valueSB = VAL_SB_0250;
+        else if (ms >   90)	valueSB = VAL_SB_0125;
+        else if (ms >   31)	valueSB = VAL_SB_0062;
+        else  				valueSB = VAL_SB_0000; // disable!!!
+        i2c.setRegister(BMP_ADDRESS,REG_CONFIG, MSK_CONFIG_T_SB, valueSB);
+    }
 
     /**< initialize */
     uint8_t initialize()
@@ -150,14 +171,17 @@ public:
 
         setPressureOversampleRatio(16);
         setTemperatureOversampleRatio(2);
+        setFilterRatio();
+        setStandby();
+        i2c.setRegister(BMP_ADDRESS,REG_CONFIG, MSK_CONFIG_SPI3W_EN, 0);
 
         readTrimming();
-        /*
+/*
         Serial.println("");
         Serial.println(dig_T1);
         Serial.println(dig_T2);
         Serial.println(dig_T3);
-        */
+*/
         setEnabled(1);
         return 1;
     };
@@ -166,11 +190,11 @@ public:
     {
         uint8_t value[2];
         i2c.read(BMP_ADDRESS, 0x88, value, 2);
-        dig_T1 = uint16_t((uint16_t(value[0]<<8)) | value[1]);
+        dig_T1 = uint16_t((uint16_t(value[1]<<8)) | value[0]);
         i2c.read(BMP_ADDRESS, 0x8A, value, 2);
-        dig_T2 = int16_t((int8_t(value[0])<<8) | value[1]);
+        dig_T2 = int16_t((value[1]<<8) | value[0]);
         i2c.read(BMP_ADDRESS, 0x8C, value, 2);
-        dig_T3 = int16_t((int8_t(value[0])<<8) | value[1]);
+        dig_T3 = int16_t((value[1]<<8) | value[0]);
     };
 
 
@@ -227,17 +251,27 @@ public:
     /**<  gives temperature in degree celsius */
     void getTemperature(float& celsius)
     {
-        // Read temperature registers
         uint8_t value[3];
-        i2c.read(BMP_ADDRESS, REG_TEMP_MSB, value, 3); // °C in Q8.4 signed in 2x
-
-        float adc;
-        adc = float(value[2]>>4);
-        adc += (float( uint16_t(value[0] << 8) | value[1]))*16;
-
+        i2c.read(BMP_ADDRESS, REG_TEMP_MSB, value, 3);
+        float adc  = float((uint32_t( uint16_t(value[0] << 8) | value[1])<<4) | (value[2]>>4));
         float var1 = (adc/16384.0 - float(dig_T1)/1024.0)*float(dig_T2);
         float var2 = (adc/131072.0 - float(dig_T1)/8192.0);
         celsius = (var1 + var2*var2*float(dig_T3))/5120.0;
+    };
+
+    void getTemperature(int32_t& millicelsius)
+    {
+        uint8_t value[3];
+        i2c.read(BMP_ADDRESS, REG_TEMP_MSB, value, 3);
+
+        int32_t var1, var2, t_fine, adcTemp;
+        adcTemp = (uint32_t( uint16_t(value[0] << 8) | value[1])<<4) | (value[2]>>4);
+        var1    = ((((adcTemp>>3) - ((int32_t)dig_T1<<1))) * ((int32_t)dig_T2)) >> 11;
+        //var2 = ((adcTemp>>4) - ((int32_t)dig_T1));
+        //var2 = (((var2 * var2) >> 12) * ((int32_t)dig_T3))>>14;
+        var2    = (((((adcTemp>>4) - ((int32_t)dig_T1)) * ((adcTemp>>4) - ((int32_t)dig_T1))) >> 12) * ((int32_t)dig_T3))>>14;
+        t_fine  = var1 + var2;
+        millicelsius = (t_fine * 50 + 1280) >> 8;
 
     };
 

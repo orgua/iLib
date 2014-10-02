@@ -28,7 +28,8 @@ void loop()
     float pascal;
     bmp280.getPressure(pascal);
 
-    float temperature;
+    //float temperature;
+    int32_t temperature;
     bmp280.getTemperature(temperature);
     bmp280.triggerMeasurement();
 

@@ -26,6 +26,7 @@
 		<Unit filename="WS2812B.h" />
 		<Unit filename="examples/WS2812B_Clock_90Led/WS2812B_Clock_90Led.ino" />
 		<Unit filename="examples/firstrun_ledBlink/firstrun_ledBlink.ino" />
+		<Unit filename="examples/i2c_BMP280/i2c_BMP280.ino" />
 		<Unit filename="examples/i2c_L3G/i2c_L3G.ino" />
 		<Unit filename="examples/i2c_LPS331/i2c_LPS331.ino" />
 		<Unit filename="examples/i2c_MAG3110/i2c_MAG3110.ino" />
@@ -38,6 +39,7 @@
 		<Unit filename="examples/i2c_probeBus/i2c_probeBus.ino" />
 		<Unit filename="i2c.cpp" />
 		<Unit filename="i2c.h" />
+		<Unit filename="i2c_BMP280.h" />
 		<Unit filename="i2c_L3G.h">
 			<Option compile="1" />
 			<Option link="1" />
