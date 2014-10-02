@@ -8,8 +8,8 @@ MMA8451 mma8451 = MMA8451();
 void setup()
 {
     Serial.begin(115200);
-    Serial.println("READ MMA8451");
 
+    Serial.print("Probe MMA8451: ");
     if (mma8451.initialize()) Serial.println("Sensor found!");
     else
     {

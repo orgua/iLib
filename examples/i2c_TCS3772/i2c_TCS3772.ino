@@ -8,15 +8,14 @@ TCS3772 tcs3772 = TCS3772();
 void setup()
 {
     Serial.begin(115200);
-    Serial.println("READ TCS3772");
 
+    Serial.println("Probe TCS3772: ");
     if (tcs3772.initialize()) Serial.println("Sensor found");
     else
     {
         Serial.println("Sensor missing");
         while (1) {}
     }
-
 }
 
 void loop()

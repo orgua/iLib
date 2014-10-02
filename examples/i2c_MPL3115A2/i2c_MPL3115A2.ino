@@ -7,8 +7,8 @@ MPL3115A2 mpl3115 = MPL3115A2();
 void setup()
 {
     Serial.begin(115200);
-    Serial.println("READ MPL3115A2");
 
+    Serial.print("Probe MPL3115A2: ");
     if (mpl3115.initialize()) Serial.println("Sensor found");
     else
     {

@@ -7,8 +7,8 @@ MAX44009 max44009 = MAX44009();
 void setup()
 {
     Serial.begin(115200);
-    Serial.println("READ MAX44009");
 
+    Serial.println("Probe MAX44009: ");
     if (max44009.initialize()) Serial.println("Sensor found");
     else
     {

@@ -7,8 +7,8 @@ MPU9250 mpu9250 = MPU9250();
 void setup()
 {
     Serial.begin(115200);
-    Serial.println("READ MPU9250");
 
+    Serial.print("Probe MPU9250: ");
     switch (mpu9250.initialize())
     {
         case 0: Serial.println("MPU-Sensor missing"); while(1) {};

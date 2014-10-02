@@ -8,8 +8,8 @@ SI7021 si7021 = SI7021();
 void setup()
 {
     Serial.begin(115200);
-    Serial.println("READ SI7021");
 
+    Serial.println("Probe SI7021: ");
     if (si7021.initialize()) Serial.println("Sensor found!");
     else
     {

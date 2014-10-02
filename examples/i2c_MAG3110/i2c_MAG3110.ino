@@ -8,8 +8,8 @@ MAG3110 mag3110 = MAG3110();
 void setup()
 {
     Serial.begin(115200);
-    Serial.println("READ MAG3310");
 
+    Serial.print("Probe MAG3310: ");
     if (mag3110.initialize())  Serial.println("Sensor found!");
     else
     {
