@@ -31,13 +31,21 @@ void loop()
     float pascal;
     bmp280.getPressure(pascal);
 
+    static float meters, metersold;
+    bmp280.getAltitude(meters);
+    metersold = (metersold * 10 + meters)/11;
+
     bmp280.triggerMeasurement();
 
+    Serial.print(" HeightPT1: ");
+    Serial.print(metersold);
+    Serial.print(" m; Height: ");
+    Serial.print(meters);
     Serial.print(" Pressure: ");
     Serial.print(pascal);
-    Serial.print(" Pa; Temp: ");
+    Serial.print(" Pa; T: ");
     Serial.print(temperature);
-    Serial.println(" degC");
+    Serial.println(" C");
 }
 
 /**<

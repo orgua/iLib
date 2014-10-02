@@ -255,17 +255,7 @@ public:
         return 1; // Measurement finished
     };
 
-    /**<  gives the number of meters above sea level */
-    void getAltitude(float& meter)
-    {
-        uint8_t value[3];
-        //      i2c.read(BMP_ADDRESS, REG_OUT_P_MSB, value, 3);  // meter in Q16.4 signed in 3x8bit left
-        float tempcsb = (value[2]>>4)/16.0;
-        meter = (float)( (value[0] << 8) | value[1]) + tempcsb;
-    };
-
-
-    /**<  gives airpressure in Pascal 10mPa-Steps */
+    /**<  gives airpressure in Pascal */
     void getPressure(uint32_t& pascal)
     {
         uint8_t value[3];
@@ -301,6 +291,16 @@ public:
     void getMeasurement(float& pascal)
     {
         getPressure(pascal);
+    };
+
+    /**<  gives the number of meters above sea level */
+    void getAltitude(float& meter)
+    {
+        uint32_t iPascal;
+        getPressure(iPascal);
+
+        meter = 44330.0*(1-pow(float(iPascal)/101325.0,1.0/5.255));
+
     };
 
     /**<  gives temperature in degree celsius */
