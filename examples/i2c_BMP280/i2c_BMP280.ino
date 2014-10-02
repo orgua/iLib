@@ -25,19 +25,19 @@ void loop()
 {
     bmp280.awaitMeasurement();
 
+    float temperature;
+    bmp280.getTemperature(temperature);
+
     float pascal;
     bmp280.getPressure(pascal);
 
-    //float temperature;
-    int32_t temperature;
-    bmp280.getTemperature(temperature);
     bmp280.triggerMeasurement();
 
     Serial.print(" Pressure: ");
     Serial.print(pascal);
-    Serial.print(" Temp: ");
+    Serial.print(" Pa; Temp: ");
     Serial.print(temperature);
-    Serial.println("");
+    Serial.println(" degC");
 }
 
 /**<

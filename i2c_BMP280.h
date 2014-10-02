@@ -22,9 +22,21 @@ class BMP280 : public i2cSensor, public manualSensor
 
     /** ######### Register-Map ################################################################# */
 
-#define BMP_ADDRESS 	        0x76
+#define BMP_ADDRESS 	            0x76
 
 // CALIBRATION DATA, 25 Register. 0x88 - 0xA1
+#define REG_DIG_T1                  0x88    // watch out - switched MSB/LSB
+#define REG_DIG_T2                  0x8A
+#define REG_DIG_T3                  0x8C
+#define REG_DIG_P1                  0x8E
+#define REG_DIG_P2                  0x90
+#define REG_DIG_P3                  0x92
+#define REG_DIG_P4                  0x94
+#define REG_DIG_P5                  0x96
+#define REG_DIG_P6                  0x98
+#define REG_DIG_P7                  0x9A
+#define REG_DIG_P8                  0x9C
+#define REG_DIG_P9                  0x9E
 
 #define REG_ID						0xD0
 #define		VAL_ID					0x58
@@ -83,8 +95,9 @@ class BMP280 : public i2cSensor, public manualSensor
 #define REG_TEMP_XLSB				0xFC	// bit 4-7 usable
 
 private:
-    uint16_t dig_T1, dig_P1;
-    int16_t  dig_T2, dig_T3, dig_P2, dig_P3, dig_P4, dig_P5, dig_P6, dig_P7, dig_P8, dig_P9;
+    uint16_t    dig_T1, dig_P1;
+    int16_t     dig_T2, dig_T3, dig_P2, dig_P3, dig_P4, dig_P5, dig_P6, dig_P7, dig_P8, dig_P9;
+    int32_t     tFine;
 
     /** ######### function definition ################################################################# */
 
@@ -189,12 +202,33 @@ public:
     void readTrimming()
     {
         uint8_t value[2];
-        i2c.read(BMP_ADDRESS, 0x88, value, 2);
+        i2c.read(BMP_ADDRESS, REG_DIG_T1, value, 2);
         dig_T1 = uint16_t((uint16_t(value[1]<<8)) | value[0]);
-        i2c.read(BMP_ADDRESS, 0x8A, value, 2);
+        i2c.read(BMP_ADDRESS, REG_DIG_T2, value, 2);
         dig_T2 = int16_t((value[1]<<8) | value[0]);
-        i2c.read(BMP_ADDRESS, 0x8C, value, 2);
+        i2c.read(BMP_ADDRESS, REG_DIG_T3, value, 2);
         dig_T3 = int16_t((value[1]<<8) | value[0]);
+
+        i2c.read(BMP_ADDRESS, REG_DIG_P1, value, 2);
+        dig_P1 = uint16_t((uint16_t(value[1]<<8)) | value[0]);
+        i2c.read(BMP_ADDRESS, REG_DIG_P2, value, 2);
+        dig_P2 = int16_t((value[1]<<8) | value[0]);
+        i2c.read(BMP_ADDRESS, REG_DIG_P3, value, 2);
+        dig_P3 = int16_t((value[1]<<8) | value[0]);
+
+        i2c.read(BMP_ADDRESS, REG_DIG_P4, value, 2);
+        dig_P4 = int16_t((value[1]<<8) | value[0]);
+        i2c.read(BMP_ADDRESS, REG_DIG_P5, value, 2);
+        dig_P5 = int16_t((value[1]<<8) | value[0]);
+        i2c.read(BMP_ADDRESS, REG_DIG_P6, value, 2);
+        dig_P6 = int16_t((value[1]<<8) | value[0]);
+
+        i2c.read(BMP_ADDRESS, REG_DIG_P7, value, 2);
+        dig_P7 = int16_t((value[1]<<8) | value[0]);
+        i2c.read(BMP_ADDRESS, REG_DIG_P8, value, 2);
+        dig_P8 = int16_t((value[1]<<8) | value[0]);
+        i2c.read(BMP_ADDRESS, REG_DIG_P9, value, 2);
+        dig_P9 = int16_t((value[1]<<8) | value[0]);
     };
 
 
@@ -231,16 +265,37 @@ public:
     };
 
 
-    /**<  gives airpressure in Pascal */
+    /**<  gives airpressure in Pascal 10mPa-Steps */
+    void getPressure(uint32_t& pascal)
+    {
+        uint8_t value[3];
+        i2c.read(BMP_ADDRESS, REG_PRESS_MSB, value, 3);
+
+        int32_t var1, var2, adc;
+        adc     = (uint32_t( uint16_t(value[0] << 8) | value[1])<<4) | (value[2]>>4);
+        var1 = (((int32_t)tFine)>>1) - (int32_t)64000;
+        var2 = (((var1>>2) * (var1>>2)) >> 11 ) * ((int32_t)dig_P6);
+        var2 = var2 + ((var1*((int32_t)dig_P5))<<1);
+        var2 = (var2>>2)+(((int32_t)dig_P4)<<16);
+        var1 = (((dig_P3 * (((var1>>2) * (var1>>2)) >> 13 )) >> 3) + ((((int32_t)dig_P2) * var1)>>1))>>18;
+        var1 =((((32768+var1))*((int32_t)dig_P1))>>15);
+        if (var1 == 0) return; // avoid exception caused by division by zero
+
+        pascal = (((uint32_t)(((int32_t)1048576)-adc)-(var2>>12)))*3125;
+        if (pascal < 0x80000000)    pascal = (pascal << 1) / ((uint32_t)var1);
+        else                        pascal = (pascal / (uint32_t)var1) * 2;
+
+        var1 = (((int32_t)dig_P9) * ((int32_t)(((pascal>>3) * (pascal>>3))>>13)))>>12;
+        var2 = (((int32_t)(pascal>>2)) * ((int32_t)dig_P8))>>13;
+        pascal = (uint32_t)((int32_t)pascal + ((var1 + var2 + dig_P7) >> 4));
+    };
+
     void getPressure(float& pascal)
     {
-        // Read pressure registers
-        uint8_t value[3];
-        i2c.read(BMP_ADDRESS, REG_PRESS_MSB, value, 3);  // pascal in Q18.2 unsigned in 3x8bit left
-
-        float tempcsb = (value[2]>>4);
-        pascal = (float)( (value[0] << 8) | value[1]) + tempcsb;
-    };
+        uint32_t iPascal;
+        getPressure(iPascal);
+        pascal = float(iPascal)/100;
+    }
 
     /**<  gives pressure-values */
     void getMeasurement(float& pascal)
@@ -249,30 +304,27 @@ public:
     };
 
     /**<  gives temperature in degree celsius */
-    void getTemperature(float& celsius)
-    {
-        uint8_t value[3];
-        i2c.read(BMP_ADDRESS, REG_TEMP_MSB, value, 3);
-        float adc  = float((uint32_t( uint16_t(value[0] << 8) | value[1])<<4) | (value[2]>>4));
-        float var1 = (adc/16384.0 - float(dig_T1)/1024.0)*float(dig_T2);
-        float var2 = (adc/131072.0 - float(dig_T1)/8192.0);
-        celsius = (var1 + var2*var2*float(dig_T3))/5120.0;
-    };
-
     void getTemperature(int32_t& millicelsius)
     {
         uint8_t value[3];
         i2c.read(BMP_ADDRESS, REG_TEMP_MSB, value, 3);
 
-        int32_t var1, var2, t_fine, adcTemp;
-        adcTemp = (uint32_t( uint16_t(value[0] << 8) | value[1])<<4) | (value[2]>>4);
-        var1    = ((((adcTemp>>3) - ((int32_t)dig_T1<<1))) * ((int32_t)dig_T2)) >> 11;
-        //var2 = ((adcTemp>>4) - ((int32_t)dig_T1));
+        int32_t var1, var2, adc;
+        adc     = (uint32_t( uint16_t(value[0] << 8) | value[1])<<4) | (value[2]>>4);
+        var1    = ((((adc>>3) - ((int32_t)dig_T1<<1))) * ((int32_t)dig_T2)) >> 11;
+        var2    = (((((adc>>4) - ((int32_t)dig_T1)) * ((adc>>4) - ((int32_t)dig_T1))) >> 12) * ((int32_t)dig_T3))>>14;
+        //var2 = ((adc>>4) - ((int32_t)dig_T1));
         //var2 = (((var2 * var2) >> 12) * ((int32_t)dig_T3))>>14;
-        var2    = (((((adcTemp>>4) - ((int32_t)dig_T1)) * ((adcTemp>>4) - ((int32_t)dig_T1))) >> 12) * ((int32_t)dig_T3))>>14;
-        t_fine  = var1 + var2;
-        millicelsius = (t_fine * 50 + 1280) >> 8;
+        tFine   = var1 + var2;
+        millicelsius = (tFine * 50 + 1280) >> 8;
 
+    };
+
+    void getTemperature(float& celsius)
+    {
+        int32_t iTemperature;
+        getTemperature(iTemperature);
+        celsius = float(iTemperature) / 1000;
     };
 
 };
