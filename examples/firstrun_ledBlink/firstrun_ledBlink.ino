@@ -2,9 +2,11 @@
 
 Program Fuses:
 
-LOW     0xFD
-HIGH    0xDF
-EXT     0xFF
+EXT     0xFD
+HIGH    0xDF or xDE (bootrst EN)
+LOW     0xFF
+
+
 
  */
 

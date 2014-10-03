@@ -17,6 +17,11 @@
 #define LOW         (0)
 #define HIGH        (1)
 
+/// are they really usefull?
+#define UBLB(a,b)  ( ( (a) << 8) | (b) )
+#define UBLB19(a,b) ( ( (a) << 16 ) | (b) )
+#define UBLB32(a,b,c,d)  ((( ((a)<<24) | ((b)<<16) ) | ((c)<<8)) | (d) )
+
 /**< A way to get around Questions with shifting
 
     uint8_t value = 250;

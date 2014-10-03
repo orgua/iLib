@@ -34,6 +34,7 @@
 		<Unit filename="examples/i2c_MMA8451/i2c_MMA8451.ino" />
 		<Unit filename="examples/i2c_MPL3115A2/i2c_MPL3115A2.ino" />
 		<Unit filename="examples/i2c_MPU9250/i2c_MPU9250.ino" />
+		<Unit filename="examples/i2c_PCF2127/i2c_PCF2127.ino" />
 		<Unit filename="examples/i2c_SI7021/i2c_SI7021.ino" />
 		<Unit filename="examples/i2c_TCS3772/i2c_TCS3772.ino" />
 		<Unit filename="examples/i2c_probeBus/i2c_probeBus.ino" />
@@ -54,6 +55,7 @@
 		</Unit>
 		<Unit filename="i2c_MPL3115A2.h" />
 		<Unit filename="i2c_MPU9250.h" />
+		<Unit filename="i2c_PCF2127.h" />
 		<Unit filename="i2c_PRESET.h" />
 		<Unit filename="i2c_SI7021.h" />
 		<Unit filename="i2c_Sensor.h">
