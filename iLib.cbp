@@ -63,6 +63,7 @@
 			<Option link="1" />
 		</Unit>
 		<Unit filename="i2c_TCS3772.h" />
+		<Unit filename="spi_rfm95.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
