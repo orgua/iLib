@@ -40,6 +40,7 @@ public:
 
     uint8_t probe(const uint8_t);
     uint8_t probeAddress(const uint8_t);
+    void    write(uint8_t, uint8_t, uint8_t *, uint8_t);
     void    writeByte(const uint8_t, const uint8_t, const uint8_t);
     void    writeCMD(const uint8_t, const uint8_t);
     uint8_t readByte(const uint8_t , const uint8_t );
@@ -50,7 +51,7 @@ public:
 
 /** ######### Implementation ################################################################# */
 
- WirePlus::WirePlus()
+WirePlus::WirePlus()
 {
     Wire.begin(); 		// I2C as Master
     bitSet(PORTC, 4); 	// deactivate internal pull-ups for twi
@@ -76,11 +77,18 @@ uint8_t WirePlus::probeAddress(uint8_t address)
 
 void WirePlus::write(uint8_t address, uint8_t register_address, uint8_t write_value[], uint8_t length=1)
 {
+    if (!length) return;
     Wire.beginTransmission(address);
     Wire.write(register_address);
-    for (uint8_t counter = 0; counter < length; counter++) Wire.write(write_value[counter]);
+    uint8_t counter;
+    counter = 0;
+    while (counter < length)
+    {
+        Wire.write(write_value[counter]);
+        counter++;
+    }
     Wire.endTransmission(true);
-}
+};
 
 void WirePlus::writeByte( uint8_t address, uint8_t register_address, uint8_t write_value)
 {
@@ -90,10 +98,30 @@ void WirePlus::writeByte( uint8_t address, uint8_t register_address, uint8_t wri
     Wire.endTransmission(true);
 };
 
-void WirePlus::writeCMD(uint8_t address, uint8_t cmd) {
-  Wire.beginTransmission(address);
-  Wire.write(cmd);
-  Wire.endTransmission();
+void WirePlus::writeCMD(uint8_t address, uint8_t cmd)
+{
+    Wire.beginTransmission(address);
+    Wire.write(cmd);
+    Wire.endTransmission();
+};
+
+void WirePlus::read( uint8_t address, uint8_t registeraddress, uint8_t buff[], uint8_t length=1)
+{
+    Wire.beginTransmission(address); 	// Adress + WRITE (0)
+    Wire.write(registeraddress);
+    Wire.endTransmission(false); 		// No Stop Condition, for repeated Talk
+
+    if (!length) return;
+    Wire.requestFrom(address, length); 	// Address + READ (1)
+    uint8_t _i;
+    _i=0;
+    while(Wire.available())
+    {
+        buff[_i] = Wire.read();
+        _i++;
+    }
+
+    Wire.endTransmission(true); 		// Stop Condition
 };
 
 uint8_t WirePlus::readByte(uint8_t address, uint8_t register_address)
@@ -102,27 +130,6 @@ uint8_t WirePlus::readByte(uint8_t address, uint8_t register_address)
     read(address, register_address, &_readvalue, 1);
     return _readvalue;
 };
-
-
-void WirePlus::read( uint8_t address, uint8_t registeraddress, uint8_t buff[], uint8_t length=1)
-{
-    Wire.beginTransmission(address); 	// Adress + WRITE (0)
-    Wire.write(registeraddress);
-    Wire.endTransmission(false); 		// No Stop Condition, for repeated Talk
-    if (length)
-    {
-        Wire.requestFrom(address, length); 	// Address + READ (1)
-        uint8_t _i;
-        _i=0;
-        while(Wire.available())
-        {
-            buff[_i] = Wire.read();
-            _i++;
-        }
-        Wire.endTransmission(true); 		// Stop Condition
-    }
-};
-
 
 void WirePlus::setRegister(uint8_t address, uint8_t registeraddress, uint8_t mask, uint8_t writevalue)
 {

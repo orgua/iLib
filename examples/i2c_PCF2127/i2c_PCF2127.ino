@@ -17,40 +17,38 @@ void setup()
         while (1) {}
     }
 
-    pcf2127.setYears(14);
-    pcf2127.setMonth(10);
-    pcf2127.setDays(3);
-
+    pcf2127.setTime(2014,9,3,5,4,11,12);
     char time = '__TIME__';
-
-    pcf2127.setHours(10);
-    pcf2127.setMinutes(10);
-    pcf2127.setSeconds(10);
 }
 
 void loop()
 {
-    uint8_t Y,M,D,h,m,s;
+    uint8_t MM,WW,DD,hh,mm,ss;
+    uint16_t YY;
+    pcf2127.readTime();
 
-    pcf2127.setYears(Y);
-    pcf2127.setMonth(M);
-    pcf2127.setDays(D);
-    pcf2127.setHours(h);
-    pcf2127.setMinutes(m);
-    pcf2127.setSeconds(s);
+    pcf2127.getYears(YY);
+    pcf2127.getMonth(MM);
+    pcf2127.getWeekdays(WW);
+    pcf2127.getDays(DD);
+    pcf2127.getHours(hh);
+    pcf2127.getMinutes(mm);
+    pcf2127.getSeconds(ss);
 
-    Serial.print(2000+Y);
+    Serial.print(YY);
     Serial.print("-");
-    Serial.print(M);
+    Serial.print(MM);
     Serial.print("-");
-    Serial.print(D);
+    Serial.print(WW);
     Serial.print("-");
+    Serial.print(DD);
+    Serial.print(" ");
 
-    Serial.print(h);
+    Serial.print(hh);
     Serial.print(":");
-     Serial.print(m);
+    Serial.print(mm);
     Serial.print(":");
-        Serial.print(s);
+    Serial.print(ss);
     Serial.println("");
     delay(200);
 }

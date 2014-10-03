@@ -57,6 +57,7 @@ class PCF2127
 #define REG_WEEKDAYS            0x07    // 3bit
 #define REG_MONTH               0x08    // 5bit
 #define REG_YEARS               0x09    // 8bit
+#define     VAL_YEAR_OFFSET     2000
 
 #define REG_SECOND_ALARM        0x0A
 #define REG_MINUTE_ALARM        0x0B
@@ -92,6 +93,10 @@ class PCF2127
 #define REG_RAM_ADDR_LSB        0x1B
 #define REG_RAM_WRT_CMD         0x1C
 #define REG_RAM_RD_CMD          0x1D
+
+private:
+    uint8_t datetime[7];
+
     /** ######### function definition ################################################################# */
 
 public:
@@ -139,7 +144,7 @@ public:
     void clearInterrupt()
     {
         i2c.setRegister(PCF_ADDRESS, REG_CONTROL1, MSK_CONTROL1_TSF1, 0);
-    }
+    };
 
     void setTemperaturePeriod(uint8_t seconds=240)
     {
@@ -148,7 +153,7 @@ public:
         else if (seconds > 45)   seconds = B10000000;    // 60s
         else                     seconds = B11000000;    // 30s
         i2c.setRegister(PCF_ADDRESS, REG_CLOCKOUT_CTL, MSK_CLOCKOUT_TCR, seconds);
-    }
+    };
 
     void setClockOut(uint16_t clock = 1)
     {
@@ -162,132 +167,162 @@ public:
         else                    clock = 111;    // disable
         i2c.setRegister(PCF_ADDRESS, REG_CLOCKOUT_CTL, MSK_CLOCKOUT_COF, clock);
 
-    }
+    };
+
+    void setTime(uint16_t YYYY, uint8_t MM, uint8_t W, uint8_t DD, uint8_t hh, uint8_t mm, uint8_t ss)
+    {
+        uint8_t decimal = 0;
+
+        /// YEAR
+        if (YYYY >= VAL_YEAR_OFFSET) YYYY -= VAL_YEAR_OFFSET;
+        if (YYYY > 99) return;
+        decimal = 0;
+        while (YYYY > 9)
+        {
+            YYYY -= 10;
+            decimal += 1;
+        }
+        datetime[6] = YYYY | ((decimal)<<4);
+
+        /// MONTH
+        if (MM > 12) return;
+        decimal = 0;
+        while (MM > 9)
+        {
+            MM -= 10;
+            decimal++;
+        }
+        datetime[5] = MM | (decimal)<<4;
+
+        /// WEEKDAYS
+        if (W > 6) return;
+        datetime[4] = W;
+
+        /// DAY
+        if (DD > 32) return;
+        decimal = 0;
+        while (DD > 9)
+        {
+            DD -= 10;
+            decimal++;
+        }
+        datetime[3] = DD | (decimal)<<4;
+
+
+        /// HOURS
+        if (hh > 24) return;
+        decimal = 0;
+        while (hh > 9)
+        {
+            hh -= 10;
+            decimal++;
+        }
+        datetime[2] = hh | (decimal)<<4;
+
+        /// MINUTES
+        if (mm > 60) return;
+        decimal = 0;
+        while (mm > 9)
+        {
+            mm -= 10;
+            decimal++;
+        }
+        datetime[1] = mm | (decimal)<<4;
+
+
+        /// SECONDS
+        if (ss > 60) return;
+        decimal = 0;
+        while (ss > 9)
+        {
+            ss -= 10;
+            decimal++;
+        }
+        datetime[0] = ss | (decimal)<<4;
+
+        i2c.setRegister(PCF_ADDRESS, REG_CONTROL1, MSK_CONTROL1_STOP, MSK_CONTROL1_STOP);
+        i2c.write(PCF_ADDRESS, REG_SECONDS, datetime, 7);
+        i2c.setRegister(PCF_ADDRESS, REG_CONTROL1, MSK_CONTROL1_STOP, 0);
+
+    };
+
+    void readTime()
+    {
+       i2c.read(PCF_ADDRESS, REG_SECONDS, datetime, 7);
+
+        //uint8_t counter;
+        //counter = 0;
+       // while (counter<7)
+       for (uint8_t counter = 0; counter<7; counter++)
+       {
+        datetime[counter]  = uint8_t(((datetime[counter]>>4) * 10) + (datetime[counter] & B00001111));
+        //counter++;
+       }
+    };
+
 
     void setSeconds(uint8_t unit = 0)
     {
-        if (unit > 60) return;
-        uint8_t decimal = 0;
-        while (unit > 9)
-        {
-            unit -= 10;
-            decimal++;
-        }
-        unit |= (decimal)<<4;
-        i2c.writeByte(PCF_ADDRESS, REG_SECONDS, unit);
-    }
+    };
 
     void getSeconds(uint8_t& unit)
     {
-        unit = i2c.readByte(PCF_ADDRESS, REG_SECONDS);
-        unit = ((unit>>4) * 10) + (unit &= B00001111);
-    }
+        unit = datetime[0];
+    };
 
     void setMinutes(uint8_t unit = 0)
     {
-        if (unit > 60) return;
-        uint8_t decimal = 0;
-        while (unit > 9)
-        {
-            unit -= 10;
-            decimal++;
-        }
-        unit |= (decimal)<<4;
-        i2c.writeByte(PCF_ADDRESS, REG_MINUTES, unit);
-    }
+    };
 
     void getMinutes(uint8_t& unit)
     {
-        unit = i2c.readByte(PCF_ADDRESS, REG_MINUTES);
-        unit = ((unit>>4) * 10) + (unit &= B00001111);
-    }
+        unit = datetime[1];
+    };
 
     void setHours(uint8_t unit = 0)
     {
-        if (unit > 24) return;
-        uint8_t decimal = 0;
-        while (unit > 9)
-        {
-            unit -= 10;
-            decimal++;
-        }
-        unit |= (decimal)<<4;
-        i2c.writeByte(PCF_ADDRESS, REG_HOURS, unit);
-    }
+    };
 
     void getHours(uint8_t& unit)
     {
-        unit = i2c.readByte(PCF_ADDRESS, REG_HOURS);
-        unit = ((unit>>4) * 10) + (unit &= B00001111);
-    }
+        unit = datetime[2];
+    };
 
     void setDays(uint8_t unit = 0)
     {
-        if (unit > 32) return;
-        uint8_t decimal = 0;
-        while (unit > 9)
-        {
-            unit -= 10;
-            decimal++;
-        }
-        unit |= (decimal)<<4;
-        i2c.writeByte(PCF_ADDRESS, REG_DAYS, unit);
-    }
+    };
 
      void getDays(uint8_t& unit)
     {
-        unit = i2c.readByte(PCF_ADDRESS, REG_DAYS);
-        unit = ((unit>>4) * 10) + (unit &= B00001111);
+        unit = datetime[3];
     }
 
     void setWeekdays(uint8_t unit = 0)
     {
-        if (unit > 6) return;
-        i2c.writeByte(PCF_ADDRESS, REG_WEEKDAYS, unit); // start on Sunday
-    }
+    };
 
          void getWeekdays(uint8_t& unit)
     {
-        unit = i2c.readByte(PCF_ADDRESS, REG_WEEKDAYS);
-    }
+        unit = datetime[4];
+    };
 
     void setMonth(uint8_t unit = 0)
     {
-        if (unit > 12) return;
-        uint8_t decimal = 0;
-        while (unit > 9)
-        {
-            unit -= 10;
-            decimal++;
-        }
-        unit |= (decimal)<<4;
-        i2c.writeByte(PCF_ADDRESS, REG_MONTH, unit);
-    }
+    };
 
     void getMonth(uint8_t& unit)
     {
-        unit = i2c.readByte(PCF_ADDRESS, REG_MONTH);
-        unit = ((unit>>4) * 10) + (unit &= B00001111);
-    }
+        unit = datetime[5];
+    };
 
     void setYears(uint8_t unit = 0)
     {
-        if (unit > 12) return;
-        uint8_t decimal = 0;
-        while (unit > 9)
-        {
-            unit -= 10;
-            decimal += 1;
-        }
-        unit |= (decimal)<<4;
-        i2c.writeByte(PCF_ADDRESS, REG_MONTH, unit);
-    }
+    };
 
-    void getYears(uint8_t& unit)
+    void getYears(uint16_t& unit)
     {
-        unit = i2c.readByte(PCF_ADDRESS, REG_MONTH);
-        unit = ((unit>>4) * 10) + (unit &= B00001111);
-    }
+        unit = VAL_YEAR_OFFSET + uint16_t(datetime[6]);
+    };
 /*
 
 #define REG_SECONDS             0x03    // 7bit
