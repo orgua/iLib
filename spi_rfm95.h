@@ -52,12 +52,6 @@ class RFM95
 #define         VAL_MODE_RX_SINGLE  0x06
 #define         VAL_MODE_CAD        0x07
 
-//#define REG_BITRATEMSB              0x02    // bit rate setting
-//#define REG_BITRATELSB              0x03
-
-//#define REG_FDEVMSB                 0x04    // Freq Deviation setting
-//#define REG_FDEVLSB                 0x05
-
 #define REG_REGFRFMSB               0x06    // RF Carrier Freq --> access in sleep/stdby
 #define REG_REGFRFMID               0x07
 #define REG_REGFRFLSB               0x08
@@ -67,7 +61,7 @@ class RFM95
 #define     MSK_PA_MAX_POWER        (B01110000)  // pmax = 10.8+0.6*REG dBm
 #define     MSK_PA_OUT_POWER        (B00001111)  // pout = pmax - (15-REG) OR (boost) pout = 2 + REG
 #define REG_PA_RAMP                 0x0A    // low phase noise
-//#define     MSK_PA_SHAPING          (B01100000)
+
 #define     MSK_PA_RAMP             (B00001111)
 #define REG_OCP                     0x0B    // Over current Protection
 #define     MSK_OCP_ON              (B00100000)
@@ -141,53 +135,70 @@ class RFM95
 #define     MSK_MODEM_IMPLICITHDR   (B00000001) // implicit header stores length
 
 #define REG_MODEM_CONFIG2           0x1E
-SF06 // 64 chips/symbol --> SNR -5 dB
-SF07 // 128 chips/symbol --> SNR -7.5 dB
-SF08 // 256 chips/symbol --> SNR -10 dB
-SF09 // 512 chips/symbol --> SNR -12.5 dB
-SF10 // 1024 chips/symbol --> SNR -15 dB
-SF11 // 2048 chips/symbol --> SNR -17.5 dB
-SF12 // 4096 chips/symbol --> SNR -20 dB
-
-#define REG_PREAMBLE_DETECT         0x1F
-#define REG_PREAMBLE_MSB            0x20
+#define     MSK_MODEM_SF            (B11110000)
+#define         VAL_MODEM_SF06      (B01100000) // 64 chips/symbol --> SNR -5 dB
+#define         VAL_MODEM_SF07      (B01110000) // 128 chips/symbol --> SNR -7.5 dB
+#define         VAL_MODEM_SF08      (B10000000) // 256 chips/symbol --> SNR -10 dB
+#define         VAL_MODEM_SF09      (B10010000) // 512 chips/symbol --> SNR -12.5 dB
+#define         VAL_MODEM_SF10      (B10100000) // 1024 chips/symbol --> SNR -15 dB
+#define         VAL_MODEM_SF11      (B10110000) // 2048 chips/symbol --> SNR -17.5 dB
+#define         VAL_MODEM_SF12      (B11000000) // 4096 chips/symbol --> SNR -20 dB
+#define     MSK_TX_CONTINOUOS       (B00001000)
+#define     MSK_RX_PAYLOAD_CRC_ON   (B00000100)
+#define     MSK_SYMB_TIMEOUTMSB     (B00000011)
+#define REG_SYMB_TIMEOUTLSB         0x1F    // number of symbols; timeout = REG * Ts
+#define REG_PREAMBLE_MSB            0x20    // Length = REG + 4.25 Symbols
 #define REG_PREAMBLE_LSB            0x21
 
 #define REG_PAYLOAD_LENGTH          0x22    // size of bytes to be transmitted
 #define REG_MAX_PAYLOAD_LENGTH      0x23
 
-#define REG_HOP_PERIOD              0x24
+#define REG_HOP_PERIOD              0x24    // 0: disable
 
 #define REG_FIFO_RX_BYTE_ADDR       0x25    // Addr of last byte written
 
 #define REG_MODEM_CONFIG3           0x26
+#define     MSK_LOW_DATARATE_OPTI   (B00001000) // Mandatory when symbollength > 16ms
+#define     MSK_AGC_AUTO_ON         (B00000100)
 
 /// 0x27 - 3F not for LORA
 
 #define REG_DIO_MAPPING_1           0x40
+#define     MSK_DIO0_MAPPING        (B11000000)
+#define     MSK_DIO1_MAPPING        (B00110000)
+#define     MSK_DIO2_MAPPING        (B00001100)
+#define     MSK_DIO3_MAPPING        (B00000011)
 #define REG_DIO_MAPPING_2           0x41
+#define     MSK_DIO4_MAPPING        (B11000000)
+#define     MSK_DIO5_MAPPING        (B00110000)
+#define     MSK_DIO_MAP_PREAMB_DET  (B00000001)
 #define REG_VERSION                 0x42
 #define     VAL_V1B                 0x12 // has errors --> extra document (errata)
 
 #define REG_TCXO                    0x4B    // TCXO or XTAL input
+#define     MSK_TCXO_ON             (B00010000)
 #define REG_PA_DAC                  0x4D    // Power setting of PA
-#define REG_FORMER_TEMP             0x5B
+#define     MSK_PA_DAC              (B00000111)
+#define         VAL_PA_DAC_DEFAULT  0x04
+#define         VAL_PA_DAC_20DBM    0x07    // when outputpower = 111
+#define REG_FORMER_TEMP             0x5B    // -1°C per LSB
 
 #define REG_AGC_REF                 0x61
+#define     MSK_AGC_REF_LEVEL       (B00111111) // def=0x19
 #define REG_AGC_THRESH1             0x62
+#define     MSK_AGC_STEP1           0x0F
 #define REG_AGC_THRESH2             0x63
+#define     MSK_AGC_STEP2           0xF0
+#define     MSK_AGC_STEP3           0x0F
 #define REG_AGC_THRESH3             0x64
+#define     MSK_AGC_STEP4           0xF0
+#define     MSK_AGC_STEP5           0x0F
 #define REG_PLL                     0x70
-
-
-
-#define PAYLOAD_LENGTH              0x0A
-#define IMPLICIT_MODE               0x0C
-
-// LOW NOISE AMPLIFIER
-#define REG_LNA                     0x0C
-#define LNA_MAX_GAIN                0x23 // 0010 0011
-#define LNA_OFF_GAIN                0x00
+#define     MSK_PLL_BW              (B11000000)
+#define         VAL_PLL_BW075KHZ    (B00000000)
+#define         VAL_PLL_BW150KHZ    (B01000000)
+#define         VAL_PLL_BW225KHZ    (B10000000)
+#define         VAL_PLL_BW300KHZ    (B11000000)
 
 /// static configuration:
 // CRCon
