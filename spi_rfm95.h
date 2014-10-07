@@ -1,5 +1,5 @@
 #ifndef spi_rfm95_h
-#define i2c_rfm95_h
+#define spi_rfm95_h
 
 #include <SPI.h>
 
@@ -30,6 +30,7 @@ class RFM95
 #define RFM_FIFO_SIZE               256
 #define RFM_FXOSC                   32000000.0
 #define RFM_FSTEP                   (RFM_FXOSC / 524288)
+#define RFM_CS                      10 // PIN
 
 #define SPI_WRITE(a)                (a|0x80)
 #define SPI_READ(a)                 (a&0x7F)
@@ -161,7 +162,7 @@ class RFM95
 #define     MSK_LOW_DATARATE_OPTI   (B00001000) // Mandatory when symbollength > 16ms
 #define     MSK_AGC_AUTO_ON         (B00000100)
 
-/// 0x27 - 3F not for LORA
+/// 0x27 - 3F not for LoRa
 
 #define REG_DIO_MAPPING_1           0x40
 #define     MSK_DIO0_MAPPING        (B11000000)
@@ -214,7 +215,11 @@ public:
 
     RFM95(void)
     {
-        //_address = MPL_ADDRESS;
+        pinMode(RFM_CS, OUTPUT);
+        SPI.begin();
+        SPI.setClockDivider(SPI_CLOCK_DIV8); // RFM95W can handle 10MHz
+        SPI.setDataMode(SPI_MODE0);
+        SPI.setBitOrder(MSBFIRST);
     };
 
 // write();
@@ -223,19 +228,51 @@ public:
 // readByte();
 // readFlag();
 
-    void exchange(uint8_t register, uint8_t& buffer[], uint8_t length=1) // uint8_t CS,
+    void spiExchange(uint8_t regExchange, uint8_t buffer[], uint8_t length=1) // uint8_t CS,
 {
     if (!length) return;
-    digitalWrite(CS, LOW);
-
-    SPI.transfer(buffer[counter]);
-
+    digitalWrite(RFM_CS, LOW);
+    SPI.transfer(regExchange);
     for (uint8_t counter=0; counter < length; counter++)
     {
         buffer[counter] = SPI.transfer(buffer[counter]);
-    }
-    digitalWrite(CS, HIGH);
+    };
+    // todo: better while (length--) *buffer++ = SPI.transfer(*buffer);
+    digitalWrite(RFM_CS, HIGH);
 };
+
+    uint8_t spiRead(uint8_t regValue)
+{
+    digitalWrite(RFM_CS, LOW);
+    SPI.transfer(SPI_READ(regValue));
+    uint8_t _value = SPI.transfer(0);
+    digitalWrite(RFM_CS, HIGH);
+    return _value;
+};
+
+    void spiWrite(uint8_t regValue, uint8_t value)
+{
+    digitalWrite(RFM_CS, LOW);
+    SPI.transfer(SPI_WRITE(regValue));
+    SPI.transfer(value);
+    digitalWrite(RFM_CS, HIGH);
+};
+
+void setRegister(uint8_t regValue, uint8_t mask, uint8_t value)
+{
+    uint8_t _toWrite = spiRead(regValue);
+    _toWrite = (_toWrite & (!mask)) | value;
+    spiWrite(regValue, _toWrite);
+};
+
+
+uint8_t initialize()
+{
+    if (spiRead(REG_VERSION) != VAL_V1B) return 1; // FAIL
+
+
+    return 0; // all OK
+}
 
 // setLoRaMode()
 // setMode()
@@ -283,4 +320,10 @@ public:
 
 
 
+};
 
+/** ######### Preinstantiate Object ################################################################# */
+/** < it's better when this is done by the user */
+//PRESET preset = PRESET();
+
+#endif

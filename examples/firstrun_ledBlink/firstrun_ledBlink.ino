@@ -6,8 +6,6 @@ EXT     0xFD
 HIGH    0xDF or xDE (bootrst EN)
 LOW     0xFF
 
-
-
  */
 
 #define TIMEON   20
