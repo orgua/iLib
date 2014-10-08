@@ -12,6 +12,7 @@ void setup()
 {
     Serial.begin(115200);
 
+    Serial.println(rfm.getFrequency());
     Serial.print("Probe RFM95W: ");
     if (rfm.initialize()) Serial.println("missing");
     else Serial.println("found");
