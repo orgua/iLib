@@ -28,8 +28,10 @@ class RFM95
 {
 
 #define RFM_FIFO_SIZE               256
-#define RFM_FXOSC                   32000000.0
-#define RFM_FSTEP                   (RFM_FXOSC / 524288)
+#define RFM_PACKET_SIZE_MAX         128
+#define RFM_FOSC                    32000000.0
+#define RFM_FSTEP                   (RFM_FOSC / 524288)
+#define RFM_FINV                    (524288.0 / RFM_FOSC)
 #define RFM_CS                      10 // PIN
 
 #define SPI_WRITE(a)                (a|0x80)
@@ -88,7 +90,7 @@ class RFM95
 #define     MSK_IRQ_TX_DONE         (B00001000)
 #define     MSK_IRQ_CAD_DONE        (B00000100)
 #define     MSK_IRQ_FHSS_CHANGE     (B00000010)
-#define     MSK_IRQ_CAT_DETECTED    (B00000001)
+#define     MSK_IRQ_CAD_DETECTED    (B00000001)
 
 
 #define REG_RX_NB_BYTES             0x13    // successful receive will write this bytecount
@@ -208,10 +210,52 @@ class RFM95
 
 private:
 
+    uint8_t _filterBadCRC;
+    uint8_t _mode;
+public:
+
+
+
+    /** ######### SPI ################################################################# */
+
+    void spiExchange(uint8_t regExchange, uint8_t buffer[], uint8_t length=1) // uint8_t CS,
+    {
+        if (!length) return;
+        digitalWrite(RFM_CS, LOW);
+        SPI.transfer(regExchange);
+        for (uint8_t counter=0; counter < length; counter++)
+        {
+            buffer[counter] = SPI.transfer(buffer[counter]);
+        };
+        // todo: better while (length--) *buffer++ = SPI.transfer(*buffer);
+        digitalWrite(RFM_CS, HIGH);
+    };
+
+    uint8_t spiRead(uint8_t regValue)
+    {
+        digitalWrite(RFM_CS, LOW);
+        SPI.transfer(SPI_READ(regValue));
+        uint8_t _value = SPI.transfer(0);
+        digitalWrite(RFM_CS, HIGH);
+        return _value;
+    };
+
+    void spiWrite(uint8_t regValue, uint8_t value)
+    {
+        digitalWrite(RFM_CS, LOW);
+        SPI.transfer(SPI_WRITE(regValue));
+        SPI.transfer(value);
+        digitalWrite(RFM_CS, HIGH);
+    };
+
+    void setRegister(uint8_t regValue, uint8_t mask, uint8_t value)
+    {
+        uint8_t _toWrite = spiRead(regValue);
+        _toWrite = (_toWrite & (!mask)) | value;
+        spiWrite(regValue, _toWrite);
+    };
 
     /** ######### function definition ################################################################# */
-
-public:
 
     RFM95(void)
     {
@@ -222,101 +266,313 @@ public:
         SPI.setBitOrder(MSBFIRST);
     };
 
-// write();
-// writeByte();
-// read()
-// readByte();
-// readFlag();
-
-    void spiExchange(uint8_t regExchange, uint8_t buffer[], uint8_t length=1) // uint8_t CS,
-{
-    if (!length) return;
-    digitalWrite(RFM_CS, LOW);
-    SPI.transfer(regExchange);
-    for (uint8_t counter=0; counter < length; counter++)
+    uint8_t initialize()
     {
-        buffer[counter] = SPI.transfer(buffer[counter]);
+        if (spiRead(REG_VERSION) != VAL_V1B) return 1; // FAIL
+
+        /// activate sleep and lora
+        setEnabled(1);
+        delay(10);
+        setRegister(REG_OPMODE, MSK_OPMODE_LORA, 255); // setLoRaMode()
+
+        /// config FIFO
+        spiWrite(REG_FIFO_TX_BASE_AD, 0x00);
+        spiWrite(REG_FIFO_RX_BASE_AD, 0x00);
+        spiWrite(REG_FIFO_ADDR_PTR, 0x00);
+        spiWrite(REG_MAX_PAYLOAD_LENGTH, RFM_PACKET_SIZE_MAX); // longer packets trigger CRC-Error
+        /// config IRQs
+        // TODO
+        spiWrite(REG_IRQ_FLAGS_MASK, 255); // All ON
+
+        /// configure Message / Tranceiver
+        setFrequency(868000);
+        setPreambleLength(8);
+        setPMax(10);
+        setIMax(100);
+        setLNA();
+        filterCRC(0);
+
+        setBandwidth(500);
+        setRegister(REG_MODEM_CONFIG1, MSK_MODEM_CR, VAL_MODEM_CR1); // set CodingRate
+        setRegister(REG_MODEM_CONFIG2, MSK_MODEM_SF, VAL_MODEM_SF06); // set SpreadingFactor
+        // setRegister(REG_MODEM_CONFIG3, MSK_LOW_DATARATE_OPTI, 255); // Mandatory when symbollength > 16ms
+        setRegister(REG_MODEM_CONFIG2, MSK_TX_CONTINOUOS, 0); // single Packet sending
+        setRegister(REG_MODEM_CONFIG2, MSK_RX_PAYLOAD_CRC_ON,MSK_RX_PAYLOAD_CRC_ON); // CRC on
+        spiWrite(REG_HOP_PERIOD, 0); // 0: disable
+
+        ///
+        return 0; // all OK
     };
-    // todo: better while (length--) *buffer++ = SPI.transfer(*buffer);
-    digitalWrite(RFM_CS, HIGH);
-};
 
-    uint8_t spiRead(uint8_t regValue)
-{
-    digitalWrite(RFM_CS, LOW);
-    SPI.transfer(SPI_READ(regValue));
-    uint8_t _value = SPI.transfer(0);
-    digitalWrite(RFM_CS, HIGH);
-    return _value;
-};
+    /**< Go into powersaving standby */
+    void setEnabled(uint8_t enabled)
+    {
+        if (enabled)    setRegister(REG_OPMODE, MSK_OPMODE_MODE, VAL_MODE_SLEEP);
+        else            setRegister(REG_OPMODE, MSK_OPMODE_MODE, VAL_MODE_STANDBY);
+        _mode = VAL_MODE_SLEEP; // TODO: not completely right
+    };
 
-    void spiWrite(uint8_t regValue, uint8_t value)
-{
-    digitalWrite(RFM_CS, LOW);
-    SPI.transfer(SPI_WRITE(regValue));
-    SPI.transfer(value);
-    digitalWrite(RFM_CS, HIGH);
-};
+    void setPreambleLength(uint16_t length)
+    {
+        spiWrite(REG_PREAMBLE_MSB, (length >> 8)&0xFF);
+        spiWrite(REG_PREAMBLE_LSB, (length&0xFF));
+    };
 
-void setRegister(uint8_t regValue, uint8_t mask, uint8_t value)
-{
-    uint8_t _toWrite = spiRead(regValue);
-    _toWrite = (_toWrite & (!mask)) | value;
-    spiWrite(regValue, _toWrite);
-};
+    void setFrequency(uint32_t kHz)
+    {
+        kHz = uint32_t(RFM_FINV * float(kHz) * 1000.0);
+        spiWrite(REG_REGFRFLSB, kHz & 0xFF);
+        kHz = kHz >> 8;
+        spiWrite(REG_REGFRFMID, kHz & 0xFF);
+        kHz = kHz >> 8;
+        spiWrite(REG_REGFRFMSB, kHz & 0xFF);
+    };
+
+    uint32_t getFrequency()
+    {
+        uint32_t frf;
+        frf = spiRead(REG_REGFRFMSB);
+        frf = (frf<<8) | spiRead(REG_REGFRFMID);
+        frf = (frf<<8) | spiRead(REG_REGFRFLSB);
+        frf = uint32_t(RFM_FSTEP * float(frf) / 1000.0);
+        return frf;
+    };
+
+    void setIMax(uint8_t mA) /// zero turns current protection off
+    {
+        if (mA > 120)   mA = ((mA - 45) / 5);
+        else if (mA)    mA = ((mA + 30) / 10);
+        else
+        {
+            setRegister(REG_OCP, MSK_OCP_ON, 0);
+            return;
+        }
+        setRegister(REG_OCP, MSK_OCP_ON, 255);
+        setRegister(REG_OCP, MSK_OCP_TRIM,mA);
+    }
+
+    void setPMax(uint8_t dBm)
+    {
+        if (dBm > 20) dBm = 20;
+        uint8_t paBoost = 0;
+        uint8_t paMax = 0;
+
+        if (dBm > 14)
+        {
+            paBoost = 255;
+            paMax = 255;
+            dBm -= 5;
+        }
+        else if (dBm > 11)  paMax = 255;
+        else                dBm += 4;
+
+        setRegister(REG_PA_CONFIG,MSK_PA_SELECT, paBoost);
+        setRegister(REG_PA_CONFIG,MSK_PA_MAX_POWER,paMax);
+        setRegister(REG_PA_CONFIG,MSK_PA_OUT_POWER, dBm&MSK_PA_OUT_POWER);
+    };
+
+    void setLNA()
+    {
+       setRegister(REG_LNA, MSK_LNA_GAIN, B00100000);
+       setRegister(REG_LNA, MSK_LNA_BOOST_HF, VAL_LNA_BOOST_HF_ON);
+       setRegister(REG_MODEM_CONFIG3, MSK_AGC_AUTO_ON, MSK_AGC_AUTO_ON);
+    }
+
+    void setBandwidth(uint16_t kHz = 500)
+    {
+        if      (kHz > 300) kHz = VAL_MODEM_BW500;
+        else if (kHz > 200) kHz = VAL_MODEM_BW250;
+        else if (kHz > 100) kHz = VAL_MODEM_BW125;
+        else if (kHz >  50) kHz = VAL_MODEM_BW063;
+        else if (kHz >  35) kHz = VAL_MODEM_BW042;
+        else if (kHz >  25) kHz = VAL_MODEM_BW031;
+        else if (kHz >  18) kHz = VAL_MODEM_BW021;
+        else if (kHz >  13) kHz = VAL_MODEM_BW016;
+        else if (kHz >   9) kHz = VAL_MODEM_BW010;
+        else                kHz = VAL_MODEM_BW008;
+        setRegister(REG_MODEM_CONFIG1, MSK_MODEM_BW, kHz);
+    }
+
+    void handleIRQ()
+    {
+        uint8_t flags = spiRead(REG_IRQ_FLAGS);
+        if (flags & MSK_IRQ_RX_TIMEOUT) { flags &= !MSK_IRQ_RX_TIMEOUT; Serial.println("RX_Timeout"); }
+        if (flags & MSK_IRQ_RX_DONE) { flags &= !MSK_IRQ_RX_DONE; Serial.println("RX_Done"); } // valid header CRC  --> set the RxDone interrupt
+        if (flags & MSK_IRQ_PAYLOAD_CRC_ERR) { flags &= !MSK_IRQ_PAYLOAD_CRC_ERR; Serial.println("CRC_Error"); }
+        if (flags & MSK_IRQ_VALID_HEADER) { flags &= !MSK_IRQ_VALID_HEADER; Serial.println("Valid HDR"); }
+
+        if (flags & MSK_IRQ_TX_DONE) { flags &= !MSK_IRQ_TX_DONE; Serial.println("TX Done"); receiveDataCont(); }
+        if (flags & MSK_IRQ_CAD_DONE) { flags &= !MSK_IRQ_CAD_DONE; Serial.println("CAD Done"); }
+        if (flags & MSK_IRQ_FHSS_CHANGE) { flags &= !MSK_IRQ_FHSS_CHANGE; Serial.println("FHSS Change"); }
+        if (flags & MSK_IRQ_CAD_DETECTED) { flags &= !MSK_IRQ_CAD_DETECTED; Serial.println("CAD Detected"); }
+        spiWrite(REG_IRQ_FLAGS, flags);
+    }
 
 
-uint8_t initialize()
-{
-    if (spiRead(REG_VERSION) != VAL_V1B) return 1; // FAIL
 
 
-    return 0; // all OK
-}
-
-// setLoRaMode()
 // setMode()
 // setRXTimeout()
+    uint8_t canSend()
+    {
+        if (_mode == VAL_MODE_TX) return 0;
+        return 1;
+    }
 
     void sendData()
-{
-    // goto Standby
-    // Set FifoPtrAddr to FifoTxPtrBase.
-    // Write PayloadLength bytes to the FIFO (RegFifo)
-};
+    {
+        if (_mode == VAL_MODE_TX) return;
+
+        setRegister(REG_OPMODE, MSK_OPMODE_MODE, VAL_MODE_SLEEP); // goto Standby
+        spiWrite(REG_FIFO_ADDR_PTR, 0); // Set FifoPtrAddr to FifoTxPtrBase.
+        /// TODO
+        uint8_t length = 5;
+        while (length)
+            {
+            spiWrite(REG_FIFO, length--); //put content TODO
+            }
+
+        spiWrite(REG_PAYLOAD_LENGTH, 5); // Write PayloadLength bytes to the FIFO (RegFifo)
+
+        setRegister(REG_DIO_MAPPING_1, MSK_DIO0_MAPPING, 0x00); // Packet Sent IRQ
+        /// TODO: activate IRQ
+        setRegister(REG_OPMODE, MSK_OPMODE_MODE, VAL_MODE_TX);
+        _mode = VAL_MODE_TX;
+    };
+
+    void filterCRC(uint8_t enable)
+    {
+        _filterBadCRC = enable && 1;
+    }
 
     void receiveDataSingle()
-{
-    //1 Set FifoAddrPtr to FifoRxBaseAddr.
-    //2 Static configuration register device can be written in either Sleep mode, Stand-by mode or FSRX mode.
-    //3 A single packet receive operation is initiated by selecting the operating mode RXSINGLE.
-    //4 The receiver will then await the reception of a valid preamble. Once received, the gain of the receive chain is set. Following the ensuing reception of a valid header, indicated by the ValidHeader interrupt in explicit mode. The packet reception process commences. Once the reception process is complete the RxDone interrupt is set. The radio then returns automatically to Stand-by mode to reduce power consumption.
-    //5 The receiver status register PayloadCrcError should be checked for packet payload integrity.
-    //6 If a valid packet payload has been received then the FIFO should be read (See Payload Data Extraction below). Should a subsequent single packet reception need to be triggered, then the RXSINGLE operating mode must be re-selected to launch the receive process again - taking care to reset the SPI pointer (FifoAddrPtr) to the base location in memory (FifoRxBaseAddr).
-};
+    {
+        setRegister(REG_OPMODE, MSK_OPMODE_MODE, VAL_MODE_SLEEP);
+        spiWrite(REG_FIFO_ADDR_PTR, 0); // Set FifoAddrPtr to FifoRxBaseAddr.
+        //2 Static configuration register device can be written in either Sleep mode, Stand-by mode or FSRX mode.
+        //3 A single packet receive operation is initiated by selecting the operating mode RXSINGLE.
+        //4 The receiver will then await the reception of a valid preamble. Once received, the gain of the receive chain is set. Following the ensuing reception of a valid header, indicated by the ValidHeader interrupt in explicit mode. The packet reception process commences. Once the reception process is complete the RxDone interrupt is set. The radio then returns automatically to Stand-by mode to reduce power consumption.
+        //5 The receiver status register PayloadCrcError should be checked for packet payload integrity.
+        //6 If a valid packet payload has been received then the FIFO should be read (See Payload Data Extraction below). Should a subsequent single packet reception need to be triggered, then the RXSINGLE operating mode must be re-selected to launch the receive process again - taking care to reset the SPI pointer (FifoAddrPtr) to the base location in memory (FifoRxBaseAddr).
+        if (_filterBadCRC)   setRegister(REG_DIO_MAPPING_1, MSK_DIO0_MAPPING, B01000000); // CRC OK
+        else                setRegister(REG_DIO_MAPPING_1, MSK_DIO0_MAPPING, B00000000); // Payload Ready
+
+        setRegister(REG_OPMODE, MSK_OPMODE_MODE, VAL_MODE_RX_SINGLE);
+    };
 
     void receiveDataCont()
     {
-    //1 Whilst in Sleep or Stand-by mode select RXCONT mode.
-    //2 Upon reception of a valid header CRC the RxDone interrupt is set. The radio remains in RXCONT mode waiting for the
-    //next RX LoRaTM packet.
-    //3 The PayloadCrcError flag should be checked for packet integrity.
-    //4 If packet has been correctly received the FIFO data buffer can be read (see below).
-    //5 The reception process (steps 2 - 4) can be repeated or receiver operating mode exited as desired.
+        if ((_mode != VAL_MODE_SLEEP) && (_mode != VAL_MODE_STANDBY)) return;
+
+        setRegister(REG_OPMODE, MSK_OPMODE_MODE, VAL_MODE_SLEEP);
+
+        if (_filterBadCRC)  setRegister(REG_DIO_MAPPING_1, MSK_DIO0_MAPPING, B01000000); // CRC OK
+        else                setRegister(REG_DIO_MAPPING_1, MSK_DIO0_MAPPING, B00000000); // Payload Ready
+
+        /// activate IRQ
+        setRegister(REG_OPMODE, MSK_OPMODE_MODE, VAL_MODE_RX_CONT);
+        _mode = VAL_MODE_RX_CONT;
     };
 
     void extractFifo()
     {
-       // ValidHeader, PayloadCrcError, RxDone and RxTimeout should not be set
-       // RegRxNbBytes Indicates the number of bytes that have been received thus far.
-       // RegFifoAddrPtr is a dynamic pointer that indicates precisely where the Lora modem received data has been written up
-       // to.
-       // Set RegFifoAddrPtr to RegFifoRxCurrentAddr. This sets the FIFO pointer to the location of the last packet received in
-       // the FIFO. The payload can then be extracted by reading the register RegFifo, RegRxNbBytes times.
-       // Alternatively, it is possible to manually point to the location of the last packet received, from the start of the current
-       // packet, by setting RegFifoAddrPtr to RegFifoRxByteAddr minus RegRxNbBytes. The payload bytes can then be read
-       // from the FIFO by reading the RegFifo address RegRxNbBytes times.
+        // ValidHeader, PayloadCrcError, RxDone and RxTimeout should not be set
+        // RegRxNbBytes Indicates the number of bytes that have been received thus far.
+        // RegFifoAddrPtr is a dynamic pointer that indicates precisely where the Lora modem received data has been written up
+        // to.
+        // Set RegFifoAddrPtr to RegFifoRxCurrentAddr. This sets the FIFO pointer to the location of the last packet received in
+        // the FIFO. The payload can then be extracted by reading the register RegFifo, RegRxNbBytes times.
+        // Alternatively, it is possible to manually point to the location of the last packet received, from the start of the current
+        // packet, by setting RegFifoAddrPtr to RegFifoRxByteAddr minus RegRxNbBytes. The payload bytes can then be read
+        // from the FIFO by reading the RegFifo address RegRxNbBytes times.
     };
+
+/*
+#define REG_FIFO                    0x00    // cleared when in SleepMode
+#define REG_FIFO_RX_CURRENT_ADDR    0x10    // start of last packet received
+
+#define REG_IRQ_FLAGS_MASK          0x11
+#define REG_IRQ_FLAGS               0x12
+#define     MSK_IRQ_RX_TIMEOUT      (B10000000)
+#define     MSK_IRQ_RX_DONE         (B01000000)
+#define     MSK_IRQ_PAYLOAD_CRC_ERR (B00100000)
+#define     MSK_IRQ_VALID_HEADER    (B00010000)
+#define     MSK_IRQ_TX_DONE         (B00001000)
+#define     MSK_IRQ_CAD_DONE        (B00000100)
+#define     MSK_IRQ_FHSS_CHANGE     (B00000010)
+#define     MSK_IRQ_CAT_DETECTED    (B00000001)
+
+
+#define REG_RX_NB_BYTES             0x13    // successful receive will write this bytecount
+
+#define REG_RX_HEADER_CNT_MSB       0x14
+#define REG_RX_HEADER_CNT_LSB       0x15
+#define REG_RX_PACKET_CNT_MSB       0x16
+#define REG_RX_PACKET_CNT_LSB       0x17
+
+#define REG_MODEM_STAT              0x18
+#define     MSK_MODEM_RX_CODINGRATE (B11100000)
+#define     MSK_MODEM_STATUS        (B00011111)
+#define     MSK_MODEM_STATUS_CLEAR  (B00010000)
+#define     MSK_MODEM_STATUS_HDRVAL (B00001000)
+#define     MSK_MODEM_STATUS_RXON   (B00000100)
+#define     MSK_MODEM_STATUS_SYNC   (B00000010)
+#define     MSK_MODEM_STATUS_SIGDET (B00000001)
+
+#define REG_PKT_SNR_VALUE           0x19    // last Packets SNR dB = int8_REG/4
+#define REG_PKT_RSSI_VALUE          0x1A    // last Packets RSSI dBm = REG - 127
+#define REG_RSSI_VALUE              0x1B    // current RSSI dBm = REG - 127
+
+#define REG_HOP_CHANNEL             0x1C
+#define     MSK_HOP_PLL_TIMEOUT     (B10000000)
+#define     MSK_HOP_RX_CRCON        (B01000000)
+#define     MSK_HOP_FHSS_CHANNEL    (B00111111)
+
+
+#define REG_SYMB_TIMEOUTLSB         0x1F    // number of symbols; timeout = REG * Ts
+
+#define REG_FIFO_RX_BYTE_ADDR       0x25    // Addr of last byte written
+
+/// 0x27 - 3F not for LoRa
+
+#define REG_DIO_MAPPING_1           0x40
+#define     MSK_DIO0_MAPPING        (B11000000)
+#define     MSK_DIO1_MAPPING        (B00110000)
+#define     MSK_DIO2_MAPPING        (B00001100)
+#define     MSK_DIO3_MAPPING        (B00000011)
+#define REG_DIO_MAPPING_2           0x41
+#define     MSK_DIO4_MAPPING        (B11000000)
+#define     MSK_DIO5_MAPPING        (B00110000)
+#define     MSK_DIO_MAP_PREAMB_DET  (B00000001)
+#define REG_VERSION                 0x42
+#define     VAL_V1B                 0x12 // has errors --> extra document (errata)
+
+#define REG_TCXO                    0x4B    // TCXO or XTAL input
+#define     MSK_TCXO_ON             (B00010000)
+#define REG_PA_DAC                  0x4D    // Power setting of PA
+#define     MSK_PA_DAC              (B00000111)
+#define         VAL_PA_DAC_DEFAULT  0x04
+#define         VAL_PA_DAC_20DBM    0x07    // when outputpower = 111
+#define REG_FORMER_TEMP             0x5B    // -1°C per LSB
+
+#define REG_AGC_REF                 0x61
+#define     MSK_AGC_REF_LEVEL       (B00111111) // def=0x19
+#define REG_AGC_THRESH1             0x62
+#define     MSK_AGC_STEP1           0x0F
+#define REG_AGC_THRESH2             0x63
+#define     MSK_AGC_STEP2           0xF0
+#define     MSK_AGC_STEP3           0x0F
+#define REG_AGC_THRESH3             0x64
+#define     MSK_AGC_STEP4           0xF0
+#define     MSK_AGC_STEP5           0x0F
+#define REG_PLL                     0x70
+#define     MSK_PLL_BW              (B11000000)
+#define         VAL_PLL_BW075KHZ    (B00000000)
+#define         VAL_PLL_BW150KHZ    (B01000000)
+#define         VAL_PLL_BW225KHZ    (B10000000)
+#define         VAL_PLL_BW300KHZ    (B11000000)
+
+*/
 
 
 

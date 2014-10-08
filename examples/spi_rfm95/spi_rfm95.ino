@@ -3,6 +3,11 @@
 RFM95 rfm = RFM95();
 
 
+#define TIMEON   20
+#define TIMEOFF  (1000-TIMEON)
+#define LEDPINA   8
+
+
 void setup()
 {
     Serial.begin(115200);
@@ -11,13 +16,28 @@ void setup()
     if (rfm.initialize()) Serial.println("missing");
     else Serial.println("found");
 
-    while (1) {};
+
+    Serial.println(rfm.getFrequency());
+    rfm.receiveDataCont();
+
+    //while (1) { rfm.handleIRQ(); };
+
+    pinMode(LEDPINA, OUTPUT);
+    digitalWrite(LEDPINA,HIGH);
 }
 
 void loop()
 {
-    Serial.print(" test ");
-    delay(50);
+    rfm.handleIRQ();
+    delay(TIMEOFF);
+    if (rfm.canSend())
+    {
+        digitalWrite(LEDPINA,HIGH);
+        rfm.sendData();
+    };
+
+    delay(TIMEON);
+    digitalWrite(LEDPINA,LOW);
 }
 
 /**<
@@ -27,3 +47,4 @@ A105: b
 A157: b
 
  */
+

@@ -38,6 +38,7 @@
 		<Unit filename="examples/i2c_SI7021/i2c_SI7021.ino" />
 		<Unit filename="examples/i2c_TCS3772/i2c_TCS3772.ino" />
 		<Unit filename="examples/i2c_probeBus/i2c_probeBus.ino" />
+		<Unit filename="examples/spi_rfm95/spi_rfm95.ino" />
 		<Unit filename="i2c.cpp" />
 		<Unit filename="i2c.h" />
 		<Unit filename="i2c_BMP280.h" />
