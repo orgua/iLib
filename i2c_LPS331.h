@@ -16,7 +16,7 @@ Driver for the LPS331-Sensor
 ///
 ########################################################################  */
 
-class LPS331 : public i2cSensor
+class LPS331 : public i2cSensor, public manualSensor
 {
 
     /** ######### Register-Map ################################################################# */
@@ -67,7 +67,8 @@ public:
 
     void setDatarate(uint8_t valueHz)
     {
-        if 		(valueHz <= 1)  valueHz = 0b00010000;    // Pressure 512 averages, Temp 128 averages
+        if      (valueHz == 0)  valueHz = 0b00000000; // ONE-SHOT / MANUAL
+        else if (valueHz == 1)  valueHz = 0b00010000;    // Pressure 512 averages, Temp 128 averages
         else if (valueHz <= 7)  valueHz = 0b01010000; // 7 Hz
         else if (valueHz <= 13) valueHz = 0b01100000; // 12.5 Hz
         else                    valueHz = 0b01110000; // 25Hz, Temp 64 averages
@@ -117,7 +118,7 @@ public:
     /**< only used when in manual/standby mode */
     void triggerMeasurement(void)
     {
-        i2c.setRegister(LPS_ADDRESS, LPS331_CTRL_REG2, 0x01, 0x01); // Boot and SWRESET
+        i2c.setRegister(LPS_ADDRESS, LPS331_CTRL_REG2, 0x01, 0x01);
     }
 
     /**< check for new data, return 1 when Measurement is ready */

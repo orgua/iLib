@@ -24,6 +24,7 @@
 			</Target>
 		</Build>
 		<Unit filename="WS2812B.h" />
+		<Unit filename="atmel_vcc.h" />
 		<Unit filename="examples/WS2812B_Clock_90Led/WS2812B_Clock_90Led.ino" />
 		<Unit filename="examples/firstrun_ledBlink/firstrun_ledBlink.ino" />
 		<Unit filename="examples/i2c_BMP280/i2c_BMP280.ino" />

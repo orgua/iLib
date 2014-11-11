@@ -1,6 +1,7 @@
 #include <Wire.h>
 #include "i2c.h"
 
+// IMU-Sensor
 #include "i2c_MPU9250.h"
 MPU9250 mpu9250 = MPU9250();
 
@@ -17,6 +18,7 @@ void setup()
         case 3: Serial.println("MPU9250 found!"); break;
     }
 
+    Serial.print("Probe AK8963: ");
     if (i2c.probe(0x0C)) Serial.println("AK8963 found!");
     else                 Serial.println("AK8963 missing");
 
