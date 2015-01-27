@@ -90,7 +90,7 @@ public:
         i2c.setRegister(TCS_ADDRESS, REG_ENABLE | CMD_INCREMENT, MASK_AEN | MASK_PON, enable);
     };
 
-    void reset() {}
+    void reset() {};
 
     void setWaitTime(uint16_t wait = 0)
     {

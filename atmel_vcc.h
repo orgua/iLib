@@ -32,6 +32,13 @@ int32_t readVcc() {
   return result; // Vcc in millivolts
 };
 
+/*
+volatile bool adcDone;
+ISR(ADC_vect)
+{
+    adcDone = true;
+}
+*/
 };
 
 #endif
