@@ -45,7 +45,8 @@ void spektrumSerial_init(void)
     Clock_kkbo=19.2-20.0 both very temperaturestable!
     Working Range: 16.6-18.4 MHz, Test in 0.1Steps --> Middle 17.5
     */
-#define UART_BAUD_RATE 105324 // 17.5MHz
+//#define UART_BAUD_RATE 105324 // 17.5MHz
+#define UART_BAUD_RATE 108200
 
 #define UART_BAUD_SELECT ((F_CPU/UART_BAUD_RATE/16)-1)
     UBRR0L=((unsigned char)UART_BAUD_SELECT);
