@@ -15,6 +15,7 @@ volatile uint8_t sso_frame[SSO_FRAME_SIZE];
 volatile uint8_t frame_counter;
 volatile uint8_t frame_send;
 
+
 void spektrumSerial_init(void)
 {
     int i;
@@ -61,25 +62,19 @@ void spektrumSerial_init(void)
     asm("sei");
 }
 
+
+
 void spektrumSerial_send(unsigned int *channel_data)
 {
     int i;
     unsigned int temp_val;
 
-    for (i=0; i<6; i++)
+    for (i=0; i<7; i++)
     {
-        if (channel_data[i] <= 0)
-        {
-            temp_val = 0;
-        }
-        else if (channel_data[i] >= SSO_MAX_VAL)
-        {
-            temp_val = SSO_MAX_VAL;
-        }
-        else
-        {
-            temp_val = channel_data[i];//&SSO_MAX_VAL;
-        }
+        if (channel_data[i] <= 0) 					temp_val = 0;
+        else if (channel_data[i] >= SSO_MAX_VAL)	temp_val = SSO_MAX_VAL;
+        else										temp_val = channel_data[i]; //&SSO_MAX_VAL;
+		
         //sso_frame[2+(i*2)] = (sso_channel_map[i] << 2) | (temp_val>>8);
         sso_frame[2+(i*2)] = ((i&7) << 2) | (temp_val>>8);
         sso_frame[2+(i*2)+1] = temp_val & 0xFF;
@@ -98,13 +93,10 @@ ISR(USART_TX_vect)
 
     if (frame_counter >= SSO_FRAME_SIZE)   /* Frame is over, let's disable ourselves */
     {
-
         /* reset */
         frame_counter = 0;
-
         /* disable */
         UCSR0B=(0<<RXCIE0)|(0<<TXCIE0)|(0<<RXEN0)|(1<<TXEN0);
-
         frame_send = 1;
     }
 }
