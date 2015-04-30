@@ -46,15 +46,15 @@ public:
 
     WirePlus();
 
-    uint8_t probe(const uint8_t) noexcept;
-    uint8_t probeAddress(const uint8_t) noexcept;
-    void    write(const uint8_t, const uint8_t, const uint8_t *, const uint8_t) noexcept;
-    void    writeByte(const uint8_t, const uint8_t, const uint8_t) noexcept;
-    void    writeCMD(const uint8_t, const uint8_t) noexcept;
-    uint8_t readByte(const uint8_t , const uint8_t ) noexcept;
-    void    read(const uint8_t , const uint8_t , uint8_t *, const uint8_t ) noexcept;
-    void    setRegister(const uint8_t, const uint8_t, const uint8_t, const uint8_t) noexcept;
-    uint8_t getRegister(const uint8_t, const uint8_t, const uint8_t) noexcept;
+    uint8_t probe(const uint8_t);
+    uint8_t probeAddress(const uint8_t);
+    void    write(const uint8_t, const uint8_t, const uint8_t *, const uint8_t);
+    void    writeByte(const uint8_t, const uint8_t, const uint8_t);
+    void    writeCMD(const uint8_t, const uint8_t);
+    uint8_t readByte(const uint8_t , const uint8_t );
+    void    read(const uint8_t , const uint8_t , uint8_t *, const uint8_t );
+    void    setRegister(const uint8_t, const uint8_t, const uint8_t, const uint8_t);
+    uint8_t getRegister(const uint8_t, const uint8_t, const uint8_t);
 };
 
 /** ######### Implementation ################################################################# */
