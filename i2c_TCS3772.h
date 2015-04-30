@@ -106,34 +106,36 @@ public:
     void setWaitTime(const uint16_t wait = 0)
     {
         uint8_t _valueA, _valueB, _valueC;
-        /**< TODO: rewrite with local Vars and only 3 writeCalls at the end */
         if (wait > 7372)
         {
-            i2c.setRegister(I2C_ADDRESS, REG_ENABLE | CMD_INCREMENT, MASK_WEN,   255);
-            i2c.setRegister(I2C_ADDRESS, REG_CONFIG | CMD_INCREMENT, MASK_WLONG, 255);
-            i2c.writeByte(  I2C_ADDRESS, REG_WTIME  | CMD_INCREMENT, VAL_MAX);
+            _valueA = 255;
+            _valueB = 255;
+            _valueC = VAL_MAX;
         }
         else if (wait > 614)
         {
-            i2c.setRegister(I2C_ADDRESS, REG_ENABLE | CMD_INCREMENT, MASK_WEN,   255);
-            i2c.setRegister(I2C_ADDRESS, REG_CONFIG | CMD_INCREMENT, MASK_WLONG, 255);
-            i2c.writeByte(  I2C_ADDRESS, REG_WTIME  | CMD_INCREMENT, MSEC_TO_ATIMELONG(wait));
+            _valueA =  255;
+            _valueB =  255;
+            _valueC =  MSEC_TO_ATIMELONG(wait);
         }
         else if (wait < 4)
         {
-            i2c.setRegister(I2C_ADDRESS, REG_ENABLE | CMD_INCREMENT, MASK_WEN,   0);
-            i2c.setRegister(I2C_ADDRESS, REG_CONFIG | CMD_INCREMENT, MASK_WLONG, 0);
-            i2c.writeByte(  I2C_ADDRESS, REG_WTIME  | CMD_INCREMENT, VAL_MIN);
+            _valueA =  0;
+            _valueB =  0;
+            _valueC =  VAL_MIN;
         }
         else
         {
-            i2c.setRegister(I2C_ADDRESS, REG_ENABLE | CMD_INCREMENT, MASK_WEN,   255);
-            i2c.setRegister(I2C_ADDRESS, REG_CONFIG | CMD_INCREMENT, MASK_WLONG, 0);
-            i2c.writeByte(  I2C_ADDRESS, REG_WTIME  | CMD_INCREMENT, MSEC_TO_ATIME(wait));
+            _valueA = 255;
+            _valueB = 0;
+            _valueC = MSEC_TO_ATIME(wait);
         }
+        i2c.setRegister(I2C_ADDRESS, REG_ENABLE | CMD_INCREMENT, MASK_WEN,   _valueA);
+        i2c.setRegister(I2C_ADDRESS, REG_CONFIG | CMD_INCREMENT, MASK_WLONG, _valueB);
+        i2c.writeByte(  I2C_ADDRESS, REG_WTIME  | CMD_INCREMENT, _valueC);
     };
 
-    void setATime(uint16_t integrationtime)
+    inline void setATime(const uint16_t integrationtime)
     {
         uint8_t _value;
         if (integrationtime > 614)      _value = VAL_MAX;
@@ -144,46 +146,42 @@ public:
 
     uint8_t setAGain(const uint8_t gain)
     {
+        uint8_t _valueA, _valueB;
         /**< TODO: rewrite with local Vars and only 1 writeCall at the end */
         if      (gain <  4)
         {
-            i2c.setRegister(I2C_ADDRESS, REG_CONTROL | CMD_INCREMENT, MASK_AGAIN, VAL_AGAIN_01);
-            return 1;
+            _valueA = VAL_AGAIN_01;
+            _valueB = 1;
         }
         else if (gain < 16)
         {
-            i2c.setRegister(I2C_ADDRESS, REG_CONTROL | CMD_INCREMENT, MASK_AGAIN, VAL_AGAIN_04);
-            return 4;
+            _valueA = VAL_AGAIN_04;
+            _valueB = 4;
         }
         else if (gain < 60)
         {
-            i2c.setRegister(I2C_ADDRESS, REG_CONTROL | CMD_INCREMENT, MASK_AGAIN, VAL_AGAIN_16);
-            return 16;
+            _valueA = VAL_AGAIN_16;
+            _valueB = 16;
         }
         else
         {
-            i2c.setRegister(I2C_ADDRESS, REG_CONTROL | CMD_INCREMENT, MASK_AGAIN, VAL_AGAIN_60);
-            return 60;
+            _valueA = VAL_AGAIN_60;
+            _valueB = 60;
         }
-
+        i2c.setRegister(I2C_ADDRESS, REG_CONTROL | CMD_INCREMENT, MASK_AGAIN, _valueA);
+        return _valueB;
     };
 
     /**< gives back the total gain when values are in good range, otherwise return 0!  */
-    uint8_t autoGain(uint16_t val_clear)
+    uint8_t autoGain(const uint16_t val_clear)
     {
         /**< TODO: something is wrong here! switching integrationtime shows no faster measurement?!? */
         static uint8_t val_gain, val_time, gain;
         static uint16_t val_last;
 
         // val_clear between 0 .. 65k
-        static const uint8_t  MARGIN_LOW
-        {
-            5000
-        };
-        static const uint8_t  MARGIN_HIGH
-        {
-            0xFFFF - MARGIN_LOW
-        };
+        static const uint16_t  MARGIN_LOW   =(5000);
+        static const uint16_t  MARGIN_HIGH  =(0xFFFF - MARGIN_LOW);
 
         // val_gain: 0=G1,  1=G4,   2=G16, 3=G60
         // val_time: 0=i64, 1=i128, 2=i256
@@ -249,7 +247,7 @@ public:
     };
 
 
-    uint8_t initialize()
+    inline uint8_t initialize()
     {
         if (i2c.probe(I2C_ADDRESS)==0) return 0;
 
@@ -267,14 +265,14 @@ public:
     }
 
     /**< check for new data, return 1 when Measurement is ready */
-    uint8_t checkMeasurement(void)
+    inline uint8_t checkMeasurement(void)
     {
         /**< TODO: Implement */
         return 1; // Measurement finished
     };
 
     /**<  wait for new data*/
-    uint8_t awaitMeasurement(void)
+    inline uint8_t awaitMeasurement(void)
     {
         /**< TODO: Implement */
         return 1; // Measurement finished

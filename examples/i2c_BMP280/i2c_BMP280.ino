@@ -2,7 +2,7 @@
 #include "i2c.h"
 
 #include "i2c_BMP280.h"
-BMP280 bmp280 = BMP280();
+BMP280 bmp280;
 
 void setup()
 {

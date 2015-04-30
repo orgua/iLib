@@ -186,7 +186,7 @@ public:
 
 
     /**< initialize */
-    inline uint8_t initialize()
+    inline uint8_t initialize(void)
     {
         if (i2c.probe(I2C_ADDRESS)==0) return 0;
 

@@ -2,7 +2,7 @@
 #include "i2c.h"
 
 #include "i2c_MMA8451.h"
-MMA8451 mma8451 = MMA8451();
+MMA8451 mma8451;
 
 
 void setup()
@@ -41,5 +41,5 @@ void loop()
 Program size:
 A1.0.5:
 A1.5.7: 6992b
-
+A1.6.3: 6988b / 494b
  */

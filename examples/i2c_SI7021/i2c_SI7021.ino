@@ -2,7 +2,7 @@
 #include "i2c.h"
 
 #include "i2c_SI7021.h"
-SI7021 si7021 = SI7021();
+SI7021 si7021;
 
 
 void setup()

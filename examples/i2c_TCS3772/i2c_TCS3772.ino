@@ -2,7 +2,7 @@
 #include "i2c.h"
 
 #include "i2c_TCS3772.h"
-TCS3772 tcs3772 = TCS3772();
+TCS3772 tcs3772;
 
 
 void setup()
@@ -49,5 +49,5 @@ void loop()
 Program size:
 A1.0.5: 6754b
 A1.5.7: 6454b
-
+A1.6.3: 6322b / 494b
  */

@@ -3,7 +3,7 @@
 
 // RTC
 #include "i2c_PCF2127.h"
-PCF2127 pcf2127 = PCF2127();
+PCF2127 pcf2127;
 
 
 void setup()

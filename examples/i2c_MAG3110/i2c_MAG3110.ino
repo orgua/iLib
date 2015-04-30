@@ -2,7 +2,7 @@
 #include "i2c.h"
 
 #include "i2c_MAG3110.h"
-MAG3110 mag3110 = MAG3110();
+MAG3110 mag3110;
 
 
 void setup()
@@ -40,5 +40,5 @@ void loop()
 Program size:
 A1.0.5: 7144b
 A1.5.7: 6860b
-
+A1.6.3: 6766b / 493b
  */

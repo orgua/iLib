@@ -1,7 +1,7 @@
 #include <Wire.h>
 #include "i2c.h"
 #include "i2c_MAX44009.h"
-MAX44009 max44009 = MAX44009();
+MAX44009 max44009;
 
 
 void setup()
