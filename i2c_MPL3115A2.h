@@ -19,75 +19,75 @@ Driver for the MPL3115A2-Sensor
 
 class MPL3115A2 : public i2cSensor, public manualSensor
 {
-
+private:
     /** ######### Register-Map ################################################################# */
 
-#define MPL_ADDRESS 	        0x60
+const uint8_t  MPL_ADDRESS 	            {0x60};
 
-#define REG_STATUS 	            0x00 // data ready, previous data unread and overwritten
-#define REG_OUT_P_MSB 	        0x01
-#define REG_OUT_P_CSB 	        0x02
-#define REG_OUT_P_LSB 	        0x03
-#define REG_OUT_T_MSB 	        0x04
-#define REG_OUT_T_LSB 	        0x05
-#define REG_DR_STATUS 	        0x06
-#define REG_OUT_P_DELTA_MSB 	0x07
-#define REG_OUT_P_DELTA_CSB 	0x08
-#define REG_OUT_P_DELTA_LSB 	0x09
-#define REG_OUT_T_DELTA_MSB     0x0A
-#define REG_OUT_T_DELTA_LSB 	0x0B
-#define REG_WHO_AM_I   	        0x0C
-#define   VAL_WHO_AM_I          0xC4
+const uint8_t  REG_STATUS 	            {0x00}; // data ready, previous data unread and overwritten
+const uint8_t  REG_OUT_P_MSB 	        {0x01};
+const uint8_t  REG_OUT_P_CSB 	        {0x02};
+const uint8_t  REG_OUT_P_LSB 	        {0x03};
+const uint8_t  REG_OUT_T_MSB 	        {0x04};
+const uint8_t  REG_OUT_T_LSB 	        {0x05};
+const uint8_t  REG_DR_STATUS 	        {0x06};
+const uint8_t  REG_OUT_P_DELTA_MSB 	    {0x07};
+const uint8_t  REG_OUT_P_DELTA_CSB 	    {0x08};
+const uint8_t  REG_OUT_P_DELTA_LSB 	    {0x09};
+const uint8_t  REG_OUT_T_DELTA_MSB      {0x0A};
+const uint8_t  REG_OUT_T_DELTA_LSB 	    {0x0B};
+const uint8_t  REG_WHO_AM_I   	        {0x0C};
+const uint8_t    VAL_WHO_AM_I           {0xC4};
 
-#define REG_FIFO_STATUS 	    0x0D
-#define REG_FIFO_DATA 	        0x0E
-#define REG_FIFO_SETUP 	        0x0F
-#define REG_TIME_DLY 	        0x10
-#define REG_SYSMOD 	            0x11
-#define   VAL_SYS_ACTIVE        0x01
-#define   VAL_SYS_STANDBY       0x00
+const uint8_t  REG_FIFO_STATUS 	        {0x0D};
+const uint8_t  REG_FIFO_DATA 	        {0x0E};
+const uint8_t  REG_FIFO_SETUP 	        {0x0F};
+const uint8_t  REG_TIME_DLY 	        {0x10};
+const uint8_t  REG_SYSMOD 	            {0x11};
+const uint8_t    VAL_SYS_ACTIVE         {0x01};
+const uint8_t    VAL_SYS_STANDBY        {0x00};
 
-#define REG_INT_SOURCE 	        0x12
-#define REG_PT_DATA_CFG 	    0x13
-#define   MSK_DATA_READY        0x04
-#define   MSK_PRES_READY        0x02
-#define   MSK_TEMP_READY        0x01
+const uint8_t  REG_INT_SOURCE 	        {0x12};
+const uint8_t  REG_PT_DATA_CFG 	        {0x13};
+const uint8_t    MSK_DATA_READY         {0x04};
+const uint8_t    MSK_PRES_READY         {0x02};
+const uint8_t    MSK_TEMP_READY         {0x01};
 
-#define REG_BAR_IN_MSB 	        0x14
-#define REG_BAR_IN_LSB 	        0x15
-#define REG_P_TGT_MSB 	        0x16   // target int16 in meters OR uint16 in 2Pa
-#define REG_P_TGT_LSB 	        0x17
-#define REG_T_TGT 	            0x18
-#define REG_P_WND_MSB 	        0x19
-#define REG_P_WND_LSB 	        0x1A
-#define REG_T_WND 	            0x1B
-#define REG_P_MIN_MSB 	        0x1C
-#define REG_P_MIN_CSB 	        0x1D
-#define REG_P_MIN_LSB 	        0x1E
-#define REG_T_MIN_MSB 	        0x1F
-#define REG_T_MIN_LSB 	        0x20
-#define REG_P_MAX_MSB 	        0x21
-#define REG_P_MAX_CSB 	        0x22
-#define REG_P_MAX_LSB 	        0x23
-#define REG_T_MAX_MSB 	        0x24
-#define REG_T_MAX_LSB 	        0x25
+const uint8_t  REG_BAR_IN_MSB 	        {0x14};
+const uint8_t  REG_BAR_IN_LSB 	        {0x15};
+const uint8_t  REG_P_TGT_MSB 	        {0x16};  // target int16 in meters OR uint16 in 2Pa
+const uint8_t  REG_P_TGT_LSB 	        {0x17};
+const uint8_t  REG_T_TGT 	            {0x18};
+const uint8_t  REG_P_WND_MSB 	        {0x19};
+const uint8_t  REG_P_WND_LSB 	        {0x1A};
+const uint8_t  REG_T_WND 	            {0x1B};
+const uint8_t  REG_P_MIN_MSB 	        {0x1C};
+const uint8_t  REG_P_MIN_CSB 	        {0x1D};
+const uint8_t  REG_P_MIN_LSB 	        {0x1E};
+const uint8_t  REG_T_MIN_MSB 	        {0x1F};
+const uint8_t  REG_T_MIN_LSB 	        {0x20};
+const uint8_t  REG_P_MAX_MSB 	        {0x21};
+const uint8_t  REG_P_MAX_CSB 	        {0x22};
+const uint8_t  REG_P_MAX_LSB 	        {0x23};
+const uint8_t  REG_T_MAX_MSB 	        {0x24};
+const uint8_t  REG_T_MAX_LSB 	        {0x25};
 
-#define REG_CTRL1 	            0x26  //
-#define   MSK_SBYB              0x01
-#define   MSK_OST               0x02  // triggers measurement even when standby (onetime)!!!
-#define   MSK_RST               0x04
-#define   MSK_OS                (B00111000)
-#define   MSK_RAW               (B01000000)
-#define   MSK_ALT               (B10000000)
+const uint8_t  REG_CTRL1 	            {0x26};  //
+const uint8_t    MSK_SBYB               {0x01};
+const uint8_t    MSK_OST                {0x02};  // triggers measurement even when standby (onetime)!!!
+const uint8_t    MSK_RST                {0x04};
+const uint8_t    MSK_OS                 {B00111000};
+const uint8_t    MSK_RAW                {B01000000};
+const uint8_t    MSK_ALT                {B10000000};
 
-#define REG_CTRL2 	            0x27  // can only be modified in standby
-#define REG_CTRL3 	            0x28  // can only be modified in standby
-#define REG_CTRL4 	            0x29  // can only be modified in standby
-#define REG_CTRL5 	            0x2A  // can only be modified in standby
+const uint8_t  REG_CTRL2 	            {0x27};  // can only be modified in standby
+const uint8_t  REG_CTRL3 	            {0x28};  // can only be modified in standby
+const uint8_t  REG_CTRL4 	            {0x29};  // can only be modified in standby
+const uint8_t  REG_CTRL5 	            {0x2A};  // can only be modified in standby
 
-#define REG_OFF_P 	            0x2B  // registers not preserved in standby
-#define REG_OFF_T 	            0x2C  // registers not preserved in standby
-#define REG_OFF_H 	            0x2D  // registers not preserved in standby
+const uint8_t  REG_OFF_P 	            {0x2B};  // registers not preserved in standby
+const uint8_t  REG_OFF_T 	            {0x2C};  // registers not preserved in standby
+const uint8_t  REG_OFF_H 	            {0x2D};  // registers not preserved in standby
 
     /** ######### function definition ################################################################# */
 
@@ -175,10 +175,9 @@ public:
 
     /**< Enables the measurement event flags */
     /**< This is recommended in datasheet during setup. */
-    void setEventFlags(uint8_t flags = (MSK_DATA_READY | MSK_PRES_READY | MSK_TEMP_READY))
+    void setEventFlags(const uint8_t flags)
     {
-        flags = flags & 0x07;
-        i2c.writeByte(MPL_ADDRESS,REG_PT_DATA_CFG, flags); // Enable all three pressure and temp event flags
+        i2c.writeByte(MPL_ADDRESS,REG_PT_DATA_CFG, (flags & 0x07)); // Enable all three pressure and temp event flags
     };
 
 
@@ -190,7 +189,7 @@ public:
         reset();
         delay(2);
         setEnabled(0);
-        setEventFlags();
+        setEventFlags((MSK_DATA_READY | MSK_PRES_READY | MSK_TEMP_READY));
         setOversampleRatio(128);
         setAltimeter(1);
         setEnabled(1);

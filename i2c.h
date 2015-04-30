@@ -14,8 +14,11 @@
 #define TRUE        (1==1)
 #define FALSE       (1==2)
 #endif
+
+#ifndef HIGH
 #define LOW         (0)
 #define HIGH        (1)
+#endif
 
 /// are they really usefull?
 #define UBLB(a,b)  ( ( (a) << 8) | (b) )
@@ -43,15 +46,15 @@ public:
 
     WirePlus();
 
-    uint8_t probe(const uint8_t);
-    uint8_t probeAddress(const uint8_t);
-    void    write(uint8_t, uint8_t, uint8_t *, uint8_t);
-    void    writeByte(const uint8_t, const uint8_t, const uint8_t);
-    void    writeCMD(const uint8_t, const uint8_t);
-    uint8_t readByte(const uint8_t , const uint8_t );
-    void    read(const uint8_t , const uint8_t , uint8_t *, const uint8_t );
-    void    setRegister(const uint8_t, const uint8_t, const uint8_t, const uint8_t);
-    uint8_t getRegister(const uint8_t, const uint8_t, const uint8_t);
+    uint8_t probe(const uint8_t) noexcept;
+    uint8_t probeAddress(const uint8_t) noexcept;
+    void    write(const uint8_t, const uint8_t, const uint8_t *, const uint8_t) noexcept;
+    void    writeByte(const uint8_t, const uint8_t, const uint8_t) noexcept;
+    void    writeCMD(const uint8_t, const uint8_t) noexcept;
+    uint8_t readByte(const uint8_t , const uint8_t ) noexcept;
+    void    read(const uint8_t , const uint8_t , uint8_t *, const uint8_t ) noexcept;
+    void    setRegister(const uint8_t, const uint8_t, const uint8_t, const uint8_t) noexcept;
+    uint8_t getRegister(const uint8_t, const uint8_t, const uint8_t) noexcept;
 };
 
 /** ######### Implementation ################################################################# */
@@ -68,19 +71,19 @@ WirePlus::WirePlus()
 
 
 
-uint8_t WirePlus::probe(uint8_t address)
+uint8_t WirePlus::probe(const uint8_t address)
 {
     Wire.beginTransmission(address);
     if (Wire.endTransmission(true)==0) return 1; // found something
     else                               return 0; // no response
 };
 
-uint8_t WirePlus::probeAddress(uint8_t address)
+uint8_t WirePlus::probeAddress(const uint8_t address)
 {
     return probe(address);
 };
 
-void WirePlus::write(uint8_t address, uint8_t register_address, uint8_t write_value[], uint8_t length=1)
+void WirePlus::write(const uint8_t address, const uint8_t register_address, const uint8_t write_value[], const uint8_t length=1)
 {
     if (!length) return;
     Wire.beginTransmission(address);
@@ -95,7 +98,7 @@ void WirePlus::write(uint8_t address, uint8_t register_address, uint8_t write_va
     Wire.endTransmission(true);
 };
 
-void WirePlus::writeByte( uint8_t address, uint8_t register_address, uint8_t write_value)
+void WirePlus::writeByte(const uint8_t address, const uint8_t register_address, const uint8_t write_value)
 {
     Wire.beginTransmission(address);
     Wire.write(register_address);
@@ -103,14 +106,14 @@ void WirePlus::writeByte( uint8_t address, uint8_t register_address, uint8_t wri
     Wire.endTransmission(true);
 };
 
-void WirePlus::writeCMD(uint8_t address, uint8_t cmd)
+void WirePlus::writeCMD(const uint8_t address, const uint8_t cmd)
 {
     Wire.beginTransmission(address);
     Wire.write(cmd);
     Wire.endTransmission();
 };
 
-void WirePlus::read( uint8_t address, uint8_t registeraddress, uint8_t buff[], uint8_t length=1)
+void WirePlus::read(const uint8_t address, const uint8_t registeraddress, uint8_t buff[], const uint8_t length=1)
 {
     Wire.beginTransmission(address); 	// Adress + WRITE (0)
     Wire.write(registeraddress);
@@ -129,14 +132,14 @@ void WirePlus::read( uint8_t address, uint8_t registeraddress, uint8_t buff[], u
     Wire.endTransmission(true); 		// Stop Condition
 };
 
-uint8_t WirePlus::readByte(uint8_t address, uint8_t register_address)
+uint8_t WirePlus::readByte(const uint8_t address, const uint8_t register_address)
 {
     uint8_t _readvalue;
     read(address, register_address, &_readvalue, 1);
     return _readvalue;
 };
 
-void WirePlus::setRegister(uint8_t address, uint8_t registeraddress, uint8_t mask, uint8_t writevalue)
+void WirePlus::setRegister(const uint8_t address, const uint8_t registeraddress, const uint8_t mask, const uint8_t writevalue)
 {
     uint8_t _setting;
     read(address, registeraddress, &_setting, 1 );
@@ -145,7 +148,7 @@ void WirePlus::setRegister(uint8_t address, uint8_t registeraddress, uint8_t mas
     writeByte(address, registeraddress, _setting);
 };
 
-uint8_t WirePlus::getRegister(uint8_t address, uint8_t registeraddress, uint8_t mask)
+uint8_t WirePlus::getRegister(const uint8_t address, const uint8_t registeraddress, const uint8_t mask)
 {
     uint8_t _setting;
     read(address, registeraddress, &_setting, (uint8_t)1 );

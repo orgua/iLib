@@ -15,7 +15,7 @@ public:
     /**< TODO: new functions: wait for value, check for new value */
 
     /**< declaring prototypes */
-    virtual void    setEnabled(uint8_t enable=1) = 0;     // Enable Sensor or set it to Standby (1 or 0)
+    virtual void    setEnabled(const uint8_t enable=1) = 0;     // Enable Sensor or set it to Standby (1 or 0)
 
     virtual void    reset(void) = 0;                    // trigger a software-reboot of the sensor
 
@@ -35,10 +35,17 @@ public:
     //virtual void    getValue(uint8_t buffer[]) = 0;     // get the main values the sensor was made for (barometer gives pressure)
 
 protected:
+    i2cSensor() {};
+    //~i2cSensor() {}; // makes code larger and is never used in the typical case
     // instance gets control over
     //uint8_t _address;
+
 private:
     // instance has no control over these
+    i2cSensor(const i2cSensor&);            // declaration only for copy constructor
+    i2cSensor& operator=(const i2cSensor&);  // declaration only for copy assignment --> make it uncopyable
+
+
 };
 
 class manualSensor
