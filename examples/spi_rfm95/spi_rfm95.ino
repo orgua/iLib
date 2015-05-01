@@ -1,6 +1,6 @@
 #include <SPI.h>
 #include "spi_rfm95.h"
-RFM95 rfm = RFM95();
+RFM95 rfm;
 
 
 #define TIMEON   20

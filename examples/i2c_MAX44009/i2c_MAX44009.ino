@@ -1,7 +1,7 @@
 #include <Wire.h>
 #include "i2c.h"
 #include "i2c_MAX44009.h"
-MAX44009 max44009 = MAX44009();
+MAX44009 max44009;
 
 
 void setup()
@@ -35,5 +35,5 @@ void loop()
 Program size:
 A1.0.5: 5126b
 A1.5.7: 4860b
-
+A1.6.3: 4764b / 463b
  */

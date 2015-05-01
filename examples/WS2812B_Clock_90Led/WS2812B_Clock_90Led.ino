@@ -7,7 +7,7 @@ the code was not refactored once... maybe i have time for this in the future
 
 
 #include "WS2812B.h"
-WS2812B ws2812b = WS2812B();
+WS2812B ws2812b;
 
 #define LEDS_SIZE     90 //120
 #define LEDS_CHANNELS  3

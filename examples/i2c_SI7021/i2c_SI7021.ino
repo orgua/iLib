@@ -2,7 +2,7 @@
 #include "i2c.h"
 
 #include "i2c_SI7021.h"
-SI7021 si7021 = SI7021();
+SI7021 si7021;
 
 
 void setup()
@@ -39,5 +39,5 @@ void loop()
 Program size:
 A1.0.5: 6896b
 A1.5.7: 6590b
-
+A1.6.3: 6484b / 499b
  */

@@ -3,7 +3,7 @@
 
 // RTC
 #include "i2c_PCF2127.h"
-PCF2127 pcf2127 = PCF2127();
+PCF2127 pcf2127;
 
 
 void setup()
@@ -59,5 +59,5 @@ void loop()
 Program size:
 A1.0.5: 6754b
 A1.5.7: 6454b
-
+A1.6.3: 5016b / 446b
  */

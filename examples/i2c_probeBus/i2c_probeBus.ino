@@ -32,5 +32,6 @@ void loop() { }
 Program size:
 A1.0.5:
 A1.5.7: 4072b
+A1.6.3: 3982b / 435b
 
  */

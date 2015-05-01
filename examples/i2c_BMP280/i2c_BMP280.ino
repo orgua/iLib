@@ -2,7 +2,7 @@
 #include "i2c.h"
 
 #include "i2c_BMP280.h"
-BMP280 bmp280 = BMP280();
+BMP280 bmp280;
 
 void setup()
 {
@@ -52,7 +52,8 @@ void loop()
 
 Program size:
 A1.0.5:
-A1.5.7: 6980b
+A1.5.7: 9680b
+A1.6.3: 9664b / 561b
 
  */
 

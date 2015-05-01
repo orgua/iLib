@@ -2,7 +2,7 @@
 #include "i2c.h"
 
 #include "i2c_MPL3115A2.h"
-MPL3115A2 mpl3115 = MPL3115A2();
+MPL3115A2 mpl3115;
 
 void setup()
 {
@@ -44,6 +44,6 @@ void loop()
 Program size:
 A1.0.5:
 A1.5.7: 6980b
-
+A1.6.3: 6890b / 495b
  */
 

@@ -15,157 +15,174 @@ possible gains: 4 (3.8 .. 4.2), 16 (15 .. 16.8), 60 (58 .. 63)
 
 ########################################################################  */
 
-class TCS3772 : public i2cSensor
+class TCS3772 : private i2cSensor
 {
+
+private:
 
     /** ######### Register-Map ################################################################# */
 
-#define TCS_ADDRESS 				0x29
+    static const uint8_t    I2C_ADDRESS 				=(0x29);
 
 // Keept Out: Proximity Feature, Interrupts,
+    static const uint8_t    CMD_REPEAT                  =(B10000000);
+    static const uint8_t        CMD_INCREMENT           =(B10100000);
+    static const uint8_t        CMD_SPECIAL             =(B11100000);
 
-#define CMD_REPEAT                  (B10000000)
-#define CMD_INCREMENT               (B10100000)
-#define CMD_SPECIAL                 (B11100000)
+    static const uint8_t    REG_ENABLE				    =(0x00);
+    static const uint8_t        MASK_PON 			  	=(bit(0));   // POWER ON
+    static const uint8_t            VAL_PWR_ON			=(0x01);
+    static const uint8_t            VAL_PWR_OFF			=(0x00);
+    static const uint8_t        MASK_AEN                =(bit(1));   // RGBC-Sensor Enable
+    static const uint8_t        MASK_WEN                =(bit(3));   // WAIT Enable
 
-#define REG_ENABLE				    0x00
-#define   MASK_PON 			  	    (bit(0))   // POWER ON
-#define     VAL_PWR_ON				0x01
-#define     VAL_PWR_OFF				0x00
-#define   MASK_AEN                  (bit(1))   // RGBC-Sensor Enable
-#define   MASK_WEN                  (bit(3))   // WAIT Enable
-
-#define REG_ATIME				    0x01       // Integration time in 2.4ms Steps
-#define   VAL_MIN                   0xFF       // 2.4ms
-#define   VAL_MAX                   0x00       // 614ms
-
-#define   ATIME_TO_MSEC(atime)		(2.4*(256-ATIME))
-#define   MSEC_TO_ATIME(msec) 		(256 - msec/2.4)
-#define   FACT_TO_ATIME(factor)  	(256 - factor)
-
-#define REG_WTIME                   0x03       // WLONG=0 2.4ms Steps, WLONG=1 28.8ms Steps
-#define   MSEC_TO_ATIMELONG(msec)   (256 - msec/28.8)
+    static const uint8_t    REG_ATIME				    =(0x01);       // Integration time in 2.4ms Steps
+    static const uint8_t        VAL_MIN                 =(0xFF);       // 2.4ms
+    static const uint8_t        VAL_MAX                 =(0x00);       // 614ms
+    static const uint8_t    REG_WTIME                   =(0x03);       // WLONG=0 2.4ms Steps, WLONG=1 28.8ms Steps
 
 //// INTERRUPT THRESHOLD, ....
 
-#define REG_CONFIG                  0x0D
-#define   MASK_WLONG               (bit(1))    // Factor 12x for WTIME
-#define REG_CONTROL				    0x0F
-#define   MASK_AGAIN				0x03
-#define     VAL_AGAIN_01 			0x00
-#define     VAL_AGAIN_04 			0x01
-#define     VAL_AGAIN_16 			0x02
-#define     VAL_AGAIN_60 			0x03
+    static const uint8_t    REG_CONFIG                  =(0x0D);
+    static const uint8_t        MASK_WLONG              =(bit(1));    // Factor 12x for WTIME
+    static const uint8_t    REG_CONTROL				    =(0x0F);
+    static const uint8_t        MASK_AGAIN				=(0x03);
+    static const uint8_t            VAL_AGAIN_01 		=(0x00);
+    static const uint8_t            VAL_AGAIN_04 		=(0x01);
+    static const uint8_t            VAL_AGAIN_16 		=(0x02);
+    static const uint8_t            VAL_AGAIN_60 		=(0x03);
 
-#define REG_ID   				    0x12
-#define   VAL_DEVICE_ID_A 			0x48         // TCS37721 & TCS37725
-#define   VAL_DEVICE_ID_B 			0x49	     // TCS37723 & TCS37727
+    static const uint8_t    REG_ID   				    =(0x12);
+    static const uint8_t        VAL_DEVICE_ID_A 		=(0x48);        // TCS37721 & TCS37725
+    static const uint8_t        VAL_DEVICE_ID_B 		=(0x49);	     // TCS37723 & TCS37727
 
-#define REG_STATUS   				0x13
-#define   MASK_AVALID               (bit(0))     // cylce completed since AEN=1
+    static const uint8_t    REG_STATUS   				=(0x13);
+    static const uint8_t        MASK_AVALID             =(bit(0));     // cylce completed since AEN=1
 
-#define REG_CLEAR_DATAL 			0x14
-#define REG_CLEAR_DATAH 			0x15
-#define REG_RED_DATAL 				0x16
-#define REG_RED_DATAH 				0x17
-#define REG_GREEN_DATAL		  	    0x18
-#define REG_GREEN_DATAH			    0x19
-#define REG_BLUE_DATAL 				0x1A
-#define REG_BLUE_DATAH 				0x1B
-
+    static const uint8_t    REG_CLEAR_DATAL 			=(0x14);
+    static const uint8_t    REG_CLEAR_DATAH 			=(0x15);
+    static const uint8_t    REG_RED_DATAL 				=(0x16);
+    static const uint8_t    REG_RED_DATAH 				=(0x17);
+    static const uint8_t    REG_GREEN_DATAL		  	    =(0x18);
+    static const uint8_t    REG_GREEN_DATAH			    =(0x19);
+    static const uint8_t    REG_BLUE_DATAL 				=(0x1A);
+    static const uint8_t    REG_BLUE_DATAH 				=(0x1B);
 
     /** ######### function definition ################################################################# */
 
+    inline uint16_t static const   ATIME_TO_MSEC(const uint8_t atime)
+    {
+        return (2.4*(256-atime));
+    }; // TODO: WB
+    inline uint8_t static const   MSEC_TO_ATIME(const uint16_t msec)
+    {
+        return (256 - (msec/2.4));
+    };
+    inline uint8_t static const   FACT_TO_ATIME(const uint8_t factor)
+    {
+        return (256 - factor);
+    }; // TODO: WB
+    inline uint8_t    MSEC_TO_ATIMELONG(const uint16_t msec)
+    {
+        return (256 - (msec/28.8));
+    }; // TODO: WB
+
 public:
 
-    TCS3772(void)
+    TCS3772(void) // TODO: WB
     {
         //_address = MPL_ADDRESS;
     };
 
-    void setEnabled(uint8_t enable = 1)
+    inline void setEnabled(const uint8_t enable = 1)
     {
-        if (enable) enable = VAL_PWR_ON | MASK_AEN;
-        else        enable = 0;
-        i2c.setRegister(TCS_ADDRESS, REG_ENABLE | CMD_INCREMENT, MASK_AEN | MASK_PON, enable);
+        uint8_t _value;
+        if (enable) _value = VAL_PWR_ON | MASK_AEN;
+        else        _value = 0;
+        i2c.setRegister(I2C_ADDRESS, REG_ENABLE | CMD_INCREMENT, MASK_AEN | MASK_PON, _value);
     };
 
-    void reset() {};
+    inline void reset() {};
 
-    void setWaitTime(uint16_t wait = 0)
+    inline void setWaitTime(const uint16_t wait = 0)
     {
-        /**< TODO: rewrite with local Vars and only 3 writeCalls at the end */
+        uint8_t _valueA, _valueB, _valueC;
         if (wait > 7372)
         {
-            i2c.setRegister(TCS_ADDRESS, REG_ENABLE | CMD_INCREMENT, MASK_WEN,   255);
-            i2c.setRegister(TCS_ADDRESS, REG_CONFIG | CMD_INCREMENT, MASK_WLONG, 255);
-            i2c.writeByte(  TCS_ADDRESS, REG_WTIME  | CMD_INCREMENT, VAL_MAX);
+            _valueA = 255;
+            _valueB = 255;
+            _valueC = VAL_MAX;
         }
         else if (wait > 614)
         {
-            i2c.setRegister(TCS_ADDRESS, REG_ENABLE | CMD_INCREMENT, MASK_WEN,   255);
-            i2c.setRegister(TCS_ADDRESS, REG_CONFIG | CMD_INCREMENT, MASK_WLONG, 255);
-            i2c.writeByte(  TCS_ADDRESS, REG_WTIME  | CMD_INCREMENT, MSEC_TO_ATIMELONG(wait));
+            _valueA =  255;
+            _valueB =  255;
+            _valueC =  MSEC_TO_ATIMELONG(wait);
         }
         else if (wait < 4)
         {
-            i2c.setRegister(TCS_ADDRESS, REG_ENABLE | CMD_INCREMENT, MASK_WEN,   0);
-            i2c.setRegister(TCS_ADDRESS, REG_CONFIG | CMD_INCREMENT, MASK_WLONG, 0);
-            i2c.writeByte(  TCS_ADDRESS, REG_WTIME  | CMD_INCREMENT, VAL_MIN);
+            _valueA =  0;
+            _valueB =  0;
+            _valueC =  VAL_MIN;
         }
         else
         {
-            i2c.setRegister(TCS_ADDRESS, REG_ENABLE | CMD_INCREMENT, MASK_WEN,   255);
-            i2c.setRegister(TCS_ADDRESS, REG_CONFIG | CMD_INCREMENT, MASK_WLONG, 0);
-            i2c.writeByte(  TCS_ADDRESS, REG_WTIME  | CMD_INCREMENT, MSEC_TO_ATIME(wait));
+            _valueA = 255;
+            _valueB = 0;
+            _valueC = MSEC_TO_ATIME(wait);
         }
+        i2c.setRegister(I2C_ADDRESS, REG_ENABLE | CMD_INCREMENT, MASK_WEN,   _valueA);
+        i2c.setRegister(I2C_ADDRESS, REG_CONFIG | CMD_INCREMENT, MASK_WLONG, _valueB);
+        i2c.writeByte(  I2C_ADDRESS, REG_WTIME  | CMD_INCREMENT, _valueC);
     };
 
-    void setATime(uint16_t integrationtime)
+    inline void setATime(const uint16_t integrationtime)
     {
         uint8_t _value;
         if (integrationtime > 614)      _value = VAL_MAX;
         else if (integrationtime < 4)   _value = VAL_MIN;
         else                            _value = (uint8_t) MSEC_TO_ATIME(integrationtime);
-        i2c.writeByte( TCS_ADDRESS, REG_ATIME  | CMD_INCREMENT, _value);
+        i2c.writeByte( I2C_ADDRESS, REG_ATIME  | CMD_INCREMENT, _value);
     };
 
     uint8_t setAGain(const uint8_t gain)
     {
+        uint8_t _valueA, _valueB;
         /**< TODO: rewrite with local Vars and only 1 writeCall at the end */
         if      (gain <  4)
         {
-            i2c.setRegister(TCS_ADDRESS, REG_CONTROL | CMD_INCREMENT, MASK_AGAIN, VAL_AGAIN_01);
-            return 1;
+            _valueA = VAL_AGAIN_01;
+            _valueB = 1;
         }
         else if (gain < 16)
         {
-            i2c.setRegister(TCS_ADDRESS, REG_CONTROL | CMD_INCREMENT, MASK_AGAIN, VAL_AGAIN_04);
-            return 4;
+            _valueA = VAL_AGAIN_04;
+            _valueB = 4;
         }
         else if (gain < 60)
         {
-            i2c.setRegister(TCS_ADDRESS, REG_CONTROL | CMD_INCREMENT, MASK_AGAIN, VAL_AGAIN_16);
-            return 16;
+            _valueA = VAL_AGAIN_16;
+            _valueB = 16;
         }
         else
         {
-            i2c.setRegister(TCS_ADDRESS, REG_CONTROL | CMD_INCREMENT, MASK_AGAIN, VAL_AGAIN_60);
-            return 60;
+            _valueA = VAL_AGAIN_60;
+            _valueB = 60;
         }
-
+        i2c.setRegister(I2C_ADDRESS, REG_CONTROL | CMD_INCREMENT, MASK_AGAIN, _valueA);
+        return _valueB;
     };
 
     /**< gives back the total gain when values are in good range, otherwise return 0!  */
-    uint8_t autoGain(uint16_t val_clear)
+    uint8_t autoGain(const uint16_t val_clear)
     {
         /**< TODO: something is wrong here! switching integrationtime shows no faster measurement?!? */
         static uint8_t val_gain, val_time, gain;
         static uint16_t val_last;
 
         // val_clear between 0 .. 65k
-#define MARGIN_LOW   5000
-#define MARGIN_HIGH  (0xFFFF - MARGIN_LOW)
+        static const uint16_t  MARGIN_LOW   =(5000);
+        static const uint16_t  MARGIN_HIGH  =(0xFFFF - MARGIN_LOW);
 
         // val_gain: 0=G1,  1=G4,   2=G16, 3=G60
         // val_time: 0=i64, 1=i128, 2=i256
@@ -231,12 +248,12 @@ public:
     };
 
 
-    uint8_t initialize()
+    inline uint8_t initialize()
     {
-        if (i2c.probe(TCS_ADDRESS)==0) return 0;
+        if (i2c.probe(I2C_ADDRESS)==0) return 0;
 
         byte _sensor_id;
-        _sensor_id = i2c.readByte(TCS_ADDRESS, REG_ID | CMD_INCREMENT);
+        _sensor_id = i2c.readByte(I2C_ADDRESS, REG_ID | CMD_INCREMENT);
 
         setEnabled(1);
         setATime(2.4*64);
@@ -249,14 +266,14 @@ public:
     }
 
     /**< check for new data, return 1 when Measurement is ready */
-    uint8_t checkMeasurement(void)
+    inline uint8_t checkMeasurement(void)
     {
         /**< TODO: Implement */
         return 1; // Measurement finished
     };
 
     /**<  wait for new data*/
-    uint8_t awaitMeasurement(void)
+    inline uint8_t awaitMeasurement(void)
     {
         /**< TODO: Implement */
         return 1; // Measurement finished
@@ -265,7 +282,7 @@ public:
     void getMeasurement(uint16_t value_crgb[])
     {
         uint8_t _content[8];
-        i2c.read(TCS_ADDRESS, REG_CLEAR_DATAL | CMD_INCREMENT, _content, 8);
+        i2c.read(I2C_ADDRESS, REG_CLEAR_DATAL | CMD_INCREMENT, _content, 8);
         value_crgb[0] = (_content[1]<<8) + _content[0];
         value_crgb[1] = (_content[3]<<8) + _content[2];
         value_crgb[2] = (_content[5]<<8) + _content[4];

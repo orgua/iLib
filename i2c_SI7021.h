@@ -22,41 +22,43 @@ You have to trigger the Measurement yourself --> requestHumidity,
 class SI7021 : public i2cSensor, public manualSensor
 {
 
+private:
+
     /** ######### Register-Map ################################################################# */
 
-#define SI7021_ADDRESS 		        0x40
+    static const uint8_t    I2C_ADDRESS 		                =(0x40);
 
-#define CMD_MEASURE_HUMIDITY_HOLD       0xE5    // Hold:    clock stretching
-#define CMD_MEASURE_HUMIDITY_NO_HOLD    0xF5    // No Hold: Not Acknowledging read requests
-#define CMD_MEASURE_TEMPERATURE_HOLD    0xE3    // performs an extra measurement
-#define CMD_MEASURE_TEMPERATURE_NO_HOLD 0xF3
+    static const uint8_t    CMD_MEASURE_HUMIDITY_HOLD           =(0xE5);    // Hold:    clock stretching
+    static const uint8_t    CMD_MEASURE_HUMIDITY_NO_HOLD        =(0xF5);    // No Hold: Not Acknowledging read requests
+    static const uint8_t    CMD_MEASURE_TEMPERATURE_HOLD        =(0xE3);    // performs an extra measurement
+    static const uint8_t    CMD_MEASURE_TEMPERATURE_NO_HOLD     =(0xF3);
 
-#define CMD_READ_PREVIOUS_TEMPERATURE   0xE0    // performs NO extra measurement,
-#define CMD_RESET                       0xFE
-#define CMD_WRITE_REG1                  0xE6
-#define CMD_READ_REG1                   0xE7
-#define   MASK_RESOLUTION               B10000001
-#define     VAL_RESOLUTION_H12_T14      0x00    // takes 10 -12 ms
-#define     VAL_RESOLUTION_H11_T11      0x01    // takes 5.8- 7 ms
-#define     VAL_RESOLUTION_H10_T13      0x80    // takes 3.7-4.5 ms
-#define     VAL_RESOLUTION_H08_T12      0x81    // takes 2.6-3.1 ms
-#define   MASK_LOW_VOLTAGE              0x40    // just for reading/checking
-#define   MASK_ENABLE_HEATER            0x04    // for dew-point-measurement
+    static const uint8_t    CMD_READ_PREVIOUS_TEMPERATURE       =(0xE0);    // performs NO extra measurement,
+    static const uint8_t    CMD_RESET                           =(0xFE);
+    static const uint8_t    CMD_WRITE_REG1                      =(0xE6);
+    static const uint8_t    CMD_READ_REG1                       =(0xE7);
+    static const uint8_t        MASK_RESOLUTION                 =(B10000001);
+    static const uint8_t            VAL_RESOLUTION_H12_T14      =(0x00);    // takes 10 -12 ms
+    static const uint8_t            VAL_RESOLUTION_H11_T11      =(0x01);    // takes 5.8- 7 ms
+    static const uint8_t            VAL_RESOLUTION_H10_T13      =(0x80);    // takes 3.7-4.5 ms
+    static const uint8_t            VAL_RESOLUTION_H08_T12      =(0x81);    // takes 2.6-3.1 ms
+    static const uint8_t        MASK_LOW_VOLTAGE                =(0x40);    // just for reading/checking
+    static const uint8_t        MASK_ENABLE_HEATER              =(0x04);    // for dew-point-measurement
 
 
     /** ######### function definition ################################################################# */
 
-protected:
+protected: // TODO: why protected and not private?
 
     /**< helperfunction */
-    uint16_t readValue(uint8_t registerAdd)
+    uint16_t readValue(const uint8_t registerAdd)
     {
         uint16_t _ret;
-        Wire.beginTransmission(SI7021_ADDRESS);
+        Wire.beginTransmission(I2C_ADDRESS);
         Wire.write(registerAdd);
         Wire.endTransmission();                   // difference to normal read
-        Wire.beginTransmission(SI7021_ADDRESS);   // difference to normal read
-        Wire.requestFrom(SI7021_ADDRESS, 2);
+        Wire.beginTransmission(I2C_ADDRESS);   // difference to normal read
+        Wire.requestFrom(I2C_ADDRESS, (uint8_t) 2);
         _ret      = (Wire.read() << 8 );
         _ret      |= Wire.read();
         Wire.endTransmission();
@@ -67,74 +69,66 @@ public:
 
     SI7021(void)
     {
-        //_address = MPL_ADDRESS;
     };
 
     /**< resolutions for temp and humidity is combined, influences the duration */
-    void setResolution(uint8_t stepH=4)
+    inline void setResolution(const uint8_t stepH=4)
     {
-        switch (stepH)
-        {
-        case 1:
-            i2c.setRegister(SI7021_ADDRESS, CMD_WRITE_REG1, MASK_RESOLUTION, VAL_RESOLUTION_H08_T12);
-            break;
-        case 2:
-            i2c.setRegister(SI7021_ADDRESS, CMD_WRITE_REG1, MASK_RESOLUTION, VAL_RESOLUTION_H10_T13);
-            break;
-        case 3:
-            i2c.setRegister(SI7021_ADDRESS, CMD_WRITE_REG1, MASK_RESOLUTION, VAL_RESOLUTION_H11_T11);
-            break;
-        default:
-            i2c.setRegister(SI7021_ADDRESS, CMD_WRITE_REG1, MASK_RESOLUTION, VAL_RESOLUTION_H12_T14); // takes about 12ms
-            break;
-        }
+        uint8_t _value;
+        if      (stepH == 1)    _value = VAL_RESOLUTION_H08_T12;
+        else if (stepH == 2)    _value = VAL_RESOLUTION_H10_T13;
+        else if (stepH == 3)    _value = VAL_RESOLUTION_H11_T11;
+        else                    _value = VAL_RESOLUTION_H12_T14; // takes about 12ms
+        i2c.setRegister(I2C_ADDRESS, CMD_WRITE_REG1, MASK_RESOLUTION, _value);
     };
 
     /**< for dew-point measurements, takes 3.1mA */
-    void setHeater(uint8_t enable=1)
+    inline void setHeater(const uint8_t enable=1)
     {
-        if (enable)  i2c.setRegister(SI7021_ADDRESS, CMD_WRITE_REG1, MASK_ENABLE_HEATER, 255);
-        else         i2c.setRegister(SI7021_ADDRESS, CMD_WRITE_REG1, MASK_ENABLE_HEATER, 0);
+        uint8_t _value;
+        if (enable)  _value = 255;
+        else         _value = 0;
+        i2c.setRegister(I2C_ADDRESS, CMD_WRITE_REG1, MASK_ENABLE_HEATER, _value);
     };
 
     /**< no function */
-    void setEnabled(uint8_t enable=1)
+    inline void setEnabled(const uint8_t enable=1)
     {
 
     };
 
     /**< softwarereset */
-    void reset(void)
+    inline void reset(void)
     {
-        i2c.writeCMD(SI7021_ADDRESS, CMD_RESET);
+        i2c.writeCMD(I2C_ADDRESS, CMD_RESET);
     };
 
-    /**< standardvalues */
-    byte initialize()
+    /**< set standardvalues */
+    inline uint8_t initialize()
     {
-        if (i2c.probe(SI7021_ADDRESS)==0) return 0;
+        if (i2c.probe(I2C_ADDRESS)==0) return 0;
 
-            setHeater(0);
-            setResolution(4);
-            triggerMeasurement();   // Manual Mode: Request and Read
-            return 1;
+        setHeater(0);
+        setResolution(4);
+        triggerMeasurement();   // Manual Mode: Request and Read
+        return 1;
     };
 
     /**< there is also a temperaturemeasurement taken */
     void triggerMeasurement()
     {
-        i2c.writeCMD(SI7021_ADDRESS, CMD_MEASURE_HUMIDITY_HOLD);
+        i2c.writeCMD(I2C_ADDRESS, CMD_MEASURE_HUMIDITY_HOLD);
     };
 
     /**< check for new data, return 1 when Measurement is ready */
-    uint8_t checkMeasurement(void)
+    inline uint8_t checkMeasurement(void)
     {
         /**< TODO: Implement */
         return 1; // Measurement finished
     };
 
     /**<  wait for new data*/
-    uint8_t awaitMeasurement(void)
+    inline uint8_t awaitMeasurement(void)
     {
         /**< TODO: Implement */
         return 1; // Measurement finished
@@ -150,7 +144,7 @@ public:
         return    _rh;
     };
 
-    void getHumidity(float& rh) // pass a reference
+    inline void getHumidity(float& rh) // pass a reference
     {
         int32_t   _rawHumi;
         _rawHumi  = readValue(CMD_MEASURE_HUMIDITY_HOLD);
@@ -158,8 +152,9 @@ public:
     };
 
     /**< standardcall */
-    void getMeasurement(float& rh) {
-    getHumidity(rh);
+    inline void getMeasurement(float& rh)
+    {
+        getHumidity(rh);
     }
 
     /**< inefficient way to get a value */
@@ -183,7 +178,7 @@ public:
     /**< not very usefull */
     void requestTemperature()
     {
-        i2c.writeCMD(SI7021_ADDRESS, CMD_MEASURE_TEMPERATURE_HOLD);
+        i2c.writeCMD(I2C_ADDRESS, CMD_MEASURE_TEMPERATURE_HOLD);
     };
 
     /**< inefficient way to get a value */

@@ -19,96 +19,96 @@ Driver for the PCF2127T RTC
 class PCF2127
 {
 
-    /** ######### Register-Map ################################################################# */
-
-#define PCF_ADDRESS 	        0x51
-
-#define REG_CONTROL1            0x00
-#define     MSK_CONTROL1_EXTTST (B10000000) // test mode? NO
-#define     MSK_CONTROL1_T      (B01000000) // unused
-#define     MSK_CONTROL1_STOP   (B00100000)
-#define     MSK_CONTROL1_TSF1   (B00010000)
-#define     MSK_CONTROL1_POROVRD (B00001000)
-#define     MSK_CONTROL1_12_24  (B00000100)
-#define     MSK_CONTROL1_MI     (B00000010)
-#define     MSK_CONTROL1_SI     (B00000001)
-
-#define REG_CONTROL2            0x01
-#define     MSK_CONTROL2_MSF    (B10000000)
-#define     MSK_CONTROL2_WDTF   (B01000000)
-#define     MSK_CONTROL2_TSF2   (B00100000)
-#define     MSK_CONTROL2_AF     (B00010000)
-#define     MSK_CONTROL2_CDTF   (B00001000)
-#define     MSK_CONTROL2_TSIE   (B00000100)
-#define     MSK_CONTROL2_AIE    (B00000010)
-#define     MSK_CONTROL2_CDTIE  (B00000001)
-#define REG_CONTROL3            0x02
-#define     MSK_CONTROL3_PWRMNG (B11100000)
-#define     MSK_CONTROL3_BTSE   (B00010000)
-#define     MSK_CONTROL3_BF     (B00001000)
-#define     MSK_CONTROL3_BLF    (B00000100)
-#define     MSK_CONTROL3_BIE    (B00000010)
-#define     MSK_CONTROL3_BLIE   (B00000001)
-
-#define REG_SECONDS             0x03    // 7bit
-#define REG_MINUTES             0x04    // 7bit
-#define REG_HOURS               0x05    // 6bit
-#define REG_DAYS                0x06    // 6bit
-#define REG_WEEKDAYS            0x07    // 3bit
-#define REG_MONTH               0x08    // 5bit
-#define REG_YEARS               0x09    // 8bit
-#define     VAL_YEAR_OFFSET     2000
-
-#define REG_SECOND_ALARM        0x0A
-#define REG_MINUTE_ALARM        0x0B
-#define REG_HOUR_ALARM          0x0C
-#define REG_DAY_ALARM           0x0D
-#define REG_WEEKDAY_ALARM       0x0E
-#define     VAL_ENABLE_ALARM    (B10000000) // highest bit always for Enable!
-
-#define REG_CLOCKOUT_CTL        0x0F
-#define     MSK_CLOCKOUT_TCR    (B11000000)
-#define     MSK_CLOCKOUT_COF    (B00000111)
-
-#define REG_WATCHDOG_TIM_CTL    0x10
-#define     MSK_WATCHDOG_WDCD   (B11000000)
-#define     MSK_WATCHDOG_TITP   (B00100000)
-#define     MSK_WATCHDOG_TF     (B00000011)
-#define REG_WATCHDOG_TIM_VAL    0x11
-
-#define REG_TIMESTP_CTL         0x12
-#define     MSK_TIMESTP_TSM     (B10000000)
-#define     MSK_TIMESTP_TSOFF   (B01000000)
-#define     MSK_TIMESTP_1O16    (B00011111)
-#define REG_SEC_TIMESTP         0x13
-#define REG_MIN_TIMESTP         0x14
-#define REG_HOUR_TIMESTP        0x15
-#define REG_DAY_TIMESTP         0x16
-#define REG_MON_TIMESTP         0x17
-#define REG_YEAR_TIMESTP        0x18
-
-#define REG_AGING_OFFSET        0x19    // 4bit
-
-#define REG_RAM_ADDR_MSB        0x1A    // 1bit / last
-#define REG_RAM_ADDR_LSB        0x1B
-#define REG_RAM_WRT_CMD         0x1C
-#define REG_RAM_RD_CMD          0x1D
-
 private:
+
+    /** ######### Register-Map ################################################################# */
+    static const uint8_t    I2C_ADDRESS 	            =(0x51);
+
+    static const uint8_t    REG_CONTROL1                =(0x00);
+    static const uint8_t        MSK_CONTROL1_EXTTST     =(B10000000); // test mode? NO
+    static const uint8_t        MSK_CONTROL1_T          =(B01000000); // unused
+    static const uint8_t        MSK_CONTROL1_STOP       =(B00100000);
+    static const uint8_t        MSK_CONTROL1_TSF1       =(B00010000);
+    static const uint8_t        MSK_CONTROL1_POROVRD    =(B00001000);
+    static const uint8_t        MSK_CONTROL1_12_24      =(B00000100);
+    static const uint8_t        MSK_CONTROL1_MI         =(B00000010);
+    static const uint8_t        MSK_CONTROL1_SI         =(B00000001);
+
+    static const uint8_t    REG_CONTROL2                =(0x01);
+    static const uint8_t        MSK_CONTROL2_MSF        =(B10000000);
+    static const uint8_t        MSK_CONTROL2_WDTF       =(B01000000);
+    static const uint8_t        MSK_CONTROL2_TSF2       =(B00100000);
+    static const uint8_t        MSK_CONTROL2_AF         =(B00010000);
+    static const uint8_t        MSK_CONTROL2_CDTF       =(B00001000);
+    static const uint8_t        MSK_CONTROL2_TSIE       =(B00000100);
+    static const uint8_t        MSK_CONTROL2_AIE        =(B00000010);
+    static const uint8_t        MSK_CONTROL2_CDTIE      =(B00000001);
+    static const uint8_t    REG_CONTROL3                =(0x02);
+    static const uint8_t        MSK_CONTROL3_PWRMNG     =(B11100000);
+    static const uint8_t        MSK_CONTROL3_BTSE       =(B00010000);
+    static const uint8_t        MSK_CONTROL3_BF         =(B00001000);
+    static const uint8_t        MSK_CONTROL3_BLF        =(B00000100);
+    static const uint8_t        MSK_CONTROL3_BIE        =(B00000010);
+    static const uint8_t        MSK_CONTROL3_BLIE       =(B00000001);
+
+    static const uint8_t    REG_SECONDS                 =(0x03);    // 7bit
+    static const uint8_t    REG_MINUTES                 =(0x04);    // 7bit
+    static const uint8_t    REG_HOURS                   =(0x05);    // 6bit
+    static const uint8_t    REG_DAYS                    =(0x06);    // 6bit
+    static const uint8_t    REG_WEEKDAYS                =(0x07);    // 3bit
+    static const uint8_t    REG_MONTH                   =(0x08);    // 5bit
+    static const uint8_t    REG_YEARS                   =(0x09);    // 8bit
+    static const uint16_t       VAL_YEAR_OFFSET         =(2000);
+
+    static const uint8_t    REG_SECOND_ALARM            =(0x0A);
+    static const uint8_t    REG_MINUTE_ALARM            =(0x0B);
+    static const uint8_t    REG_HOUR_ALARM              =(0x0C);
+    static const uint8_t    REG_DAY_ALARM               =(0x0D);
+    static const uint8_t    REG_WEEKDAY_ALARM           =(0x0E);
+    static const uint8_t        VAL_ENABLE_ALARM        =(B10000000); // highest bit always for Enable!
+
+    static const uint8_t    REG_CLOCKOUT_CTL            =(0x0F);
+    static const uint8_t        MSK_CLOCKOUT_TCR        =(B11000000);
+    static const uint8_t        MSK_CLOCKOUT_COF        =(B00000111);
+
+    static const uint8_t    REG_WATCHDOG_TIM_CTL        =(0x10);
+    static const uint8_t        MSK_WATCHDOG_WDCD       =(B11000000);
+    static const uint8_t        MSK_WATCHDOG_TITP       =(B00100000);
+    static const uint8_t        MSK_WATCHDOG_TF         =(B00000011);
+    static const uint8_t    REG_WATCHDOG_TIM_VAL        =(0x11);
+
+    static const uint8_t    REG_TIMESTP_CTL             =(0x12);
+    static const uint8_t        MSK_TIMESTP_TSM         =(B10000000);
+    static const uint8_t        MSK_TIMESTP_TSOFF       =(B01000000);
+    static const uint8_t        MSK_TIMESTP_1O16        =(B00011111);
+    static const uint8_t    REG_SEC_TIMESTP             =(0x13);
+    static const uint8_t    REG_MIN_TIMESTP             =(0x14);
+    static const uint8_t    REG_HOUR_TIMESTP            =(0x15);
+    static const uint8_t    REG_DAY_TIMESTP             =(0x16);
+    static const uint8_t    REG_MON_TIMESTP             =(0x17);
+    static const uint8_t    REG_YEAR_TIMESTP            =(0x18);
+
+    static const uint8_t    REG_AGING_OFFSET            =(0x19);    // 4bit
+
+    static const uint8_t    REG_RAM_ADDR_MSB            =(0x1A);    // 1bit / last
+    static const uint8_t    REG_RAM_ADDR_LSB            =(0x1B);
+    static const uint8_t    REG_RAM_WRT_CMD             =(0x1C);
+    static const uint8_t    REG_RAM_RD_CMD              =(0x1D);
+
     uint8_t datetime[7];
 
     /** ######### function definition ################################################################# */
 
 public:
     /**< TODO: do i need a constructor? */
-    PCF2127(void)
+    PCF2127(void) : datetime({0,0,0,0,0,0})
     {
-        //_address = MPL_ADDRESS;
+
     };
 
-    uint8_t initialize()
+    inline uint8_t initialize()
     {
-        if (i2c.probe(PCF_ADDRESS)==0) return 0;
+        if (i2c.probe(I2C_ADDRESS)==0) return 0;
 
         uint8_t regPCF;
 
@@ -120,20 +120,20 @@ public:
         regPCF &= !MSK_CONTROL1_12_24;
         regPCF &= !MSK_CONTROL1_MI;
         regPCF &= !MSK_CONTROL1_SI;
-        i2c.writeByte(PCF_ADDRESS, REG_CONTROL1, regPCF);
+        i2c.writeByte(I2C_ADDRESS, REG_CONTROL1, regPCF);
 
         regPCF  = 0;
         regPCF &= !MSK_CONTROL2_TSIE;
         regPCF &= !MSK_CONTROL2_AIE;
         regPCF &= !MSK_CONTROL2_CDTIE;
-        i2c.writeByte(PCF_ADDRESS, REG_CONTROL2, regPCF);
+        i2c.writeByte(I2C_ADDRESS, REG_CONTROL2, regPCF);
 
         regPCF  = 0;
         regPCF |= MSK_CONTROL3_PWRMNG & B10100000; // direct switching and no low power detection
         regPCF &= !MSK_CONTROL3_BTSE;
         regPCF &= !MSK_CONTROL3_BIE;
         regPCF &= !MSK_CONTROL3_BLIE;
-        i2c.writeByte(PCF_ADDRESS, REG_CONTROL3, regPCF);
+        i2c.writeByte(I2C_ADDRESS, REG_CONTROL3, regPCF);
 
 
         setTemperaturePeriod(240);
@@ -141,58 +141,62 @@ public:
         return 1;
     };
 
-    void clearInterrupt()
+    inline void clearInterrupt()
     {
-        i2c.setRegister(PCF_ADDRESS, REG_CONTROL1, MSK_CONTROL1_TSF1, 0);
+        i2c.setRegister(I2C_ADDRESS, REG_CONTROL1, MSK_CONTROL1_TSF1, 0);
     };
 
-    void setTemperaturePeriod(uint8_t seconds=240)
+    inline void setTemperaturePeriod(const uint8_t seconds=240)
     {
-        if      (seconds > 160)  seconds = B00000000;    // 240s
-        else if (seconds > 90)   seconds = B01000000;    // 120s
-        else if (seconds > 45)   seconds = B10000000;    // 60s
-        else                     seconds = B11000000;    // 30s
-        i2c.setRegister(PCF_ADDRESS, REG_CLOCKOUT_CTL, MSK_CLOCKOUT_TCR, seconds);
+        uint8_t _value;
+        if      (seconds > 160)  _value = B00000000;    // 240s
+        else if (seconds > 90)   _value = B01000000;    // 120s
+        else if (seconds > 45)   _value = B10000000;    // 60s
+        else                     _value = B11000000;    // 30s
+        i2c.setRegister(I2C_ADDRESS, REG_CLOCKOUT_CTL, MSK_CLOCKOUT_TCR, _value);
     };
 
-    void setClockOut(uint16_t clock = 1)
+    void setClockOut(const uint16_t clock = 1)
     {
-        if      (clock > 30000) clock = 000;    // 32768
-        else if (clock > 16000) clock = 001;    // 16384
-        else if (clock > 8000)  clock = 010;    // 8192
-        else if (clock > 4000)  clock = 011;    // 4096
-        else if (clock > 2000)  clock = 100;    // 2048
-        else if (clock > 1000)  clock = 101;    // 1024
-        else if (clock > 0)     clock = 110;    // PPS
-        else                    clock = 111;    // disable
-        i2c.setRegister(PCF_ADDRESS, REG_CLOCKOUT_CTL, MSK_CLOCKOUT_COF, clock);
+        uint8_t _value;
+        if      (clock > 30000) _value = 000;    // 32768
+        else if (clock > 16000) _value = 001;    // 16384
+        else if (clock > 8000)  _value = 010;    // 8192
+        else if (clock > 4000)  _value = 011;    // 4096
+        else if (clock > 2000)  _value = 100;    // 2048
+        else if (clock > 1000)  _value = 101;    // 1024
+        else if (clock > 0)     _value = 110;    // PPS
+        else                    _value = 111;    // disable
+        i2c.setRegister(I2C_ADDRESS, REG_CLOCKOUT_CTL, MSK_CLOCKOUT_COF, _value);
 
     };
 
-    void setTime(uint16_t YYYY, uint8_t MM, uint8_t W, uint8_t DD, uint8_t hh, uint8_t mm, uint8_t ss)
+    inline void setTime(const uint16_t YYYY, const uint8_t MM, const uint8_t W, const uint8_t DD, const uint8_t hh, const uint8_t mm, const uint8_t ss)
     {
-        uint8_t decimal = 0;
+        uint8_t decimal = 0, _value;
 
         /// YEAR
-        if (YYYY >= VAL_YEAR_OFFSET) YYYY -= VAL_YEAR_OFFSET;
-        if (YYYY > 99) return;
+        uint16_t _ivalue = YYYY;
+        if (YYYY >= VAL_YEAR_OFFSET) _ivalue -= VAL_YEAR_OFFSET;
+        if (_ivalue > 99) return;
         decimal = 0;
-        while (YYYY > 9)
+        while (_ivalue > 9)
         {
-            YYYY -= 10;
+            _ivalue -= 10;
             decimal += 1;
         }
-        datetime[6] = YYYY | ((decimal)<<4);
+        datetime[6] = _ivalue | ((decimal)<<4);
 
         /// MONTH
         if (MM > 12) return;
+        _value = MM;
         decimal = 0;
-        while (MM > 9)
+        while (_value > 9)
         {
-            MM -= 10;
+            _value -= 10;
             decimal++;
         }
-        datetime[5] = MM | (decimal)<<4;
+        datetime[5] = _value | (decimal)<<4;
 
         /// WEEKDAYS
         if (W > 6) return;
@@ -200,161 +204,172 @@ public:
 
         /// DAY
         if (DD > 32) return;
+        _value  = DD;
         decimal = 0;
-        while (DD > 9)
+        while (_value > 9)
         {
-            DD -= 10;
+            _value -= 10;
             decimal++;
         }
-        datetime[3] = DD | (decimal)<<4;
+        datetime[3] = _value | (decimal)<<4;
 
 
         /// HOURS
         if (hh > 24) return;
+        _value  = hh;
         decimal = 0;
-        while (hh > 9)
+        while (_value > 9)
         {
-            hh -= 10;
+            _value -= 10;
             decimal++;
         }
-        datetime[2] = hh | (decimal)<<4;
+        datetime[2] = _value | (decimal)<<4;
 
         /// MINUTES
         if (mm > 60) return;
+        _value  = mm;
         decimal = 0;
-        while (mm > 9)
+        while (_value > 9)
         {
-            mm -= 10;
+            _value -= 10;
             decimal++;
         }
-        datetime[1] = mm | (decimal)<<4;
+        datetime[1] = _value | (decimal)<<4;
 
 
         /// SECONDS
         if (ss > 60) return;
+        _value  = ss;
         decimal = 0;
-        while (ss > 9)
+        while (_value > 9)
         {
-            ss -= 10;
+            _value -= 10;
             decimal++;
         }
-        datetime[0] = ss | (decimal)<<4;
+        datetime[0] = _value | (decimal)<<4;
 
-        i2c.setRegister(PCF_ADDRESS, REG_CONTROL1, MSK_CONTROL1_STOP, MSK_CONTROL1_STOP);
-        i2c.write(PCF_ADDRESS, REG_SECONDS, datetime, 7);
-        i2c.setRegister(PCF_ADDRESS, REG_CONTROL1, MSK_CONTROL1_STOP, 0);
+        i2c.setRegister(I2C_ADDRESS, REG_CONTROL1, MSK_CONTROL1_STOP, MSK_CONTROL1_STOP);
+        i2c.write(I2C_ADDRESS, REG_SECONDS, datetime, 7);
+        i2c.setRegister(I2C_ADDRESS, REG_CONTROL1, MSK_CONTROL1_STOP, 0);
 
     };
 
-    void readTime()
+    inline void readTime()
     {
-       i2c.read(PCF_ADDRESS, REG_SECONDS, datetime, 7);
+        i2c.read(I2C_ADDRESS, REG_SECONDS, datetime, 7);
 
         //uint8_t counter;
         //counter = 0;
-       // while (counter<7)
-       for (uint8_t counter = 0; counter<7; counter++)
-       {
-        datetime[counter]  = uint8_t(((datetime[counter]>>4) * 10) + (datetime[counter] & B00001111));
-        //counter++;
-       }
+        // while (counter<7)
+        for (uint8_t counter = 0; counter<7; counter++)
+        {
+            datetime[counter]  = uint8_t(((datetime[counter]>>4) * 10) + (datetime[counter] & B00001111));
+            //counter++;
+        }
     };
 
 
-    void setSeconds(uint8_t unit = 0)
+    inline void setSeconds(const uint8_t unit = 0)
     {
+        // TODO:
     };
 
-    void getSeconds(uint8_t& unit)
+    inline void getSeconds(uint8_t& unit)
     {
         unit = datetime[0];
     };
 
-    void setMinutes(uint8_t unit = 0)
+    inline void setMinutes(const uint8_t unit = 0)
     {
+        // TODO:
     };
 
-    void getMinutes(uint8_t& unit)
+    inline void getMinutes(uint8_t& unit)
     {
         unit = datetime[1];
     };
 
-    void setHours(uint8_t unit = 0)
+    inline void setHours(const uint8_t unit = 0)
     {
+        // TODO
     };
 
-    void getHours(uint8_t& unit)
+    inline void getHours(uint8_t& unit)
     {
         unit = datetime[2];
     };
 
-    void setDays(uint8_t unit = 0)
+    inline void setDays(const uint8_t unit = 0)
     {
+        // TODO
     };
 
-     void getDays(uint8_t& unit)
+    inline void getDays(uint8_t& unit)
     {
         unit = datetime[3];
     }
 
-    void setWeekdays(uint8_t unit = 0)
+    inline void setWeekdays(const uint8_t unit = 0)
     {
     };
 
-         void getWeekdays(uint8_t& unit)
+    inline void getWeekdays(uint8_t& unit)
     {
         unit = datetime[4];
     };
 
-    void setMonth(uint8_t unit = 0)
+    inline void setMonth(const uint8_t unit = 0)
     {
+        // TODO:
     };
 
-    void getMonth(uint8_t& unit)
+    inline void getMonth(uint8_t& unit)
     {
         unit = datetime[5];
     };
 
-    void setYears(uint8_t unit = 0)
+    inline void setYears(const uint8_t unit = 0)
     {
+        // TODO
     };
 
-    void getYears(uint16_t& unit)
+    inline void getYears(uint16_t& unit)
     {
         unit = VAL_YEAR_OFFSET + uint16_t(datetime[6]);
     };
-/*
+    /*
+    TODO:
 
-#define REG_SECONDS             0x03    // 7bit
-#define REG_MINUTES             0x04    // 7bit
-#define REG_HOURS               0x05    // 6bit
-#define REG_DAYS                0x06    // 6bit
-#define REG_WEEKDAYS            0x07    // 3bit
-#define REG_MONTH               0x08    // 5bit
-#define REG_YEARS               0x09    // 8bit
+    static const uint8_t REG_SECONDS             0x03    // 7bit
+    static const uint8_t REG_MINUTES             0x04    // 7bit
+    static const uint8_t REG_HOURS               0x05    // 6bit
+    static const uint8_t REG_DAYS                0x06    // 6bit
+    static const uint8_t REG_WEEKDAYS            0x07    // 3bit
+    static const uint8_t REG_MONTH               0x08    // 5bit
+    static const uint8_t REG_YEARS               0x09    // 8bit
 
-#define REG_SECOND_ALARM        0x0A
-#define REG_MINUTE_ALARM        0x0B
-#define REG_HOUR_ALARM          0x0C
-#define REG_DAY_ALARM           0x0D
-#define REG_WEEKDAY_ALARM       0x0E
-#define     VAL_ENABLE_ALARM    (B10000000) // highest bit always for Enable!
+    static const uint8_t REG_SECOND_ALARM        0x0A
+    static const uint8_t REG_MINUTE_ALARM        0x0B
+    static const uint8_t REG_HOUR_ALARM          0x0C
+    static const uint8_t REG_DAY_ALARM           0x0D
+    static const uint8_t REG_WEEKDAY_ALARM       0x0E
+    static const uint8_t     VAL_ENABLE_ALARM    (B10000000) // highest bit always for Enable!
 
 
 
-#define REG_WATCHDOG_TIM_CTL    0x10
-#define     MSK_WATCHDOG_WDCD   (B11000000)
-#define     MSK_WATCHDOG_TITP   (B00100000)
-#define     MSK_WATCHDOG_TF     (B00000011)
-#define REG_WATCHDOG_TIM_VAL    0x11
+    static const uint8_t REG_WATCHDOG_TIM_CTL    0x10
+    static const uint8_t     MSK_WATCHDOG_WDCD   (B11000000)
+    static const uint8_t     MSK_WATCHDOG_TITP   (B00100000)
+    static const uint8_t     MSK_WATCHDOG_TF     (B00000011)
+    static const uint8_t REG_WATCHDOG_TIM_VAL    0x11
 
-#define REG_AGING_OFFSET        0x19    // 4bit
+    static const uint8_t REG_AGING_OFFSET        0x19    // 4bit
 
-#define REG_RAM_ADDR_MSB        0x1A    // 1bit / last
-#define REG_RAM_ADDR_LSB        0x1B
-#define REG_RAM_WRT_CMD         0x1C
-#define REG_RAM_RD_CMD          0x1D
-*/
+    static const uint8_t REG_RAM_ADDR_MSB        0x1A    // 1bit / last
+    static const uint8_t REG_RAM_ADDR_LSB        0x1B
+    static const uint8_t REG_RAM_WRT_CMD         0x1C
+    static const uint8_t REG_RAM_RD_CMD          0x1D
+    */
 };
 
 /** ######### Preinstantiate Object ################################################################# */

@@ -3,7 +3,7 @@
 
 // Pressure-Sensor
 #include "i2c_LPS331.h"
-LPS331 lps331 = LPS331();
+LPS331 lps331;
 
 
 void setup()
@@ -49,5 +49,5 @@ void loop()
 Program size:
 A1.0.5: 7098b
 A1.5.7:
-
+A1.6.3: 7184b / 567b
  */
