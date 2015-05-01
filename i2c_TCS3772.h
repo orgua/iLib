@@ -91,7 +91,6 @@ public:
 
     TCS3772(void) // TODO: WB
     {
-        //_address = MPL_ADDRESS;
     };
 
     inline void setEnabled(const uint8_t enable = 1)

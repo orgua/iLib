@@ -31,7 +31,7 @@ public:
     /**< TODO: do i need a constructor? */
     PRESET(void)
     {
-        //_address = MPL_ADDRESS;
+        //_address = I2C_ADDRESS;
     };
 
     /**<  gives values */

@@ -78,7 +78,6 @@ public:
     /**< TODO: do i need a constructor? */
     MAG3110(void)
     {
-        //_address = MPL_ADDRESS;
     };
 
     /**<  Trigger a software-reset*/

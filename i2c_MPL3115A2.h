@@ -95,7 +95,6 @@ public:
 
     MPL3115A2(void)
     {
-        //_address = I2C_ADDRESS;
     };
 
     /**< Enable Altimeter / Barometer MODE */
