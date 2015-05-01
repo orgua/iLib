@@ -83,7 +83,6 @@ public:
     /**< TODO: do i need a constructor? */
     MMA8451(void) : sensitivity(4096)
     {
-        //_address = MPL_I2C_ADDRESS;
     };
 
     inline void setEnabled(const uint8_t enable)
