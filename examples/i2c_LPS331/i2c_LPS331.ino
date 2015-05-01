@@ -49,5 +49,5 @@ void loop()
 Program size:
 A1.0.5: 7098b
 A1.5.7:
-A1.6.3:
+A1.6.3: 7184b / 567b
  */

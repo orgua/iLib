@@ -19,42 +19,43 @@ Driver for the LPS331-Sensor
 class LPS331 : public i2cSensor, public manualSensor
 {
 
+private:
+
     /** ######### Register-Map ################################################################# */
+    static const uint8_t    LPS331AP_ADDRESS_SA0_LOW    =(0b1011100);
+    static const uint8_t    LPS331AP_ADDRESS_SA0_HIGH   =(0b1011101);
+    static const uint8_t    I2C_ADDRESS				    =(LPS331AP_ADDRESS_SA0_HIGH);
 
-#define LPS331AP_ADDRESS_SA0_LOW    0b1011100
-#define LPS331AP_ADDRESS_SA0_HIGH   0b1011101
-#define LPS_ADDRESS				    LPS331AP_ADDRESS_SA0_HIGH
+    static const uint8_t    REF_P_XL                    =(0x08);
+    static const uint8_t    REF_P_L                     =(0x09);
+    static const uint8_t    REF_P_H                     =(0x0A);
 
-#define LPS331_REF_P_XL             0x08
-#define LPS331_REF_P_L              0x09
-#define LPS331_REF_P_H              0x0A
+    static const uint8_t    WHO_AM_I                    =(0x0F);
+    static const uint8_t        VAL_WHO_AM_I            =(0xBB);
 
-#define LPS331_WHO_AM_I             0x0F
-#define     VAL_WHO_AM_I            0xBB
+    static const uint8_t    RES_CONF                    =(0x10);
 
-#define LPS331_RES_CONF             0x10
+    static const uint8_t    CTRL_REG1                   =(0x20);
+    static const uint8_t    CTRL_REG2                   =(0x21);
+    static const uint8_t    CTRL_REG3                   =(0x22);
+    static const uint8_t    INTERRUPT_CFG               =(0x23);
+    static const uint8_t    INT_SOURCE                  =(0x24);
+    static const uint8_t    THS_P_L                     =(0x25);
+    static const uint8_t    THS_P_H                     =(0x26);
+    static const uint8_t    STATUS_REG                  =(0x27);
 
-#define LPS331_CTRL_REG1            0x20
-#define LPS331_CTRL_REG2            0x21
-#define LPS331_CTRL_REG3            0x22
-#define LPS331_INTERRUPT_CFG        0x23
-#define LPS331_INT_SOURCE           0x24
-#define LPS331_THS_P_L              0x25
-#define LPS331_THS_P_H              0x26
-#define LPS331_STATUS_REG           0x27
+    static const uint8_t    PRESS_OUT_XL                =(0x28);
+    static const uint8_t    PRESS_OUT_L                 =(0x29);
+    static const uint8_t    PRESS_OUT_H                 =(0x2A);
 
-#define LPS331_PRESS_OUT_XL         0x28
-#define LPS331_PRESS_OUT_L          0x29
-#define LPS331_PRESS_OUT_H          0x2A
+    static const uint8_t    TEMP_OUT_L                  =(0x2B);
+    static const uint8_t    TEMP_OUT_H                  =(0x2C);
 
-#define LPS331_TEMP_OUT_L           0x2B
-#define LPS331_TEMP_OUT_H           0x2C
+    static const uint8_t    AMP_CTRL                    =(0x30);
 
-#define LPS331_AMP_CTRL             0x30
-
-#define LPS331_DELTA_PRESS_XL       0x3C
-#define LPS331_DELTA_PRESS_L        0x3D
-#define LPS331_DELTA_PRESS_H        0x3E
+    static const uint8_t    DELTA_PRESS_XL              =(0x3C);
+    static const uint8_t    DELTA_PRESS_L               =(0x3D);
+    static const uint8_t    DELTA_PRESS_H               =(0x3E);
 
     /** ######### function definition ################################################################# */
 
@@ -62,51 +63,53 @@ public:
     /**< TODO: do i need a constructor? */
     LPS331(void)
     {
-        //_address = MPL_ADDRESS;
     };
 
-    void setDatarate(uint8_t valueHz)
+    inline void setDatarate(const uint8_t freqHz)
     {
-        if      (valueHz == 0)  valueHz = 0b00000000; // ONE-SHOT / MANUAL
-        else if (valueHz == 1)  valueHz = 0b00010000;    // Pressure 512 averages, Temp 128 averages
-        else if (valueHz <= 7)  valueHz = 0b01010000; // 7 Hz
-        else if (valueHz <= 13) valueHz = 0b01100000; // 12.5 Hz
-        else                    valueHz = 0b01110000; // 25Hz, Temp 64 averages
-        i2c.setRegister(LPS_ADDRESS, LPS331_CTRL_REG1, B01110000, valueHz);	// chip active, 12.5Hz, no INT, continuous update, no delta_pressure, SPI/I2C
+        uint8_t _value;
+        if      (freqHz == 0)   _value = 0b00000000; // ONE-SHOT / MANUAL
+        else if (freqHz == 1)   _value = 0b00010000;    // Pressure 512 averages, Temp 128 averages
+        else if (freqHz <= 7)   _value = 0b01010000; // 7 Hz
+        else if (freqHz <= 13)  _value = 0b01100000; // 12.5 Hz
+        else                    _value = 0b01110000; // 25Hz, Temp 64 averages
+        i2c.setRegister(I2C_ADDRESS, CTRL_REG1, B01110000, _value);	// chip active, 12.5Hz, no INT, continuous update, no delta_pressure, SPI/I2C
     };
 
-    void setSensitivity(uint8_t sens=0)
+    inline void setSensitivity(const uint8_t sens=0)
     {
-        if (sens) sens = 0x7A;
-        else      sens = 0x6A;
-        i2c.writeByte(LPS_ADDRESS, LPS331_RES_CONF, sens);	// temp 128samples, pres 512samples per Value
+        uint8_t _value;
+        if (sens) _value = 0x7A;
+        else      _value = 0x6A;
+        i2c.writeByte(I2C_ADDRESS, RES_CONF, _value);	// temp 128samples, pres 512samples per Value
     }
 
-    void setEnabled(uint8_t enable = 1)
+    inline void setEnabled(const uint8_t enable = 1)
     {
-        if (enable) enable = 255;
-        else        enable = 0;
-        i2c.setRegister(LPS_ADDRESS, LPS331_CTRL_REG1, B10000000, enable);
+        uint8_t _value;
+        if (enable) _value = 255;
+        else        _value = 0;
+        i2c.setRegister(I2C_ADDRESS, CTRL_REG1, B10000000, _value);
     }
 
-    void reset(void)
+    inline void reset(void)
     {
-        i2c.setRegister(LPS_ADDRESS, LPS331_CTRL_REG2, B10000100, B10000100); // Boot and SWRESET
+        i2c.setRegister(I2C_ADDRESS, CTRL_REG2, B10000100, B10000100); // Boot and SWRESET
     }
 
 
     /**< sets or detects slave address; returns bool indicating success */
-    uint8_t initialize(void)
+    inline uint8_t initialize(void)
     {
         return initialize(25);
     };
 
-    uint8_t initialize(uint8_t hzRate)
+    uint8_t initialize(const uint8_t hzRate)
     {
-        if (i2c.probe(LPS_ADDRESS)==0) return 0;
+        if (i2c.probe(I2C_ADDRESS)==0) return 0;
 
-        i2c.writeByte(LPS_ADDRESS, LPS331_CTRL_REG1,	0b00000000);	// Chip power DOWN
-        i2c.writeByte(LPS_ADDRESS, LPS331_CTRL_REG2,	0b00000000);   // NO auto_zero, NO one_shot
+        i2c.writeByte(I2C_ADDRESS, CTRL_REG1,	0b00000000);	// Chip power DOWN
+        i2c.writeByte(I2C_ADDRESS, CTRL_REG2,	0b00000000);   // NO auto_zero, NO one_shot
 
         setDatarate(hzRate);
         setSensitivity(0);
@@ -116,22 +119,22 @@ public:
     };
 
     /**< only used when in manual/standby mode */
-    void triggerMeasurement(void)
+    inline void triggerMeasurement(void)
     {
-        i2c.setRegister(LPS_ADDRESS, LPS331_CTRL_REG2, 0x01, 0x01);
+        i2c.setRegister(I2C_ADDRESS, CTRL_REG2, 0x01, 0x01);
     }
 
     /**< check for new data, return 1 when Measurement is ready */
-    uint8_t checkMeasurement(void)
+    inline uint8_t checkMeasurement(void)
     {
         uint8_t _byte;
-        i2c.read(LPS_ADDRESS,LPS331_STATUS_REG, &_byte, 1);
+        i2c.read(I2C_ADDRESS,STATUS_REG, &_byte, 1);
         if (_byte&0x02) return 1; // Pressure Measurement finished,
         else            return 0;
     };
 
     /**<  wait for new data*/
-    uint8_t awaitMeasurement(void)
+    inline uint8_t awaitMeasurement(void)
     {
         uint8_t _counter = 0;
         while (checkMeasurement()==0)
@@ -156,7 +159,7 @@ public:
     {
         uint8_t _byte[3];
         // assert MSB to enable register address auto-increment
-        i2c.read(LPS_ADDRESS,LPS331_PRESS_OUT_XL | (1 << 7), _byte, 3);
+        i2c.read(I2C_ADDRESS,PRESS_OUT_XL | (1 << 7), _byte, 3);
 
         // combine bytes
         //  GCC performs an arithmetic right shift for signed negative
@@ -178,7 +181,7 @@ public:
     {
         uint8_t _byte[2];
         // assert MSB to enable register address auto-increment
-        i2c.read(LPS_ADDRESS,LPS331_TEMP_OUT_L | (1 << 7), _byte, 2);
+        i2c.read(I2C_ADDRESS,TEMP_OUT_L | (1 << 7), _byte, 2);
 
         // combine bytes
         //  GCC performs an arithmetic right shift for signed negative
@@ -195,7 +198,7 @@ public:
     {
     uint8_t _byte[3];
     // assert MSB to enable register address auto-increment
-    i2c.read(address,LPS331_PRESS_OUT_XL | (1 << 7), _byte, (byte) 3);
+    i2c.read(address,PRESS_OUT_XL | (1 << 7), _byte, (byte) 3);
 
     unsigned long x;
 
@@ -213,13 +216,13 @@ public:
 
     void inline getAltitude(int32_t& height_cm)
     {
-        const long xnode[8]	= {2867200,		3101257,	3335314,	3569371,	3803429,	4037486,	4271543,	4505600};
-        const long yfac[7]	= {1088,		1023,		967,		916,		872,		832,		796}; // * -4096
-        const long ysum[7]	= {1062587,		1013703,	967631,		924033,		882630,		843188,		805511};
+        static const long xnode[8]	= {2867200,		3101257,	3335314,	3569371,	3803429,	4037486,	4271543,	4505600};
+        static const long yfac[7]	= {1088,		1023,		967,		916,		872,		832,		796}; // * -4096
+        static const long ysum[7]	= {1062587,		1013703,	967631,		924033,		882630,		843188,		805511};
 
         unsigned long presraw;
         uint8_t _byte[3];
-        i2c.read(LPS_ADDRESS,LPS331_PRESS_OUT_XL | (1 << 7), _byte, (byte) 3);
+        i2c.read(I2C_ADDRESS,PRESS_OUT_XL | (1 << 7), _byte, (byte) 3);
         presraw = ((int32_t)_byte[2] << 16 | (uint16_t)_byte[1] << 8 | _byte[0]);
         //presraw = readPressureRaw();
 
@@ -237,7 +240,7 @@ public:
                     }
                     else  n = 0;
                 }
-                else n=1;
+                else n = 1;
             }
             else
             {
@@ -257,7 +260,7 @@ public:
                 if (presraw < xnode[7])  n = 6;
                 else
                 {
-                    n=6;
+                    n = 6;
                     presraw = xnode[7];
                 };
             };
