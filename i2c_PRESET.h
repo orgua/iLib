@@ -19,9 +19,10 @@ Driver for the preset-Sensor
 class PRESET : public i2cSensor
 {
 
-    /** ######### Register-Map ################################################################# */
+private:
 
-#define P_ADDRESS 	        0x60
+    /** ######### Register-Map ################################################################# */
+static const uint8_t    I2C_ADDRESS 	            =(0x60);
 
 
     /** ######### function definition ################################################################# */

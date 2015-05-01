@@ -8,6 +8,8 @@ class i2cSensor
 {
 
 public:
+    /**< TODO: make virtual functions private? how to inherit of this? */
+
     /**< TODO: constructur is not usefull? */
 
     /**< TODO: Try const functions */
