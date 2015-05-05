@@ -110,13 +110,14 @@ public:
 
     };
 
+    // reset IC --> dont forget to set safety-registers first after reset
     void reset()
     {
         i2c.setRegister(I2C_ADDRESS, FAN5421_REG_IBAT, FAN5421_MSK_RESET, 255);
         i2c.setRegister(I2C_ADDRESS, FAN5421_REG_IBAT, FAN5421_MSK_RESET, 0);
     };
 
-// has to be written before any other register is written (locked after)
+    // has to be written before any other register is written (locked after)
     uint8_t set_safety()
     {
         uint8_t error = 0;
@@ -128,12 +129,13 @@ public:
         return error;
     };
 
-// has to be polled at least every 32s during charging (HOST alive)
+    // has to be polled at least every 32s during charging (HOST alive)
     void poll_timer()
     {
         i2c.setRegister(    I2C_ADDRESS, FAN5421_REG_CONTROL0, FAN5421_MSK_TMR_RST,    255);
     };
 
+    // feedback for debugging / status
     void print_status()
     {
         Serial.print("FAN5421 is ");
@@ -168,7 +170,7 @@ public:
     };
 
 
-// only for debug purpose
+    // only for debug purpose
     void print_register()
     {
         Serial.print("DEBUG \t ");
@@ -182,10 +184,12 @@ public:
         }
     };
 
-// give a basic and safe set for enable charging
+    // give a basic and safe set for enable charging
     uint8_t set_config(const uint16_t charge_current_mA = 750)
     {
         uint8_t error = 0;
+
+        // TODO: probe IC
 
         //// FAN5421_REG_CONTROL0
         i2c.writeByte(      I2C_ADDRESS, FAN5421_REG_CONTROL0, FAN5421_MSK_TMR_RST | FAN5421_MSK_EN_STAT);
@@ -193,9 +197,9 @@ public:
         if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL0, FAN5421_MSK_EN_STAT)  != FAN5421_MSK_EN_STAT)    error++;
 
         //// FAN5421_REG_CONTROL1
-        i2c.writeByte(      I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_VAL_V_LOW_3V4 | FAN5421_MSK_TE | 0 | 0);
+        i2c.writeByte(      I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_VAL_V_LOW_3V6 | FAN5421_MSK_TE | 0 | 0);
 
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_V_LOW_V) != FAN5421_VAL_V_LOW_3V4)   error++;
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_V_LOW_V) != FAN5421_VAL_V_LOW_3V6)   error++;
         if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_TE)      != FAN5421_MSK_TE)          error++;
         if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_CE_N)    != 0)                       error++;
         if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_HZ_MODE) != 0)                       error++;
@@ -227,7 +231,7 @@ public:
         return error;
     };
 
-
+    // charging current routine
     uint8_t set_current(uint16_t charge_current_mA)
     {
         uint8_t error = 0, value = 0;
@@ -245,6 +249,7 @@ public:
         return error;
     };
 
+    // increase charging-current step by step
     uint8_t increase_current()
     {
         uint8_t error = 0;
@@ -263,6 +268,7 @@ public:
         return error;
     };
 
+    // decrease charging-current step by step
     uint8_t decrease_current()
     {
         uint8_t error = 0;
@@ -281,6 +287,7 @@ public:
         return error;
     };
 
+    // mostly for debugging
     void print_info()
     {
         Serial.print(" SRST: \t ");
@@ -300,6 +307,7 @@ public:
         Serial.println(i2c.getRegister(    I2C_ADDRESS, FAN5421_REG_IC_INFO, FAN5421_MSK_REV));
     };
 
+    // gives feedback if it charges or not
     uint8_t get_chargingstatus()
     {
         uint8_t status = i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL0,FAN5421_MSK_STAT);
@@ -308,20 +316,22 @@ public:
         else                                     return 0;
     };
 
-	uint8_t charging_reenable()
-	{
-		i2c.setRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_CE_N, 1);
-		i2c.setRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_CE_N, 0);
+    // workaround for: chip doesnt charge when already charged and external power still present
+    uint8_t charging_reenable()
+    {
+        i2c.setRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_CE_N, 1);
+        delay(30); // need a nicer
+        i2c.setRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_CE_N, 0);
 
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_CE_N)    != 0)    return 1; // charging enabled
-		else 																				 return 0; // error
-	}
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_CE_N)    == 0)    return 1; // charging enabled
+        else 																				 return 0; // error
+    };
 
 
-/// by default the system current is limited to 325mA. increase with following sequence:
-// program safety register
-// set oreg to the desired value (4...18)
-// set iocharge, then reset the iolevel-bit
+    /// by default the system current is limited to 325mA. increase with following sequence:
+    // program safety register
+    // set oreg to the desired value (4...18)
+    // set iocharge, then reset the iolevel-bit
     uint8_t power_without_battery()
     {
         uint8_t error = 0;

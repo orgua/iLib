@@ -88,7 +88,7 @@ public:
 
     };
 
-// application specific (only set on POR)
+    // application specific (only set on POR)
     void set_capacity_design(const uint16_t capacity_mA)
     {
         uint16_t uvalue = capacity_mA * (MAX17047_SENSE * 200); // mAh * R / uVh
@@ -98,7 +98,7 @@ public:
         i2c.write(I2C_ADDRESS, MAX17047_DESIGN_CAP, value, 2);
     };
 
-// application specific (only set on POR)
+    // application specific (only set on POR)
     void set_full_threshold(const uint8_t percent_soc)
     {
         uint8_t  value[2];
@@ -107,7 +107,7 @@ public:
         i2c.write(I2C_ADDRESS, MAX17047_FULL_SOC_THR, value, 2);
     };
 
-// application specific (only set on POR)
+    // application specific (only set on POR)
     void set_termination_charge_current(const uint16_t current_mA)
     {
         uint8_t  value[2];
@@ -117,7 +117,7 @@ public:
         i2c.write(I2C_ADDRESS, MAX17047_I_CHG_TERM, value, 2);
     };
 
-// application specific (only set on POR)
+    // application specific (only set on POR)
     void set_empty_voltage(const uint16_t empty_mV, const uint16_t recovery_mV)
     {
         uint8_t  value[2];
@@ -126,6 +126,7 @@ public:
         i2c.write(I2C_ADDRESS, MAX17047_V_EMPTY, value, 2);
     };
 
+    // alarm turns the alarm-led on
     void set_alarm_voltage(const uint16_t lowVolt_mV, const uint16_t highVolt_mV)
     {
         uint8_t  value[2];
@@ -134,9 +135,11 @@ public:
         i2c.write(I2C_ADDRESS, MAX17047_V_ALRT_THRESHOLD, value, 2);
     };
 
-// only set once on POR!!!
+    // only set once on POR!!!
     uint8_t initialize()
     {
+        // TODO: Probe IC
+
         // Check POR-Status
         uint8_t value[2];
         i2c.read(I2C_ADDRESS, MAX17047_STATUS, value, 2);
@@ -169,7 +172,7 @@ public:
         return 1;
     };
 
-// do this at end-of-charge or end-of-discharge, gives back 20 byte
+    // do this at end-of-charge or end-of-discharge, gives back 20 byte, INFO about cells
     void backup_data(uint8_t registers[])
     {
         i2c.read(I2C_ADDRESS, MAX17047_FULL_CAP,       &registers[0], 2);
@@ -184,6 +187,7 @@ public:
         i2c.read(I2C_ADDRESS, MAX17047_D_PACC,         &registers[18], 2);
     };
 
+    // after POR you have can restore registers and don't have to relearn the cell
     uint8_t restore_data(uint8_t registers[])
     {
         uint8_t value[2];
@@ -213,6 +217,7 @@ public:
         return 1;
     };
 
+    // basic initialization
     void set_config()
     {
         uint8_t  uvalue[2];
@@ -233,6 +238,7 @@ public:
         i2c.write(I2C_ADDRESS, MAX17047_CONFIG, uvalue, 2);
     };
 
+    // feedback and status
     void print_status()
     {
         uint8_t value[2];
@@ -306,16 +312,15 @@ public:
         Serial.print(" %age :: ");
     };
 
-//int16_t     cell_current;
-//uint16_t    cell_voltage;
-
+    // return measured cell voltage in mV
     uint16_t get_cell_voltage()
     {
         uint8_t value[2];
         i2c.read(I2C_ADDRESS, MAX17047_V_CELL, value, 2);
-        return uint16_t((uint16_t(value[1]<<5) + (value[0]>>3)) / 1.6);
+        return uint16_t((uint16_t(value[1]<<5) + (value[0]>>3)) / 1.6); // mV
     };
 
+    // return measured cell coltage in mA
     int16_t get_cell_current()
     {
         uint8_t value[2];
