@@ -100,6 +100,9 @@ private:
     static const uint8_t     FAN5421_VAL_VSAFE_4V40        =(10);
     static const uint8_t     FAN5421_VAL_VSAFE_4V44        =(15);
 
+    FAN5421(const FAN5421&);            // declaration only for copy constructor
+    FAN5421& operator=(const FAN5421&);  // declaration only for copy assignment --> make it uncopyable
+
 public:
 
     FAN5421(void)
