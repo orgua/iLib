@@ -176,7 +176,7 @@ public:
     /**< get RAW values */
     void getMeasurement(int16_t xyz_raw[])
     {
-        byte buf[6];
+        uint8_t buf[6];
         i2c.read(I2C_ADDRESS, REG_OUT_X_MSB, buf, 6);
         xyz_raw[0] = (buf[0]<<8) | buf[1];
         xyz_raw[1] = (buf[2]<<8) | buf[3];
@@ -186,7 +186,7 @@ public:
     /**< values scaled to uT */
     void getMeasurement(float xyz_uT[])
     {
-        byte buf[6];
+        uint8_t buf[6];
         i2c.read(I2C_ADDRESS, REG_OUT_X_MSB, buf, 6);
         xyz_uT[0] = int16_t((buf[0]<<8) | buf[1])*0.2471f;
         xyz_uT[1] = int16_t((buf[2]<<8) | buf[3])*0.2479f;
