@@ -206,7 +206,7 @@ public:
     /**< Needed to sample faster than 1Hz */
     void triggerMeasurement(void)
     {
-        byte setting = i2c.readByte(I2C_ADDRESS,REG_CTRL1); //Read current settings
+        uint8_t setting = i2c.readByte(I2C_ADDRESS,REG_CTRL1); //Read current settings
         if (setting&2)
         {
             setting &= ~(1<<1); //Clear OST bit

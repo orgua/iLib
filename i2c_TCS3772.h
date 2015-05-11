@@ -135,12 +135,12 @@ public:
         i2c.writeByte(  I2C_ADDRESS, REG_WTIME  | CMD_INCREMENT, _valueC);
     };
 
-    inline void setATime(const uint16_t integrationtime)
+    inline void setATime(const uint16_t integrationtime_ms)
     {
         uint8_t _value;
-        if (integrationtime > 614)      _value = VAL_MAX;
-        else if (integrationtime < 4)   _value = VAL_MIN;
-        else                            _value = (uint8_t) MSEC_TO_ATIME(integrationtime);
+        if (integrationtime_ms > 614)      _value = VAL_MAX;
+        else if (integrationtime_ms < 4)   _value = VAL_MIN;
+        else                               _value = (uint8_t) MSEC_TO_ATIME(integrationtime_ms);
         i2c.writeByte( I2C_ADDRESS, REG_ATIME  | CMD_INCREMENT, _value);
     };
 

@@ -317,14 +317,13 @@ public:
     };
 
     // workaround for: chip doesnt charge when already charged and external power still present
-    uint8_t charging_reenable()
+    // disable charging, wait ~30ms, enable charging --> not working as expected, try chip.reset
+    uint8_t charging_enable(const uint8_t enable = 1)
     {
-        i2c.setRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_CE_N, 1);
-        delay(30); // need a nicer
-        i2c.setRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_CE_N, 0);
+        i2c.setRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_CE_N, ~enable);
 
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_CE_N)    == 0)    return 1; // charging enabled
-        else 																				 return 0; // error
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_CE_N) == (FAN5421_MSK_CE_N&(~enable)))    return 1; // charging-changed
+        else 																				                         return 0; // error
     };
 
 
