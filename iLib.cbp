@@ -23,11 +23,15 @@
 				<Option createStaticLib="1" />
 			</Target>
 		</Build>
+		<Unit filename=".gitattributes" />
+		<Unit filename=".gitignore" />
+		<Unit filename="README.md" />
 		<Unit filename="WS2812B.h" />
 		<Unit filename="atmel_eFunction.h" />
 		<Unit filename="atmel_math_power_and_scale.h" />
 		<Unit filename="atmel_spektrumSerial.h" />
 		<Unit filename="atmel_vcc.h" />
+		<Unit filename="doxygen/doxyfile" />
 		<Unit filename="examples/WS2812B_Clock_90Led/WS2812B_Clock_90Led.ino" />
 		<Unit filename="examples/atmel_math_power_and_scale/atmel_math_power_and_scale.ino" />
 		<Unit filename="examples/firstrun_ledBlink/firstrun_ledBlink.ino" />
@@ -47,12 +51,14 @@
 		<Unit filename="i2c.cpp" />
 		<Unit filename="i2c.h" />
 		<Unit filename="i2c_BMP280.h" />
+		<Unit filename="i2c_FAN5421.h" />
 		<Unit filename="i2c_L3G.h">
 			<Option compile="1" />
 			<Option link="1" />
 		</Unit>
 		<Unit filename="i2c_LPS331.h" />
 		<Unit filename="i2c_MAG3110.h" />
+		<Unit filename="i2c_MAX17047.h" />
 		<Unit filename="i2c_MAX44009.h" />
 		<Unit filename="i2c_MMA8451.h">
 			<Option compilerVar="CC" />
@@ -69,6 +75,7 @@
 			<Option link="1" />
 		</Unit>
 		<Unit filename="i2c_TCS3772.h" />
+		<Unit filename="iLib.layout" />
 		<Unit filename="spi_rfm95.h" />
 		<Extensions>
 			<code_completion />
