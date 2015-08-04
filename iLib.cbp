@@ -28,6 +28,7 @@
 		<Unit filename="README.md" />
 		<Unit filename="WS2812B.h" />
 		<Unit filename="atmel_eFunction.h" />
+		<Unit filename="atmel_hdlc.h" />
 		<Unit filename="atmel_math_power_and_scale.h" />
 		<Unit filename="atmel_spektrumSerial.h" />
 		<Unit filename="atmel_vcc.h" />

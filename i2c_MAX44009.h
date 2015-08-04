@@ -73,7 +73,7 @@ public:
         {
             _value = CONFIG_CONT_OFF;
         }
-        i2c.setRegister(I2C_ADDRESS, CONFIGURATION_REG, CONFIG_CONT_MASK, CONFIG_CONT_OFF);
+        i2c.setRegister(I2C_ADDRESS, CONFIGURATION_REG, CONFIG_CONT_MASK, _value);
     };
 
     inline void reset()

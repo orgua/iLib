@@ -69,8 +69,6 @@ void spektrum_init(void)
 
 void spektrum_send(uint16_t *channel_data)
 {
-    uint16_t    temp_val;
-    uint8_t     temp_i;
 
 #ifdef USE_SPEKTRUM2048
     static uint8_t  position_newVal  = {SPEKTRUM_CHAN_STATIC};
@@ -87,6 +85,7 @@ void spektrum_send(uint16_t *channel_data)
 
     for (uint8_t i=0; i<7; i++)
     {
+        uint8_t     temp_i;
 #ifdef USE_SPEKTRUM2048
         if (i < SPEKTRUM_CHAN_STATIC)      // handle the channels that get transmitted every time
         {
@@ -117,7 +116,7 @@ void spektrum_send(uint16_t *channel_data)
 #else
         temp_i = i;
 #endif // USE_SPEKTRUM2048
-
+        uint16_t    temp_val;
         if 		(channel_data[temp_i] <= 0) 				temp_val = 0;
         else if (channel_data[temp_i] >= SPEKTRUM_VAL_MASK)	temp_val = SPEKTRUM_VAL_MASK;
         else										        temp_val = channel_data[temp_i];
