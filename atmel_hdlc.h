@@ -85,7 +85,18 @@ private:
 
 public:
 
+    HDLC(void): crc16(0), msg_now(0), msg_received(0)
+    {
+        for (uint8_t loopvar = 0; loopvar < HDLC_INPUT_BUFFER_SIZE; ++loopvar)
+        {
+            msg[loopvar] = 0;
+        };
+
+    };
+
+
 // TODO: not ideal, but ok for now
+
 
     void frameOpen(void)
     {

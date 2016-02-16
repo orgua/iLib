@@ -125,7 +125,7 @@ public:
 
     void inline sendarray_mask(uint8_t *data,uint16_t datlen,uint8_t maskhi)
     {
-        uint8_t curbyte,ctr,masklo;
+        uint8_t ctr,masklo;
         uint8_t sreg_prev;
 
         masklo	=~maskhi&ws2812_PORTREG;
@@ -135,7 +135,7 @@ public:
 
         while (datlen--)
         {
-            curbyte=*data++;
+            uint8_t curbyte=*data++;
 
             asm volatile(
                 "       ldi   %0,8  \n\t"

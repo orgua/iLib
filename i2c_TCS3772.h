@@ -176,7 +176,7 @@ public:
     uint8_t autoGain(const uint16_t val_clear)
     {
         /**< TODO: something is wrong here! switching integrationtime shows no faster measurement?!? */
-        static uint8_t val_gain, val_time, gain;
+
         static uint16_t val_last;
 
         // val_clear between 0 .. 65k
@@ -187,6 +187,8 @@ public:
         // val_time: 0=i64, 1=i128, 2=i256
         if ((val_clear != val_last) || (val_clear == 0xFFFF))
         {
+            static uint8_t val_gain, val_time, gain;
+
             val_last = val_clear;
 
             if      (val_clear < MARGIN_LOW)

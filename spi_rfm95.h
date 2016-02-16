@@ -259,7 +259,7 @@ public:
 
     /** ######### function definition ################################################################# */
 
-    RFM95(void)
+    RFM95(void): _filterBadCRC(0), _mode (0), _idleState(0), _receiveContinouos(0), _awaitAck(0)
     {
         pinMode(RFM_CS, OUTPUT);
         SPI.begin();

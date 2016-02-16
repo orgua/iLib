@@ -33,9 +33,20 @@ private:
     long xnode[9]; // = {0,INTERVAL/96,INTERVAL/48,INTERVAL/24,INTERVAL/12,INTERVAL/6,INTERVAL/3,INTERVAL/1.5,INTERVAL};
     long zero_setpoint;
 public:
+    eFunction(void): zero_setpoint(0)
+    {
+        for (uint8_t ivar = 0; ivar < 8; ++ivar)
+        {
+            kf[ivar] = 1;
+            ks[ivar] = 0;
+            xnode[ivar] = 1;
+        };
+        xnode[8] = 1;
+    };
+
     void init(uint16_t interval, float pwr)
     {
-        float maxi, base, yy, xx; // 4*4=16 (nur temporär)
+        float maxi, base;  // 2*4=8 (nur temporär)
         maxi = pow(interval, 1/pwr); //interval^(1/1.7)
         base = maxi / float(interval);
         // nicht sehr schön, aber keine andere Lösung um auf aktuelle Stützstellen zu kommen
@@ -49,14 +60,15 @@ public:
         xnode[7] = long(float(interval)/1.50);
         xnode[8] = long(float(interval)/1.00);
 
-        for (uint8_t p = 0; p<8; p++)
+        for (uint8_t p = 0; p<8; ++p)
         {
+            float yy, xx; // 2*4=8 (nur temporär)
             yy = (float)((pow(base*float(xnode[p+1]),pwr))-(pow(base*float(xnode[p]),pwr)));
             xx = (float)(xnode[p+1]-xnode[p]);
             // x^pwr = x * kf + ks über Interpolation mit 9 Stützstellen
             kf[p] = (long)((yy*128)/xx);
             ks[p] = (long)((pow(base*float(xnode[p]),pwr)*128)-float(xnode[p]*kf[p]));
-        }
+        };
 
         zero_setpoint = 0;
     };
