@@ -1,2 +1,5 @@
 *.layout
-doxygen/doxyfile
+*.name
+*.iml
+*.xml
+CMakeLists.txt

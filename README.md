@@ -1,7 +1,7 @@
-iLib
+I2C-Sensor-Lib (iLib)
 ====
 
-Library for sensors and some atmel-specific functions. The following sensors can be used with an uniform interface and come with arduino-examples: 
+Library for I2C sensors and some atmel-specific functions. The following sensors can be used with an uniform interface and come with arduino-examples: 
 
 - Austria Microsystems TCS3772: light sensor - RGB and clear
 - Silicon Labs SI7021: humidity sensor
