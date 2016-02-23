@@ -16,3 +16,10 @@ Library for I2C sensors and some atmel-specific functions. The following sensors
 - Fairchild FAN5421: Single-Cell Li-Ion Switching Charger
 - STM LPS331: Pressure Sensor
 - Maxim MAX17047: Fuel Gauge for various Cells
+
+Additional Features:
+- AVR: measure VCC of the power-pin
+- AVR: emulate a spektrum-serial control
+- fast math fn for e-function, power-of with scaling (interpolation with sampling points)
+- HDLC: a protocol for serial communication featuring frames, checksum and auto-escaping of characters
+- WS2812B: efficient controller
