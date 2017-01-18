@@ -131,7 +131,7 @@ public:
     // application specific (only set on POR)
     void setCapacityDesign(const uint16_t capacity_mA) const
     {
-        uint16_t uvalue = capacity_mA * (MAX17047_SENSE * 200); // mAh * R / uVh
+        uint16_t uvalue = uint16_t(float(capacity_mA) * (MAX17047_SENSE * 200.0f)); // mAh * R / uVh
         uint8_t  value[2];
         value[0] = uvalue & 0xFF;
         value[1] = (uvalue>>8) & 0xFF;
@@ -151,7 +151,7 @@ public:
     void setTerminationChargeCurrent(const uint16_t current_mA) const
     {
         uint8_t  value[2];
-        uint16_t uvalue = current_mA * (MAX17047_SENSE * 640);
+        uint16_t uvalue = uint16_t(float(current_mA) * (MAX17047_SENSE * 640.0f));
         value[0] = uvalue & 0xFF;
         value[1] = (uvalue>>8) & 0xFF;
         i2c.write(I2C_ADDRESS, MAX17047_I_CHG_TERM, value, 2);
@@ -267,6 +267,49 @@ public:
         return (uint16_t(value[1]<<8) + (value[0])) / 11; // only an approximation to avoid float
     }
 
+    // Remaining capacity in Ah
+    uint16_t getRemainingCapacity_mAh(void)
+    {
+        uint8_t value[2];
+        i2c.read(I2C_ADDRESS, MAX17047_REM_CAP_AV, value, 2);
+        const float fvalue = float(uint16_t(value[1]<<8) + (value[0])) * (0.005 / MAX17047_SENSE);
+        return uint16_t(fvalue);
+    }
+
+
+    // full capacity
+    uint16_t getFullCapacity_mAh(void)
+    {
+        uint8_t value[2];
+        i2c.read(I2C_ADDRESS, MAX17047_FULL_CAP, value, 2);
+        const float fvalue = float(uint16_t(value[1] << 8) + (value[0])) * (0.005 / MAX17047_SENSE);
+        return uint16_t(fvalue);
+    }
+
+    // MAX17047_CYCLES in percent
+    uint16_t getChargingCycles_per(void)
+    {
+        uint8_t value[2];
+        i2c.read(I2C_ADDRESS, MAX17047_CYCLES, value, 2);
+        return (uint16_t(value[1] << 8) + (value[0]));
+    }
+
+    // MAX17047_AGE in Percent
+    float getCellAge_fper(void)
+    {
+        uint8_t value[2];
+        i2c.read(I2C_ADDRESS, MAX17047_AGE, value, 2);
+        return float(uint16_t(value[1] << 8) + (value[0])) / 256.0f;
+    }
+
+    // MAX17047_AGE in Percent
+    uint16_t getCellAge_per(void)
+    {
+        uint8_t value[2];
+        i2c.read(I2C_ADDRESS, MAX17047_AGE, value, 2);
+        return (value[1]);
+    }
+
     /*
 // feedback and status TODO: translate to getters:
 void print_status() const
@@ -279,21 +322,6 @@ void print_status() const
     if      (value[1] & 0b00000001)  Serial.print("|E"); // EMPTY
     else if (value[1] & 0b00010000)  Serial.print("|M"); // FULL exceed maximum
     else                             Serial.print("|N"); // normal
-    // POR-Status
-    if (value[0] & 2)  Serial.print("|R "); // POR SET
-    else               Serial.print("|N ");
-
-    // Remaining capacity
-    i2c.read(I2C_ADDRESS, MAX17047_REM_CAP_AV, value, 2);
-    fvalue = float(uint16_t(value[1]<<8) + (value[0])) * (0.000005 / MAX17047_SENSE);
-    Serial.print(fvalue,3);
-    Serial.print(" of ");
-
-    // full capacity
-    i2c.read(I2C_ADDRESS, MAX17047_FULL_CAP, value, 2);
-    fvalue = float(uint16_t(value[1]<<8) + (value[0])) * (0.000005 / MAX17047_SENSE);
-    Serial.print(fvalue,3);
-    Serial.print(" Ah :: ");
 
     // MAX17047_CURRENT
     i2c.read(I2C_ADDRESS, MAX17047_CURRENT, value, 2);
@@ -304,18 +332,6 @@ void print_status() const
     fvalue = float((value[1]<<8) + (value[0])) * (0.001 * (1.5625 / MAX17047_SENSE));
     Serial.print(fvalue,2);
     Serial.print(" mA :: ");
-
-    // MAX17047_CYCLES
-    i2c.read(I2C_ADDRESS, MAX17047_CYCLES, value, 2);
-    fvalue = float(uint16_t(value[1]<<8) + (value[0]));
-    Serial.print(fvalue,0);
-    Serial.print(" %cycled :: ");
-
-    // MAX17047_AGE
-    i2c.read(I2C_ADDRESS, MAX17047_AGE, value, 2);
-    fvalue = float(uint16_t(value[1]<<8) + (value[0])) / 256.0f;
-    Serial.print(fvalue,2);
-    Serial.print(" %age :: ");
 };
  */
 
