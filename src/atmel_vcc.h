@@ -28,7 +28,7 @@ int32_t readVcc() {
 
   int32_t result = (high<<8) | low;
 
-  result = 1125300L / result; // Calculate Vcc (in mV); 1125300 = 1.1*1023*1000
+  result = 1126400L / result; // Calculate Vcc (in mV); 1126400 = 1.1*1024*1000
   return result; // Vcc in millivolts
 };
 
