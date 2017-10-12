@@ -294,7 +294,7 @@ public:
         return (uint16_t(value[1] << 8) + (value[0]));
     }
 
-    // MAX17047_AGE in Percent
+    // MAX17047_AGE in percent (float)
     float getCellAge_fper(void)
     {
         uint8_t value[2];
@@ -302,7 +302,7 @@ public:
         return float(uint16_t(value[1] << 8) + (value[0])) / 256.0f;
     }
 
-    // MAX17047_AGE in Percent
+    // MAX17047_AGE in percent (truncated int)
     uint16_t getCellAge_per(void)
     {
         uint8_t value[2];
@@ -310,7 +310,31 @@ public:
         return (value[1]);
     }
 
-    /*
+   // MAX17047_TEMPERATURE in Celcius
+    float getTemperature_fc(void)
+    {
+        uint8_t value[2];
+        i2c.read(I2C_ADDRESS, MAX17047_TEMPERATURE, value, 2);
+        return float(uint16_t(value[1] << 8) + (value[0])) / 256.0f;
+    }
+
+    // MAX17047_TEMPERATURE in Celcius
+    uint16_t getTemperature_c(void)
+    {
+        uint8_t value[2];
+        i2c.read(I2C_ADDRESS, MAX17047_TEMPERATURE, value, 2);
+        return (value[1]);
+    }
+
+    // MAX17047_DESIGN_CAP in microvolt hours (mAh capacity * sense resistor = microvolt hours
+    float getDesignCap_fmAh(void)
+    {
+        uint8_t value[2];
+        i2c.read(I2C_ADDRESS, MAX17047_DESIGN_CAP, value, 2);
+        const float fvalue = float(uint16_t(value[1]<<8) + (value[0])) * (0.005 / MAX17047_SENSE);
+        return (fvalue);
+    }
+     /*
 // feedback and status TODO: translate to getters:
 void print_status() const
 {
