@@ -17,20 +17,20 @@ public:
 
 private:
 
-    static constexpr float   MAX17047_SENSE                     {0.0141};
+    static constexpr float   MAX17047_SENSE                     {0.0141}; // Application-specific sense resistor. Refer to MAX17047 documentation.
 
-    static constexpr uint8_t MAX17047_STATUS 					{0x00};
+    static constexpr uint8_t MAX17047_STATUS 					{0x00};  // Full, Empty, Normal
     static constexpr uint8_t MAX17047_V_ALRT_THRESHOLD 	        {0x01};
     static constexpr uint8_t MAX17047_T_ALRT_THRESHOLD 	        {0x02};
     static constexpr uint8_t MAX17047_SOC_ALRT_THRESHOLD	    {0x03};
     static constexpr uint8_t MAX17047_AT_RATE					{0x04};
     static constexpr uint8_t MAX17047_REM_CAP_REP			    {0x05};  // Capacity in uVh / filtered -AV
     static constexpr uint8_t MAX17047_SOC_REP				    {0x06};  // State of Charge in % (Highbyte) Filtered -AV
-    static constexpr uint8_t MAX17047_AGE						{0x07};
+    static constexpr uint8_t MAX17047_AGE						{0x07};  // FULL_CAP divided by DESIGN_CAP * 100%. Also known as state of health.
     static constexpr uint8_t MAX17047_TEMPERATURE			    {0x08};
     static constexpr uint8_t MAX17047_V_CELL					{0x09};
     static constexpr uint8_t MAX17047_CURRENT				    {0x0A};
-    static constexpr uint8_t MAX17047_AVERAGE_CURRENT		    {0x0B};
+    static constexpr uint8_t MAX17047_AVERAGE_CURRENT		    {0x0B};  // Average over a user-defined period
     static constexpr uint8_t MAX17047_SOC_MIX			        {0x0D};  // State of Charge in % (Highbyte)
     static constexpr uint8_t MAX17047_SOC_AV					{0x0E};    // State of Charge in % (Highbyte) considering all information
     static constexpr uint8_t MAX17047_REM_CAP_MIX			    {0x0F};    // Capacity in uVh (div Senseresistor for mAh)
@@ -40,7 +40,7 @@ private:
     static constexpr uint8_t MAX17047_FULL_SOC_THR			    {0x13};
     static constexpr uint8_t MAX17047_AVERAGE_TEMP			    {0x16};
     static constexpr uint8_t MAX17047_CYCLES					{0x17};    // accumulate total percent in Change in %
-    static constexpr uint8_t MAX17047_DESIGN_CAP				{0x18};
+    static constexpr uint8_t MAX17047_DESIGN_CAP				{0x18};   // Application-specific input
     static constexpr uint8_t MAX17047_AVERAGE_V_CELL		    {0x19};
     static constexpr uint8_t MAX17047_MAX_MIN_TEMP			    {0x1A};
     static constexpr uint8_t MAX17047_MAX_MIN_VOLTAGE		    {0x1B};
