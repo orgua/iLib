@@ -338,12 +338,12 @@ public:
     // return the instance's sense resistor value
     float getSense(void)
     {
-        return (MAX17047.MAX17047_SENSE);
+        return (MAX17047_SENSE);
     }
     
     // set the instance's sense resistor value
     void setSense(const float& fvalue) {
-        MAX17047.MAX17047_SENSE = fvalue;
+        MAX17047_SENSE = fvalue;
     }
      /*
 // feedback and status TODO: translate to getters:
