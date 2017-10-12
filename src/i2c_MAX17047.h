@@ -17,7 +17,7 @@ public:
 
 private:
 
-    static constexpr float   MAX17047_SENSE                     {0.0141}; // Application-specific sense resistor. Refer to MAX17047 documentation.
+    float   MAX17047_SENSE                     {0.01}; // Application-specific sense resistor. Refer to MAX17047 documentation.
 
     static constexpr uint8_t MAX17047_STATUS 					{0x00};  // Full, Empty, Normal
     static constexpr uint8_t MAX17047_V_ALRT_THRESHOLD 	        {0x01};
@@ -333,6 +333,17 @@ public:
         i2c.read(I2C_ADDRESS, MAX17047_DESIGN_CAP, value, 2);
         const float fvalue = float(uint16_t(value[1]<<8) + (value[0])) * (0.005 / MAX17047_SENSE);
         return (fvalue);
+    }
+    
+    // return the instance's sense resistor value
+    float getSense(void)
+    {
+        return (MAX17047.MAX17047_SENSE);
+    }
+    
+    // set the instance's sense resistor value
+    void setSense(const float& fvalue) {
+        MAX17047.MAX17047_SENSE = fvalue;
     }
      /*
 // feedback and status TODO: translate to getters:
