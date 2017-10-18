@@ -223,6 +223,14 @@ public:
         return (((value[1]<<8) + (value[0])) * (0.001 * (1.5625 / MAX17047_SENSE)));
     };
 
+    // return cell current in mA
+    int16_t getCellAverageCurrent_fmA() const
+    {
+		 uint8_t value[2];
+		 i2c.read(I2C_ADDRESS, MAX17047_AVERAGE_CURRENT, value, 2);
+		return float((value[1]<<8) + (value[0])) * (0.001 * (1.5625 / MAX17047_SENSE));
+	};
+	
     // State of Charge in percent
     float getStateOfCharge_f(void) const
     {
