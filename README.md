@@ -1,5 +1,6 @@
 I2C-Sensor-Lib (iLib)
 ====
+[![Compile Examples](https://github.com/orgua/iLib/workflows/Compile%20Examples/badge.svg)](https://github.com/orgua/iLib/actions?workflow=Compile+Examples)
 
 Library for I2C sensors and some atmel-specific functions. The following sensors can be used with an uniform interface and come with arduino-examples: 
 
