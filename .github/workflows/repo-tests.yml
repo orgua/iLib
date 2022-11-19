@@ -1,0 +1,22 @@
+name: Repo-Tests
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  various-tests:
+    runs-on: ubuntu-22.04 # TODO: -latest was 20.04 and had old packages
+
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }} 🐍
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.8"
+
+      - name: Run Pre-Commit Tests 🧪
+        uses: pre-commit/action@v3.0.0
