@@ -3,7 +3,7 @@
 //#include <JeeLib.h>
 
 
-#include <atmel_eFunction.h>
+#include <atmel_math_power_and_scale.h>
 eFunction eFkt;
 
 #define PWR         1.6
