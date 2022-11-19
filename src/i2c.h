@@ -4,7 +4,7 @@
 #include "Wire.h"
 #include <Arduino.h> // for uint8_t data type
 
-/** ######### usefull defines ################################################################# */
+/** ######### useful defines ################################################################# */
 
 #define getmax(a,b) ((a)>(b)?(a):(b)) // TODO: implement as static const
 #define BITMASK(a)  (1<<a)
@@ -20,7 +20,7 @@
 #define HIGH        (1)
 #endif
 
-/// are they really usefull?
+/// are they really useful?
 #define UBLB(a,b)  ( ( (a) << 8) | (b) )
 #define UBLB19(a,b) ( ( (a) << 16 ) | (b) )
 #define UBLB32(a,b,c,d)  ((( ((a)<<24) | ((b)<<16) ) | ((c)<<8)) | (d) )
@@ -120,7 +120,7 @@ void WirePlus::writeCMD(const uint8_t address, const uint8_t cmd)
 
 void WirePlus::read(const uint8_t address, const uint8_t registeraddress, uint8_t buff[], const uint8_t length=1)
 {
-    Wire.beginTransmission(address); 	// Adress + WRITE (0)
+    Wire.beginTransmission(address); 	// Address + WRITE (0)
     Wire.write(registeraddress);
     Wire.endTransmission(false); 		// No Stop Condition, for repeated Talk
 

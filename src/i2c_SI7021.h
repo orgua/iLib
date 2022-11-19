@@ -9,11 +9,11 @@
 
 Driver for the SI7021-Sensor
 
-CONSUMPTION: sleep 0.6µA, measure 120-180µA, 3.1mA Heater
+CONSUMPTION: sleep 0.6ï¿½A, measure 120-180ï¿½A, 3.1mA Heater
 MEASUREMENT: 12ms for 12bit RH, 11ms for 14bit Temp --> measurement time is combination of these two
-ACCURACY     in Main Range 0.4°C, 3% RH
+ACCURACY     in Main Range 0.4ï¿½C, 3% RH
 
-With every humiditymeasurement there is an automatical temperaturmeasurement (just read it afterwards)
+With every humidity-measurement there is an automatic temperature-measurement (just read it afterwards)
 
 You have to trigger the Measurement yourself --> requestHumidity,
 
@@ -175,7 +175,7 @@ public:
         celsius   = (_rawTemp*175.72/65536) - 46.85;
     };
 
-    /**< not very usefull */
+    /**< not very useful */
     void requestTemperature()
     {
         i2c.writeCMD(I2C_ADDRESS, CMD_MEASURE_TEMPERATURE_HOLD);

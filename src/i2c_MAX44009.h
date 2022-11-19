@@ -9,7 +9,7 @@
 
 Driver for the MAX44009-Sensor
 
-CONSUMPTION: sleep ???, measure 0.65 - 1.6µA
+CONSUMPTION: sleep ???, measure 0.65 - 1.6ï¿½A
 MEAS_RANGE: 45 mLux - 180k Lux
 
 
@@ -26,7 +26,7 @@ private:
     static const uint8_t    INT_STATUS_REG				    =(0x00);
     static const uint8_t    INT_ENABLE_REG                  =(0x01);
     static const uint8_t    CONFIGURATION_REG               =(0x02);
-    static const uint8_t        CONFIG_CONT_MASK            =(bit(7));  // CONTINOUS MODE
+    static const uint8_t        CONFIG_CONT_MASK            =(bit(7));  // CONTINUOUS MODE
     static const uint8_t            CONFIG_CONT_ON          =(1<<7);
     static const uint8_t            CONFIG_CONT_OFF         =(0);
     static const uint8_t        CONFIG_MANUAL_MASK          =(bit(6));  // MANUAL Set CDR and TIME
@@ -110,8 +110,8 @@ public:
      Mantissa = 8xM7 + 4xM6 + 2xM5 + M4
 
      READING combined Registers:
-     E3–E0: Exponent bits of lux reading
-     M7–M0: Mantissa byte of lux reading
+     E3ï¿½E0: Exponent bits of lux reading
+     M7ï¿½M0: Mantissa byte of lux reading
      Lux = 2(exponent) x mantissa x 0.045
      */
     inline void getMeasurement(uint32_t& mLux_value)
