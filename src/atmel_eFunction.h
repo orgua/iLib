@@ -46,10 +46,10 @@ public:
 
     void init(uint16_t interval, float pwr)
     {
-        float maxi, base;  // 2*4=8 (nur temporär)
+        float maxi, base;  // 2*4=8 (nur temporÃ¤r)
         maxi = pow(interval, 1/pwr); //interval^(1/1.7)
         base = maxi / float(interval);
-        // nicht sehr schön, aber keine andere Lösung um auf aktuelle Stützstellen zu kommen
+        // nicht sehr schÃ¶n, aber keine andere LÃ¶sung um auf aktuelle StÃ¼tzstellen zu kommen
         xnode[0] = long(float(0.0));
         xnode[1] = long(float(interval)/96.0);
         xnode[2] = long(float(interval)/48.0);
@@ -62,10 +62,10 @@ public:
 
         for (uint8_t p = 0; p<8; ++p)
         {
-            float yy, xx; // 2*4=8 (nur temporär)
+            float yy, xx; // 2*4=8 (nur temporÃ¤r)
             yy = (float)((pow(base*float(xnode[p+1]),pwr))-(pow(base*float(xnode[p]),pwr)));
             xx = (float)(xnode[p+1]-xnode[p]);
-            // x^pwr = x * kf + ks über Interpolation mit 9 Stützstellen
+            // x^pwr = x * kf + ks Ã¼ber Interpolation mit 9 StÃ¼tzstellen
             kf[p] = (long)((yy*128)/xx);
             ks[p] = (long)((pow(base*float(xnode[p]),pwr)*128)-float(xnode[p]*kf[p]));
         };
