@@ -230,7 +230,7 @@ public:
 		 i2c.read(I2C_ADDRESS, MAX17047_AVERAGE_CURRENT, value, 2);
 		return float((value[1]<<8) + (value[0])) * (0.001 * (1.5625 / MAX17047_SENSE));
 	};
-	
+
     // State of Charge in percent
     float getStateOfCharge_f(void) const
     {
@@ -342,13 +342,13 @@ public:
         const float fvalue = float(uint16_t(value[1]<<8) + (value[0])) * (0.005 / MAX17047_SENSE);
         return (fvalue);
     }
-    
+
     // return the instance's sense resistor value
     float getSense(void)
     {
         return (MAX17047_SENSE);
     }
-    
+
     // set the instance's sense resistor value
     void setSense(const float& fvalue) {
         MAX17047_SENSE = fvalue;

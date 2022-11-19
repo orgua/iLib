@@ -32,5 +32,3 @@ void loop() {
   digitalWrite(LEDPINB,LOW);
 
 }
-
-

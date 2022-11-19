@@ -306,6 +306,3 @@ public:
 //MPL3115 mpl3115 = MPL3115();
 
 #endif
-
-
-

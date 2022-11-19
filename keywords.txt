@@ -48,13 +48,13 @@ getPressure		KEYWORD2
 getMeasurement		KEYWORD2
 getAltitude		KEYWORD2
 getTemperature	KEYWORD2
-	
-	
+
+
 FAN5421	KEYWORD1
 set_safety	KEYWORD2
 poll_timer	KEYWORD2
 print_status	KEYWORD2
-print_register	KEYWORD2	
+print_register	KEYWORD2
 set_config	KEYWORD2
 set_current	KEYWORD2
 increase_current	KEYWORD2
@@ -69,7 +69,7 @@ L3G	KEYWORD1
 setDatarate	KEYWORD2
 setSensibility	KEYWORD2
 
-	
+
 LPS331	KEYWORD1
 setDatarate	KEYWORD2
 setSensitivity	KEYWORD2
@@ -121,8 +121,8 @@ setGSensitivity	KEYWORD2
 setASensitivity	KEYWORD2
 setDatarate	KEYWORD2
 setBandwidth	KEYWORD2
-	
-	
+
+
 PCF2127	KEYWORD1
 clearInterrupt	KEYWORD2
 setTemperaturePeriod	KEYWORD2
@@ -171,14 +171,14 @@ autoGain	KEYWORD2
 
 RFM95	KEYWORD1
 spiExchange	KEYWORD2
-	
-	
+
+
 WS2812B	KEYWORD1
 setleds	KEYWORD2
 setleds_pin	KEYWORD2
 sendarray	KEYWORD2
-sendarray_mask	KEYWORD2	
-	
+sendarray_mask	KEYWORD2
+
 
 #######################################
 # Instances (KEYWORD2)
