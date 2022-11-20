@@ -9,9 +9,9 @@
 
 Driver for the MAG3310-Sensor
 
- CONSUMPTION: standby 2 µA, measure 9-900 µA
+ CONSUMPTION: standby 2 ï¿½A, measure 9-900 ï¿½A
 
- Details: up to 80Hz, ±1000 µT, Sensitivity of 0.10 µT
+ Details: up to 80Hz, ï¿½1000 ï¿½T, Sensitivity of 0.10 ï¿½T
 
 
 ########################################################################  */
@@ -104,7 +104,7 @@ public:
         i2c.setRegister(I2C_ADDRESS,REG_CTRL_REG2,MASK_RAW, _value);
     };
 
-    /**< switch between continious and trigger/manual mode */
+    /**< switch between continuous and trigger/manual mode */
     inline void setEnabled(const uint8_t enable=1)
     {
         uint8_t _value;
@@ -201,7 +201,3 @@ public:
 //PRESET preset = PRESET();
 
 #endif
-
-
-
-

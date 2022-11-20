@@ -5,12 +5,12 @@
 
 /** ######################################################################
 
-Driver for the RFM95W LongRange Tranceiver (Samtech sx1276)
+Driver for the RFM95W LongRange Transceiver (Samtech sx1276)
 
  CONSUMPTION:
-    sleep       0.2-1 µA
-    idle        1.5 µA
-    standby     1.8 µA
+    sleep       0.2-1 ï¿½A
+    idle        1.5 ï¿½A
+    standby     1.8 ï¿½A
     RX          12 mA
     TX          20 (7dBm) - 120mA (20dBm)
 
@@ -146,7 +146,7 @@ class RFM95
 #define         VAL_MODEM_SF10      (B10100000) // 1024 chips/symbol --> SNR -15 dB
 #define         VAL_MODEM_SF11      (B10110000) // 2048 chips/symbol --> SNR -17.5 dB
 #define         VAL_MODEM_SF12      (B11000000) // 4096 chips/symbol --> SNR -20 dB
-#define     MSK_TX_CONTINOUOS       (B00001000)
+#define     MSK_TX_CONTINUOUS       (B00001000)
 #define     MSK_RX_PAYLOAD_CRC_ON   (B00000100)
 #define     MSK_SYMB_TIMEOUTMSB     (B00000011)
 #define REG_SYMB_TIMEOUTLSB         0x1F    // number of symbols; timeout = REG * Ts
@@ -184,7 +184,7 @@ class RFM95
 #define     MSK_PA_DAC              (B00000111)
 #define         VAL_PA_DAC_DEFAULT  0x04
 #define         VAL_PA_DAC_20DBM    0x07    // when outputpower = 111
-#define REG_FORMER_TEMP             0x5B    // -1°C per LSB
+#define REG_FORMER_TEMP             0x5B    // -1ï¿½C per LSB
 
 #define REG_AGC_REF                 0x61
 #define     MSK_AGC_REF_LEVEL       (B00111111) // def=0x19
@@ -212,7 +212,7 @@ private:
 
     uint8_t _filterBadCRC;
     uint8_t _mode;
-    uint8_t _idleState, _receiveContinouos, _awaitAck;
+    uint8_t _idleState, _receiveContinuous, _awaitAck;
 
 public:
 
@@ -259,7 +259,7 @@ public:
 
     /** ######### function definition ################################################################# */
 
-    RFM95(void): _filterBadCRC(0), _mode (0), _idleState(0), _receiveContinouos(0), _awaitAck(0)
+    RFM95(void): _filterBadCRC(0), _mode (0), _idleState(0), _receiveContinuous(0), _awaitAck(0)
     {
         pinMode(RFM_CS, OUTPUT);
         SPI.begin();
@@ -287,7 +287,7 @@ public:
         // TODO
         spiWrite(REG_IRQ_FLAGS_MASK, 255); // All ON
 
-        /// configure Message / Tranceiver
+        /// configure Message / Transceiver
         setFrequency(868000);
         setPreambleLength(8);
         setPMax(10);
@@ -300,7 +300,7 @@ public:
         setRegister(REG_MODEM_CONFIG1, MSK_MODEM_IMPLICITHDR, 0); // Explicit
         setRegister(REG_MODEM_CONFIG2, MSK_MODEM_SF, VAL_MODEM_SF06); // set SpreadingFactor
         // setRegister(REG_MODEM_CONFIG3, MSK_LOW_DATARATE_OPTI, 255); // Mandatory when symbollength > 16ms
-        setRegister(REG_MODEM_CONFIG2, MSK_TX_CONTINOUOS, 0); // single Packet sending
+        setRegister(REG_MODEM_CONFIG2, MSK_TX_CONTINUOUS, 0); // single Packet sending
         setRegister(REG_MODEM_CONFIG2, MSK_RX_PAYLOAD_CRC_ON,MSK_RX_PAYLOAD_CRC_ON); // CRC on
         spiWrite(REG_HOP_PERIOD, 0); // 0: disable
         setRegister(REG_TCXO, MSK_TCXO_ON, 0);
@@ -611,7 +611,7 @@ public:
     #define REG_VERSION                 0x42
     #define     VAL_V1B                 0x12 // has errors --> extra document (errata)
 
-    #define REG_FORMER_TEMP             0x5B    // -1°C per LSB
+    #define REG_FORMER_TEMP             0x5B    // -1ï¿½C per LSB
 
     #define REG_AGC_REF                 0x61
     #define     MSK_AGC_REF_LEVEL       (B00111111) // def=0x19

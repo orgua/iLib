@@ -111,7 +111,7 @@ public:
     {
         uint8_t  uvalue[2];
 
-        // Programm Alert to SOC_AV
+        // Program Alert to SOC_AV
         i2c.read(I2C_ADDRESS, MAX17047_MISC_CFG, uvalue, 2);
         uvalue[0] &= 0b11111100;
         uvalue[0] |= 0b00000001;
@@ -230,7 +230,7 @@ public:
 		 i2c.read(I2C_ADDRESS, MAX17047_AVERAGE_CURRENT, value, 2);
 		return float((value[1]<<8) + (value[0])) * (0.001 * (1.5625 / MAX17047_SENSE));
 	};
-	
+
     // State of Charge in percent
     float getStateOfCharge_f(void) const
     {
@@ -318,7 +318,7 @@ public:
         return (value[1]);
     }
 
-   // MAX17047_TEMPERATURE in Celcius
+   // MAX17047_TEMPERATURE in Celsius
     float getTemperature_fc(void)
     {
         uint8_t value[2];
@@ -326,7 +326,7 @@ public:
         return float(uint16_t(value[1] << 8) + (value[0])) / 256.0f;
     }
 
-    // MAX17047_TEMPERATURE in Celcius
+    // MAX17047_TEMPERATURE in Celsius
     uint16_t getTemperature_c(void)
     {
         uint8_t value[2];
@@ -342,13 +342,13 @@ public:
         const float fvalue = float(uint16_t(value[1]<<8) + (value[0])) * (0.005 / MAX17047_SENSE);
         return (fvalue);
     }
-    
+
     // return the instance's sense resistor value
     float getSense(void)
     {
         return (MAX17047_SENSE);
     }
-    
+
     // set the instance's sense resistor value
     void setSense(const float& fvalue) {
         MAX17047_SENSE = fvalue;

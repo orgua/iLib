@@ -37,7 +37,7 @@ volatile uint8_t        frame_send             = (0);
 void spektrum_init(void)
 {
     /* frame loss count */
-    spectrum_frame[0] = 0x00; // Let's pretend we are not loosing any frames
+    spectrum_frame[0] = 0x00; // Let's pretend we are not losing any frames
     /* Receiver identifier */
     spectrum_frame[1] = 0x01; // Let's pretend we are DX6i or similar
 

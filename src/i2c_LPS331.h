@@ -9,7 +9,7 @@
 
 Driver for the LPS331-Sensor
 
- CONSUMPTION: standby X µA, measure X µA
+ CONSUMPTION: standby X ï¿½A, measure X ï¿½A
 
  Details:
 
@@ -81,7 +81,7 @@ public:
         uint8_t _value;
         if (sens) _value = 0x7A;
         else      _value = 0x6A;
-        i2c.writeByte(I2C_ADDRESS, RES_CONF, _value);	// temp 128samples, pres 512samples per Value
+        i2c.writeByte(I2C_ADDRESS, RES_CONF, _value);	// temp 128samples, press 512samples per Value
     }
 
     inline void setEnabled(const uint8_t enable = 1)
@@ -280,8 +280,3 @@ public:
 //PRESET preset = PRESET();
 
 #endif
-
-
-
-
-

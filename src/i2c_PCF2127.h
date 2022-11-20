@@ -9,7 +9,7 @@
 
 Driver for the PCF2127T RTC
 
- CONSUMPTION: standby X µA, measure X µA
+ CONSUMPTION: standby X ÂµA, measure X ÂµA
 
  Details:
 

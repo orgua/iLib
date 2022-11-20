@@ -28,7 +28,7 @@ private:
 public:
     void init(uint16_t zero_inp, uint16_t max_inp, uint16_t max_out, float pwr)
     {
-        float       max_pow, scale_pow, yy, xx; // 4*4=16 (nur temporär)
+        float       max_pow, scale_pow, yy, xx; // 4*4=16 (nur temporÃ¤r)
         uint16_t    mean_tmp;
 
         zero_input   = zero_inp;
@@ -70,7 +70,7 @@ public:
         max_input   = max_inp;
         max_output  = max_out;
 
-        // nicht sehr schön, aber keine andere Lösung um auf aktuelle Stützstellen zu kommen
+        // nicht sehr schÃ¶n, aber keine andere LÃ¶sung um auf aktuelle StÃ¼tzstellen zu kommen
         xnode[0] = long(float(0.0));
         xnode[1] = long(float(interval)/96.0);
         xnode[2] = long(float(interval)/48.0);
@@ -85,7 +85,7 @@ public:
         {
             yy = (float)((pow(scale_pow*float(xnode[p+1]),pwr))-(pow(scale_pow*float(xnode[p]),pwr)));
             xx = (float)(xnode[p+1]-xnode[p]);
-            // x^pwr = x * kf + ks über Interpolation mit 9 Stützstellen
+            // x^pwr = x * kf + ks Ã¼ber Interpolation mit 9 StÃ¼tzstellen
             kf[p] = (long)((yy*128)/xx);
             ks[p] = (long)((pow(scale_pow*float(xnode[p]),pwr)*128)-float(xnode[p]*kf[p]));
         }

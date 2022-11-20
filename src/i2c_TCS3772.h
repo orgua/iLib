@@ -9,7 +9,7 @@
 
 Driver for the TCS3772-Sensor
 
-CONSUMPTION: sleep 4.5µA, wait 65µA, measure 230-330µA
+CONSUMPTION: sleep 4.5ï¿½A, wait 65ï¿½A, measure 230-330ï¿½A
 possible gains: 4 (3.8 .. 4.2), 16 (15 .. 16.8), 60 (58 .. 63)
 
 
@@ -24,7 +24,7 @@ private:
 
     static const uint8_t    I2C_ADDRESS 				=(0x29);
 
-// Keept Out: Proximity Feature, Interrupts,
+// Kept Out: Proximity Feature, Interrupts,
     static const uint8_t    CMD_REPEAT                  =(B10000000);
     static const uint8_t        CMD_INCREMENT           =(B10100000);
     static const uint8_t        CMD_SPECIAL             =(B11100000);
@@ -234,7 +234,7 @@ public:
 
         return 0;
 
-        /* OLD CODE - doesnt wait for good measurement-range
+        /* OLD CODE - doesn't wait for good measurement-range
           if      (val_clear < MARGIN_LOW)  { if (val_gain<3) { val_gain++; } else if ( val_time < 2) { val_time++; }}
           else if (val_clear > MARGIN_HIGH) { if (val_time>0) { val_time--; } else if ( val_gain > 0) { val_gain--; }}
         }
@@ -297,7 +297,3 @@ public:
 //PRESET preset = PRESET();
 
 #endif
-
-
-
-

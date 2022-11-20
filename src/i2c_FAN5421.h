@@ -256,7 +256,7 @@ public:
         else                                     return 0;
     };
 
-    // workaround for: chip doesnt charge when already charged and external power still present
+    // workaround for: chip doesn't charge when already charged and external power still present
     // disable charging, wait ~30ms, enable charging --> not working as expected, try chip.reset
     uint8_t enableCharging(const uint8_t enable = 1) const
     {

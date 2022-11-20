@@ -9,7 +9,7 @@
 
 Driver for the MMA8451-Sensor
 
- CONSUMPTION: standby X µA, measure X µA
+ CONSUMPTION: standby X ï¿½A, measure X ï¿½A
 
  Details:
 
@@ -194,7 +194,7 @@ public:
     * Get accelerometer readings (x, y, z)
     * by default, standard 10 bits mode is used.
     *
-    * This function also convers 2's complement number to
+    * This function also converts 2's complement number to
     * signed integer result.
     *
     * If accelerometer is initialized to use low res mode,
@@ -238,7 +238,3 @@ public:
 //PRESET preset = PRESET();
 
 #endif
-
-
-
-

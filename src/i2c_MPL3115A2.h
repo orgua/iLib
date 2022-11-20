@@ -9,7 +9,7 @@
 
 Driver for the MPL3115A2-Sensor
 
- CONSUMPTION: standby 2µA, measure 260-2000µA
+ CONSUMPTION: standby 2ÂµA, measure 260-2000ÂµA
 
  ONE-TIME-MEASURE: disable sensor, [start measurement, wait, read ] ...
  AUTO-Measure: enable sensor, start measurement, [read, read ] ...
@@ -281,7 +281,7 @@ public:
     {
         // Read temperature registers
         byte value[2];
-        i2c.read(I2C_ADDRESS, REG_OUT_T_MSB, value, 2); // °C in Q8.4 signed in 2x
+        i2c.read(I2C_ADDRESS, REG_OUT_T_MSB, value, 2); // Â°C in Q8.4 signed in 2x
 
         uint16_t foo;
         bool negSign = false;
@@ -306,6 +306,3 @@ public:
 //MPL3115 mpl3115 = MPL3115();
 
 #endif
-
-
-

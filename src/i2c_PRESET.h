@@ -9,7 +9,7 @@
 
 Driver for the preset-Sensor
 
- CONSUMPTION: standby X µA, measure X µA
+ CONSUMPTION: standby X ÂµA, measure X ÂµA
 
  Details:
 
@@ -47,7 +47,3 @@ public:
 //PRESET preset = PRESET();
 
 #endif
-
-
-
-

@@ -9,7 +9,7 @@
 
 Driver for the BMP280-Sensor
 
- CONSUMPTION: standby 0.5 µA, measure 4.2@1Hz, 260-1120µA
+ CONSUMPTION: standby 0.5 ï¿½A, measure 4.2@1Hz, 260-1120ï¿½A
 
  ONE-TIME-MEASURE: disable sensor, [start measurement, wait, read ] ...
  AUTO-Measure: enable sensor, start measurement, [read, read ] ...
@@ -53,7 +53,7 @@ private:
     static const uint8_t 	MSK_CTRL_OSRS_T			    =(B11100000);
     static const uint8_t 		VAL_CTRL_OSRS_T00	    =(B00000000); // skip measurement
     static const uint8_t 		VAL_CTRL_OSRS_T01	    =(B00100000); // 1x (no oversampling)
-    static const uint8_t 		VAL_CTRL_OSRS_T02	    =(B01000000); // 2x --> 17bit, 2m°C
+    static const uint8_t 		VAL_CTRL_OSRS_T02	    =(B01000000); // 2x --> 17bit, 2mï¿½C
     static const uint8_t 		VAL_CTRL_OSRS_T04	    =(B01100000); // 4x  	(brings no improvement)
     static const uint8_t 		VAL_CTRL_OSRS_T08	    =(B10000000); // 8x		(brings no improvement)
     static const uint8_t 		VAL_CTRL_OSRS_T16	    =(B10100000); // 16x	(brings no improvement)
@@ -236,7 +236,7 @@ public:
     };
 
 
-    /**< disables continious Mode! (enable(1)) */
+    /**< disables continuous Mode! (enable(1)) */
     inline void triggerMeasurement(void)
     {
         i2c.setRegister(I2C_ADDRESS,REG_CTRL_MEAS, MSK_CTRL_MODE, VAL_MODE_FORCED);
@@ -338,6 +338,3 @@ public:
 //BMP280 bmp280 = BMP280();
 
 #endif
-
-
-

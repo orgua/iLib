@@ -10,7 +10,7 @@ class i2cSensor
 public:
     /**< TODO: make virtual functions private? how to inherit of this? */
 
-    /**< TODO: constructur is not usefull? */
+    /**< TODO: constructor is not useful? */
 
     /**< TODO: Try const functions */
 
@@ -33,7 +33,7 @@ public:
     /**< new getValue */
     //virtual void    getMeasurement(int16_t xyz_raw[])
 
-    /**< TODO: solveable with anonymous (void) pointers or similar reference */
+    /**< TODO: solvable with anonymous (void) pointers or similar reference */
     //virtual void    getValue(uint8_t buffer[]) = 0;     // get the main values the sensor was made for (barometer gives pressure)
 
 protected:

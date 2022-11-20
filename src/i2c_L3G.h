@@ -9,7 +9,7 @@
 
 Driver for the L3G-Sensor
 
- CONSUMPTION: standby X µA, measure X µA
+ CONSUMPTION: standby X ï¿½A, measure X ï¿½A
 
  Details:
 
@@ -223,7 +223,7 @@ public:
         i2c.setRegister(I2C_ADDRESS, CTRL_REG3, DRDY_FIFO_ORUN_MASK,	0);
         i2c.setRegister(I2C_ADDRESS, CTRL_REG3, DRDY_FIFO_EMTY_MASK,	0);
 
-        i2c.setRegister(I2C_ADDRESS, CTRL_REG4, BLOCK_D_UPDATE_MASK,	0); // 0=continuos update
+        i2c.setRegister(I2C_ADDRESS, CTRL_REG4, BLOCK_D_UPDATE_MASK,	0); // 0=continuous update
         i2c.setRegister(I2C_ADDRESS, CTRL_REG4, MSB_ON_LOWADD_MASK,		0);
 
         setSensibility(degScaleRange);
@@ -232,7 +232,7 @@ public:
         i2c.setRegister(I2C_ADDRESS, CTRL_REG4, SPI_TO_3WIRE_MASK,	SPI_TO_3WIRE_DIS);
 
         i2c.setRegister(I2C_ADDRESS, CTRL_REG5, FIFO_EN_MASK,		0);
-        i2c.setRegister(I2C_ADDRESS, CTRL_REG5, HIGH_PASS_EN_MASK,	0); 	// Combination - not helpfull, or?
+        i2c.setRegister(I2C_ADDRESS, CTRL_REG5, HIGH_PASS_EN_MASK,	0); 	// Combination - not helpful, or?
         i2c.setRegister(I2C_ADDRESS, CTRL_REG5, INTSEL_LPF_EN_MASK,	0);
         i2c.setRegister(I2C_ADDRESS, CTRL_REG5, INTSEL_HPF_EN_MASK,	0);
         i2c.setRegister(I2C_ADDRESS, CTRL_REG5, DATA_LPF_EN_MASK,	0);	// Combination
@@ -296,7 +296,3 @@ public:
 //PRESET preset = PRESET();
 
 #endif
-
-
-
-
