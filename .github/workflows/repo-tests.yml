@@ -17,6 +17,8 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.8"
+      - name: Install dependencies 🔧
+        run: sudo apt install cppcheck
 
       - name: Run Pre-Commit Tests 🧪
         uses: pre-commit/action@v3.0.0
