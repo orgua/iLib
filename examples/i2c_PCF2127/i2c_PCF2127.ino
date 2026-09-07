@@ -1,12 +1,12 @@
-#include <Wire.h>
 #include "i2c.h"
+#include <Wire.h>
 
 // RTC
 #include "i2c_PCF2127.h"
 PCF2127 pcf2127;
 
 
-void setup()
+void    setup()
 {
     Serial.begin(115200);
 
@@ -18,13 +18,13 @@ void setup()
         while (1) {}
     }
 
-    pcf2127.setTime(2014,9,3,5,4,11,12);
+    pcf2127.setTime(2014, 9, 3, 5, 4, 11, 12);
     char time = '__TIME__';
 }
 
 void loop()
 {
-    uint8_t MM,WW,DD,hh,mm,ss;
+    uint8_t  MM, WW, DD, hh, mm, ss;
     uint16_t YY;
     pcf2127.readTime();
 

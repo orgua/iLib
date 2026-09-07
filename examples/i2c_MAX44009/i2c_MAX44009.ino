@@ -1,10 +1,10 @@
-#include <Wire.h>
 #include "i2c.h"
 #include "i2c_MAX44009.h"
+#include <Wire.h>
 MAX44009 max44009;
 
 
-void setup()
+void     setup()
 {
     Serial.begin(115200);
 
@@ -13,7 +13,7 @@ void setup()
     else
     {
         Serial.println("Sensor missing");
-        while (1) { };
+        while (1) {};
     }
 }
 

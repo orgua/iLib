@@ -1,8 +1,8 @@
-#include <Wire.h>
 #include "i2c.h"
+#include <Wire.h>
 
 #include "i2c_L3G.h"
-L3G l3g;
+L3G  l3g;
 
 
 void setup()
@@ -14,7 +14,7 @@ void setup()
     else
     {
         Serial.println("Sensor missing");
-        while(1) {};
+        while (1) {};
     }
 }
 
@@ -25,14 +25,13 @@ void loop()
     l3g.getMeasurement(xyz_dps);
 
     Serial.print(" X: ");
-    Serial.print(xyz_dps[0],2);
+    Serial.print(xyz_dps[0], 2);
     Serial.print(" \tY: ");
-    Serial.print(xyz_dps[1],2);
+    Serial.print(xyz_dps[1], 2);
     Serial.print(" \tZ: ");
-    Serial.print(xyz_dps[2],2);
+    Serial.print(xyz_dps[2], 2);
     Serial.println("");
     delay(20);
-
 }
 
 /**<

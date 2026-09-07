@@ -1,10 +1,10 @@
-#include <Wire.h>
 #include "i2c.h"
+#include <Wire.h>
 
 #include "i2c_MPL3115A2.h"
 MPL3115A2 mpl3115;
 
-void setup()
+void      setup()
 {
     Serial.begin(115200);
 

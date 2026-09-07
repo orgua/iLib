@@ -8,27 +8,27 @@ LOW     0xFF
 
  */
 
-#define TIMEON   20
-#define TIMEOFF  (1000-TIMEON)
+#define TIMEON  20
+#define TIMEOFF (1000 - TIMEON)
 
-#define LEDPINA   8
-#define LEDPINB   11
+#define LEDPINA 8
+#define LEDPINB 11
 
-void setup() {
-  pinMode(LEDPINA, OUTPUT);
-  pinMode(LEDPINB, OUTPUT);
-  digitalWrite(LEDPINA,LOW);
-  digitalWrite(LEDPINB,LOW);
-
+void setup()
+{
+    pinMode(LEDPINA, OUTPUT);
+    pinMode(LEDPINB, OUTPUT);
+    digitalWrite(LEDPINA, LOW);
+    digitalWrite(LEDPINB, LOW);
 }
 
-void loop() {
+void loop()
+{
 
-  delay(TIMEOFF);
-  digitalWrite(LEDPINA,HIGH);
-  digitalWrite(LEDPINB,HIGH);
-  delay(TIMEON); // busywaiting
-  digitalWrite(LEDPINA,LOW);
-  digitalWrite(LEDPINB,LOW);
-
+    delay(TIMEOFF);
+    digitalWrite(LEDPINA, HIGH);
+    digitalWrite(LEDPINB, HIGH);
+    delay(TIMEON); // busywaiting
+    digitalWrite(LEDPINA, LOW);
+    digitalWrite(LEDPINB, LOW);
 }

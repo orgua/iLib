@@ -1,11 +1,11 @@
-#include <Wire.h>
 #include "i2c.h"
+#include <Wire.h>
 
 #include "i2c_TCS3772.h"
 TCS3772 tcs3772;
 
 
-void setup()
+void    setup()
 {
     Serial.begin(115200);
 

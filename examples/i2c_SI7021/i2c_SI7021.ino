@@ -1,11 +1,11 @@
-#include <Wire.h>
 #include "i2c.h"
+#include <Wire.h>
 
 #include "i2c_SI7021.h"
 SI7021 si7021;
 
 
-void setup()
+void   setup()
 {
     Serial.begin(115200);
 
@@ -14,7 +14,7 @@ void setup()
     else
     {
         Serial.println("Sensor missing");
-        while(1) {};
+        while (1) {};
     }
 }
 
@@ -31,7 +31,6 @@ void loop()
     Serial.print(" HUMI: ");
     Serial.print(humi);
     Serial.println("");
-
 }
 
 /**<

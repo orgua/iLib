@@ -1,10 +1,10 @@
-#include <Wire.h>
 #include "i2c.h"
+#include <Wire.h>
 
 #include "i2c_BMP280.h"
 BMP280 bmp280;
 
-void setup()
+void   setup()
 {
     Serial.begin(115200);
 
@@ -33,7 +33,7 @@ void loop()
 
     static float meters, metersold;
     bmp280.getAltitude(meters);
-    metersold = (metersold * 10 + meters)/11;
+    metersold = (metersold * 10 + meters) / 11;
 
     bmp280.triggerMeasurement();
 

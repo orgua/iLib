@@ -1,5 +1,5 @@
-#include <Wire.h>
 #include "i2c.h"
+#include <Wire.h>
 
 void setup()
 {
@@ -8,7 +8,7 @@ void setup()
 
     uint8_t address, result;
 
-    for(address = 0; address < 128; address++ )
+    for (address = 0; address < 128; address++)
     {
         result = i2c.probe(address);
 
@@ -16,7 +16,7 @@ void setup()
         {
             Serial.print("Found: 0x");
             if (address < 17) Serial.print("0");
-            Serial.print(address,HEX);
+            Serial.print(address, HEX);
             Serial.println("");
         }
         delay(20);
@@ -25,7 +25,7 @@ void setup()
     Serial.println("DONE");
 }
 
-void loop() { }
+void loop() {}
 
 /**<
 

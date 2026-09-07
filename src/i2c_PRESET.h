@@ -20,26 +20,22 @@ class PRESET : public i2cSensor
 {
 
 private:
-
     /** ######### Register-Map ################################################################# */
-static const uint8_t    I2C_ADDRESS 	            =(0x60);
+    static const uint8_t I2C_ADDRESS = (0x60);
 
 
     /** ######### function definition ################################################################# */
 
 public:
     /**< TODO: do i need a constructor? */
-    PRESET(void)
-    {
+    PRESET(void) {
         //_address = I2C_ADDRESS;
     };
 
     /**<  gives values */
-    void getMeasurement(uint8_t buffer[])
-    {
+    void getMeasurement(uint8_t buffer[]) {
 
     };
-
 };
 
 /** ######### Preinstantiate Object ################################################################# */

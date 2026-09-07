@@ -17,11 +17,13 @@ public:
     /**< TODO: new functions: wait for value, check for new value */
 
     /**< declaring prototypes */
-    virtual void    setEnabled(const uint8_t enable=1) = 0;     // Enable Sensor or set it to Standby (1 or 0)
+    virtual void
+    setEnabled(const uint8_t enable = 1) = 0; // Enable Sensor or set it to Standby (1 or 0)
 
-    virtual void    reset(void) = 0;                    // trigger a software-reboot of the sensor
+    virtual void reset(void)             = 0; // trigger a software-reboot of the sensor
 
-    virtual uint8_t initialize(void) = 0;               // set up the sensor for basic operation, IF found at address
+    virtual uint8_t
+    initialize(void) = 0; // set up the sensor for basic operation, IF found at address
     //uint8_t         init(void) {initialize();};         // short form of the function above
 
     /**< check for new data, return 1 when Measurement is ready */
@@ -44,17 +46,16 @@ protected:
 
 private:
     // instance has no control over these
-    i2cSensor(const i2cSensor&);            // declaration only for copy constructor
-    i2cSensor& operator=(const i2cSensor&);  // declaration only for copy assignment --> make it uncopyable
-
-
+    i2cSensor(const i2cSensor &); // declaration only for copy constructor
+    i2cSensor &
+    operator=(const i2cSensor &); // declaration only for copy assignment --> make it uncopyable
 };
 
 class manualSensor
 {
 public:
-/**< only used when in manual/standby mode */
-    virtual void    triggerMeasurement(void) = 0;
+    /**< only used when in manual/standby mode */
+    virtual void triggerMeasurement(void) = 0;
 };
 
 #endif

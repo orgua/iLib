@@ -12,102 +12,101 @@ class FAN5421
 
     /** ######### Register-Map ################################################################# */
 public:
-
-    static constexpr uint8_t I2C_ADDRESS                	   {0x6A};
+    static constexpr uint8_t I2C_ADDRESS{0x6A};
 
 private:
+    static constexpr uint8_t FAN5421_REG_CONTROL0{0x00};
+    static constexpr uint8_t FAN5421_MSK_TMR_RST{
+            1 << 7}; // has to be written every 30s to enable charging
+    static constexpr uint8_t FAN5421_MSK_EN_STAT{1 << 6};
+    static constexpr uint8_t FAN5421_MSK_STAT{3 << 4};
+    static constexpr uint8_t FAN5421_VAL_STAT_READY{0 << 4};
+    static constexpr uint8_t FAN5421_VAL_STAT_CHARGE{1 << 4};
+    static constexpr uint8_t FAN5421_VAL_STAT_FULL{2 << 4};
+    static constexpr uint8_t FAN5421_VAL_STAT_FAULT{3 << 4};
+    static constexpr uint8_t FAN5421_MSK_FAULT{7 << 0};
+    static constexpr uint8_t FAN5421_VAL_FAULT_NORMAL{0 << 0};
+    static constexpr uint8_t FAN5421_VAL_FAULT_VBUSOVP{1 << 0};
+    static constexpr uint8_t FAN5421_VAL_FAULT_SLEEP{2 << 0};
+    static constexpr uint8_t FAN5421_VAL_FAULT_POORSRC{3 << 0};
+    static constexpr uint8_t FAN5421_VAL_FAULT_BATOVP{4 << 0};
+    static constexpr uint8_t FAN5421_VAL_FAULT_THSHTDWN{5 << 0};
+    static constexpr uint8_t FAN5421_VAL_FAULT_TMR{6 << 0};
+    static constexpr uint8_t FAN5421_VAL_FAULT_NOBAT{7 << 0};
+    static constexpr uint8_t FAN5421_REG_CONTROL1{0x01};
+    static constexpr uint8_t FAN5421_MSK_V_LOW_V{3 << 4};
+    static constexpr uint8_t FAN5421_VAL_V_LOW_3V4{0 << 4};
+    static constexpr uint8_t FAN5421_VAL_V_LOW_3V5{1 << 4};
+    static constexpr uint8_t FAN5421_VAL_V_LOW_3V6{2 << 4};
+    static constexpr uint8_t FAN5421_VAL_V_LOW_3V7{3 << 4};
+    static constexpr uint8_t FAN5421_MSK_TE{1 << 3};      // Current Termination
+    static constexpr uint8_t FAN5421_MSK_CE_N{1 << 2};    // Charge Enabled NOT
+    static constexpr uint8_t FAN5421_MSK_HZ_MODE{1 << 1}; // High impedance mode
+    static constexpr uint8_t FAN5421_REG_OREG{0x02};
+    static constexpr uint8_t FAN5421_MSK_OREG{0b11111100};
+    static constexpr uint8_t FAN5421_VAL_OREG_3V80{15 << 2};
+    static constexpr uint8_t FAN5421_VAL_OREG_3V90{20 << 2};
+    static constexpr uint8_t FAN5421_VAL_OREG_4V00{25 << 2};
+    static constexpr uint8_t FAN5421_VAL_OREG_4V10{30 << 2};
+    static constexpr uint8_t FAN5421_VAL_OREG_4V20{35 << 2}; // {4200-3500)/20
+    static constexpr uint8_t FAN5421_VAL_OREG_4V30{40 << 2};
+    static constexpr uint8_t FAN5421_VAL_OREG_4V40{45 << 2};
+    static constexpr uint8_t FAN5421_VAL_OREG_4V44{62 << 2};
+    static constexpr uint8_t FAN5421_REG_IC_INFO{0x03};
+    static constexpr uint8_t FAN5421_MSK_VENDOR{7 << 5};
+    static constexpr uint8_t FAN5421_VAL_FAIRCHILD{0b10000000};
+    static constexpr uint8_t FAN5421_MSK_PN{3 << 3};
+    static constexpr uint8_t FAN5421_VAL_PN{0b00000000};
+    static constexpr uint8_t FAN5421_MSK_REV{7};
+    static constexpr uint8_t FAN5421_VAL_REV{1};
+    static constexpr uint8_t FAN5421_REG_IBAT{0x04};
+    static constexpr uint8_t FAN5421_MSK_RESET{1 << 7};
+    static constexpr uint8_t FAN5421_MSK_IOCHARGE{15 << 3};
+    static constexpr uint8_t FAN5421_VAL_IO_1A55{10 << 3};
+    static constexpr uint8_t FAN5421_VAL_IO_1A45{9 << 3};
+    static constexpr uint8_t FAN5421_VAL_IO_1A35{8 << 3};
+    static constexpr uint8_t FAN5421_VAL_IO_1A25{7 << 3};
+    static constexpr uint8_t FAN5421_VAL_IO_1A15{6 << 3};
+    static constexpr uint8_t FAN5421_VAL_IO_1A05{5 << 3};
+    static constexpr uint8_t FAN5421_VAL_IO_0A95{4 << 3};
+    static constexpr uint8_t FAN5421_VAL_IO_0A85{3 << 3};
+    static constexpr uint8_t FAN5421_VAL_IO_0A75{2 << 3};
+    static constexpr uint8_t FAN5421_VAL_IO_0A65{1 << 3};
+    static constexpr uint8_t FAN5421_VAL_IO_0A55{0 << 3};
+    static constexpr uint8_t FAN5421_MSK_ITERM{7};
+    static constexpr uint8_t FAN5421_VAL_ITERM_050MA{0};
+    static constexpr uint8_t FAN5421_VAL_ITERM_100MA{1};
+    static constexpr uint8_t FAN5421_VAL_ITERM_150MA{2};
+    static constexpr uint8_t FAN5421_VAL_ITERM_200MA{3};
 
-    static constexpr uint8_t FAN5421_REG_CONTROL0              {0x00};
-    static constexpr uint8_t   FAN5421_MSK_TMR_RST             {1<<7};   // has to be written every 30s to enable charging
-    static constexpr uint8_t   FAN5421_MSK_EN_STAT             {1<<6};
-    static constexpr uint8_t   FAN5421_MSK_STAT                {3<<4};
-    static constexpr uint8_t     FAN5421_VAL_STAT_READY        {0<<4};
-    static constexpr uint8_t     FAN5421_VAL_STAT_CHARGE       {1<<4};
-    static constexpr uint8_t     FAN5421_VAL_STAT_FULL         {2<<4};
-    static constexpr uint8_t     FAN5421_VAL_STAT_FAULT        {3<<4};
-    static constexpr uint8_t   FAN5421_MSK_FAULT               {7<<0};
-    static constexpr uint8_t     FAN5421_VAL_FAULT_NORMAL      {0<<0};
-    static constexpr uint8_t     FAN5421_VAL_FAULT_VBUSOVP     {1<<0};
-    static constexpr uint8_t     FAN5421_VAL_FAULT_SLEEP       {2<<0};
-    static constexpr uint8_t     FAN5421_VAL_FAULT_POORSRC     {3<<0};
-    static constexpr uint8_t     FAN5421_VAL_FAULT_BATOVP      {4<<0};
-    static constexpr uint8_t     FAN5421_VAL_FAULT_THSHTDWN    {5<<0};
-    static constexpr uint8_t     FAN5421_VAL_FAULT_TMR         {6<<0};
-    static constexpr uint8_t     FAN5421_VAL_FAULT_NOBAT       {7<<0};
-    static constexpr uint8_t FAN5421_REG_CONTROL1              {0x01};
-    static constexpr uint8_t   FAN5421_MSK_V_LOW_V             {3<<4};
-    static constexpr uint8_t     FAN5421_VAL_V_LOW_3V4         {0<<4};
-    static constexpr uint8_t     FAN5421_VAL_V_LOW_3V5         {1<<4};
-    static constexpr uint8_t     FAN5421_VAL_V_LOW_3V6         {2<<4};
-    static constexpr uint8_t     FAN5421_VAL_V_LOW_3V7         {3<<4};
-    static constexpr uint8_t   FAN5421_MSK_TE                  {1<<3};  // Current Termination
-    static constexpr uint8_t   FAN5421_MSK_CE_N                {1<<2}; // Charge Enabled NOT
-    static constexpr uint8_t   FAN5421_MSK_HZ_MODE             {1<<1}; // High impedance mode
-    static constexpr uint8_t FAN5421_REG_OREG                  {0x02};
-    static constexpr uint8_t   FAN5421_MSK_OREG                {0b11111100};
-    static constexpr uint8_t     FAN5421_VAL_OREG_3V80         {15<<2};
-    static constexpr uint8_t     FAN5421_VAL_OREG_3V90         {20<<2};
-    static constexpr uint8_t     FAN5421_VAL_OREG_4V00         {25<<2};
-    static constexpr uint8_t     FAN5421_VAL_OREG_4V10         {30<<2};
-    static constexpr uint8_t     FAN5421_VAL_OREG_4V20         {35<<2}; // {4200-3500)/20
-    static constexpr uint8_t     FAN5421_VAL_OREG_4V30         {40<<2};
-    static constexpr uint8_t     FAN5421_VAL_OREG_4V40         {45<<2};
-    static constexpr uint8_t     FAN5421_VAL_OREG_4V44         {62<<2};
-    static constexpr uint8_t FAN5421_REG_IC_INFO               {0x03};
-    static constexpr uint8_t   FAN5421_MSK_VENDOR              {7<<5};
-    static constexpr uint8_t     FAN5421_VAL_FAIRCHILD         {0b10000000};
-    static constexpr uint8_t   FAN5421_MSK_PN                  {3<<3};
-    static constexpr uint8_t     FAN5421_VAL_PN                {0b00000000};
-    static constexpr uint8_t   FAN5421_MSK_REV                 {7};
-    static constexpr uint8_t     FAN5421_VAL_REV               {1};
-    static constexpr uint8_t FAN5421_REG_IBAT                  {0x04};
-    static constexpr uint8_t   FAN5421_MSK_RESET               {1<<7};
-    static constexpr uint8_t   FAN5421_MSK_IOCHARGE            {15<<3};
-    static constexpr uint8_t     FAN5421_VAL_IO_1A55           {10<<3};
-    static constexpr uint8_t     FAN5421_VAL_IO_1A45           {9<<3};
-    static constexpr uint8_t     FAN5421_VAL_IO_1A35           {8<<3};
-    static constexpr uint8_t     FAN5421_VAL_IO_1A25           {7<<3};
-    static constexpr uint8_t     FAN5421_VAL_IO_1A15           {6<<3};
-    static constexpr uint8_t     FAN5421_VAL_IO_1A05           {5<<3};
-    static constexpr uint8_t     FAN5421_VAL_IO_0A95           {4<<3};
-    static constexpr uint8_t     FAN5421_VAL_IO_0A85           {3<<3};
-    static constexpr uint8_t     FAN5421_VAL_IO_0A75           {2<<3};
-    static constexpr uint8_t     FAN5421_VAL_IO_0A65           {1<<3};
-    static constexpr uint8_t     FAN5421_VAL_IO_0A55           {0<<3};
-    static constexpr uint8_t   FAN5421_MSK_ITERM               {7};
-    static constexpr uint8_t     FAN5421_VAL_ITERM_050MA       {0};
-    static constexpr uint8_t     FAN5421_VAL_ITERM_100MA       {1};
-    static constexpr uint8_t     FAN5421_VAL_ITERM_150MA       {2};
-    static constexpr uint8_t     FAN5421_VAL_ITERM_200MA       {3};
+    static constexpr uint8_t FAN5421_REG_SP_CHARGER{0x05};
+    static constexpr uint8_t FAN5421_MSK_IO_LEVEL{1 << 5};
+    static constexpr uint8_t FAN5421_MSK_SP{1 << 4};       // Special Charger
+    static constexpr uint8_t FAN5421_MSK_EN_LEVEL{1 << 3}; // ReadOnly
+    static constexpr uint8_t FAN5421_MSK_VSP{7 << 0};
+    static constexpr uint8_t FAN5421_VAL_VSP_4V20{0 << 0};
+    static constexpr uint8_t FAN5421_VAL_VSP_4V44{3 << 0};
+    static constexpr uint8_t FAN5421_VAL_VSP_4V60{5 << 0};
+    static constexpr uint8_t FAN5421_VAL_VSP_4V76{7 << 0};
+    static constexpr uint8_t FAN5421_REG_SAFETY{
+            0x06}; // can only be written before any other register is written {after vbat > vshort)
+    static constexpr uint8_t FAN5421_MSK_ISAFE{15 << 4};
+    static constexpr uint8_t FAN5421_VAL_ISAFE_1A0{5 << 4};
+    static constexpr uint8_t FAN5421_VAL_ISAFE_1A3{0xF0}; //{7<<4};
+    static constexpr uint8_t FAN5421_VAL_ISAFE_1A5{10 << 4};
+    static constexpr uint8_t FAN5421_VAL_ISAFE_2A0{15 << 4};
+    static constexpr uint8_t FAN5421_MSK_VSAFE{15};
+    static constexpr uint8_t FAN5421_VAL_VSAFE_4V20{0};
+    static constexpr uint8_t FAN5421_VAL_VSAFE_4V30{5};
+    static constexpr uint8_t FAN5421_VAL_VSAFE_4V40{10};
+    static constexpr uint8_t FAN5421_VAL_VSAFE_4V44{15};
 
-    static constexpr uint8_t FAN5421_REG_SP_CHARGER            {0x05};
-    static constexpr uint8_t   FAN5421_MSK_IO_LEVEL            {1<<5};
-    static constexpr uint8_t   FAN5421_MSK_SP                  {1<<4}; // Special Charger
-    static constexpr uint8_t   FAN5421_MSK_EN_LEVEL            {1<<3}; // ReadOnly
-    static constexpr uint8_t   FAN5421_MSK_VSP                 {7<<0};
-    static constexpr uint8_t     FAN5421_VAL_VSP_4V20          {0<<0};
-    static constexpr uint8_t     FAN5421_VAL_VSP_4V44          {3<<0};
-    static constexpr uint8_t     FAN5421_VAL_VSP_4V60          {5<<0};
-    static constexpr uint8_t     FAN5421_VAL_VSP_4V76          {7<<0};
-    static constexpr uint8_t FAN5421_REG_SAFETY                {0x06};  // can only be written before any other register is written {after vbat > vshort)
-    static constexpr uint8_t   FAN5421_MSK_ISAFE               {15<<4};
-    static constexpr uint8_t     FAN5421_VAL_ISAFE_1A0         {5<<4};
-    static constexpr uint8_t     FAN5421_VAL_ISAFE_1A3         {0xF0};//{7<<4};
-    static constexpr uint8_t     FAN5421_VAL_ISAFE_1A5         {10<<4};
-    static constexpr uint8_t     FAN5421_VAL_ISAFE_2A0         {15<<4};
-    static constexpr uint8_t   FAN5421_MSK_VSAFE               {15};
-    static constexpr uint8_t     FAN5421_VAL_VSAFE_4V20        {0};
-    static constexpr uint8_t     FAN5421_VAL_VSAFE_4V30        {5};
-    static constexpr uint8_t     FAN5421_VAL_VSAFE_4V40        {10};
-    static constexpr uint8_t     FAN5421_VAL_VSAFE_4V44        {15};
-
-    FAN5421(const FAN5421&);            // declaration only for copy constructor
-    FAN5421& operator=(const FAN5421&);  // declaration only for copy assignment --> make it uncopyable
+    FAN5421(const FAN5421 &); // declaration only for copy constructor
+    FAN5421 &
+    operator=(const FAN5421 &); // declaration only for copy assignment --> make it uncopyable
 
 public:
-
-    FAN5421(void)
-    {
+    FAN5421(void) {
 
     };
 
@@ -125,65 +124,87 @@ public:
     uint8_t setSafetyRegister() const
     {
         uint8_t error = 0;
-        i2c.writeByte(    I2C_ADDRESS, FAN5421_REG_SAFETY, FAN5421_VAL_ISAFE_1A3 | FAN5421_VAL_VSAFE_4V20);
+        i2c.writeByte(I2C_ADDRESS, FAN5421_REG_SAFETY,
+                      FAN5421_VAL_ISAFE_1A3 | FAN5421_VAL_VSAFE_4V20);
 
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_SAFETY, FAN5421_MSK_ISAFE) != FAN5421_VAL_ISAFE_1A3)  error++;
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_SAFETY, FAN5421_MSK_VSAFE) != FAN5421_VAL_VSAFE_4V20) error++;
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_SAFETY, FAN5421_MSK_ISAFE) !=
+            FAN5421_VAL_ISAFE_1A3)
+            error++;
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_SAFETY, FAN5421_MSK_VSAFE) !=
+            FAN5421_VAL_VSAFE_4V20)
+            error++;
 
         return error;
     };
 
     // has to be polled at least every 32s during charging (HOST alive) OR the IC is not charging anymore till the next reset!
     void pollTimer() const
-    {
-        i2c.setRegister(    I2C_ADDRESS, FAN5421_REG_CONTROL0, FAN5421_MSK_TMR_RST,    255);
-    };
+    { i2c.setRegister(I2C_ADDRESS, FAN5421_REG_CONTROL0, FAN5421_MSK_TMR_RST, 255); };
 
 
     // give a basic and safe set for enable charging
     uint8_t setConfig(const uint16_t charge_current_mA = 750) const
     {
 
-        if (i2c.probe(I2C_ADDRESS)==0) return 0;
+        if (i2c.probe(I2C_ADDRESS) == 0) return 0;
 
         uint8_t error = 0;
 
         //// FAN5421_REG_CONTROL0
-        i2c.writeByte(      I2C_ADDRESS, FAN5421_REG_CONTROL0, FAN5421_MSK_TMR_RST | FAN5421_MSK_EN_STAT);
+        i2c.writeByte(I2C_ADDRESS, FAN5421_REG_CONTROL0, FAN5421_MSK_TMR_RST | FAN5421_MSK_EN_STAT);
 
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL0, FAN5421_MSK_EN_STAT)  != FAN5421_MSK_EN_STAT)    error++;
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL0, FAN5421_MSK_EN_STAT) !=
+            FAN5421_MSK_EN_STAT)
+            error++;
 
         //// FAN5421_REG_CONTROL1
-        i2c.writeByte(      I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_VAL_V_LOW_3V6 | FAN5421_MSK_TE | 0 | 0);
+        i2c.writeByte(I2C_ADDRESS, FAN5421_REG_CONTROL1,
+                      FAN5421_VAL_V_LOW_3V6 | FAN5421_MSK_TE | 0 | 0);
 
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_V_LOW_V) != FAN5421_VAL_V_LOW_3V6)   error++;
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_TE)      != FAN5421_MSK_TE)          error++;
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_CE_N)    != 0)                       error++;
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_HZ_MODE) != 0)                       error++;
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_V_LOW_V) !=
+            FAN5421_VAL_V_LOW_3V6)
+            error++;
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_TE) != FAN5421_MSK_TE)
+            error++;
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_CE_N) != 0) error++;
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_HZ_MODE) != 0) error++;
 
         //// FAN5421_REG_OREG
-        i2c.writeByte(      I2C_ADDRESS, FAN5421_REG_OREG, FAN5421_VAL_OREG_4V20);
+        i2c.writeByte(I2C_ADDRESS, FAN5421_REG_OREG, FAN5421_VAL_OREG_4V20);
 
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_OREG, FAN5421_MSK_OREG) != FAN5421_VAL_OREG_4V20)          error++;
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_OREG, FAN5421_MSK_OREG) !=
+            FAN5421_VAL_OREG_4V20)
+            error++;
 
         //// FAN5421_REG_IC_INFO
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IC_INFO, FAN5421_MSK_VENDOR) != FAN5421_VAL_FAIRCHILD)     error++;
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IC_INFO, FAN5421_MSK_PN)     != FAN5421_VAL_PN)            error++;
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IC_INFO, FAN5421_MSK_REV)    != FAN5421_VAL_REV)           error++;
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IC_INFO, FAN5421_MSK_VENDOR) !=
+            FAN5421_VAL_FAIRCHILD)
+            error++;
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IC_INFO, FAN5421_MSK_PN) != FAN5421_VAL_PN)
+            error++;
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IC_INFO, FAN5421_MSK_REV) != FAN5421_VAL_REV)
+            error++;
 
         //// FAN5421_REG_IBAT
-        i2c.writeByte(      I2C_ADDRESS, FAN5421_REG_IBAT, FAN5421_VAL_IO_0A75 | FAN5421_VAL_ITERM_100MA);
+        i2c.writeByte(I2C_ADDRESS, FAN5421_REG_IBAT, FAN5421_VAL_IO_0A75 | FAN5421_VAL_ITERM_100MA);
 
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IBAT, FAN5421_MSK_IOCHARGE)!= FAN5421_VAL_IO_0A75)         error++;
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IBAT, FAN5421_MSK_ITERM)   != FAN5421_VAL_ITERM_100MA)     error++;
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IBAT, FAN5421_MSK_IOCHARGE) !=
+            FAN5421_VAL_IO_0A75)
+            error++;
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IBAT, FAN5421_MSK_ITERM) !=
+            FAN5421_VAL_ITERM_100MA)
+            error++;
 
         error += setCurrent(charge_current_mA);
 
         //// FAN5421_REG_SP_CHARGER
-        i2c.writeByte(      I2C_ADDRESS, FAN5421_REG_SP_CHARGER, 0 | FAN5421_VAL_VSP_4V20);
+        i2c.writeByte(I2C_ADDRESS, FAN5421_REG_SP_CHARGER, 0 | FAN5421_VAL_VSP_4V20);
 
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_SP_CHARGER, FAN5421_MSK_IO_LEVEL) != 0)                    error++;
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_SP_CHARGER, FAN5421_MSK_VSP) != FAN5421_VAL_VSP_4V20)      error++;
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_SP_CHARGER, FAN5421_MSK_IO_LEVEL) != 0)
+            error++;
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_SP_CHARGER, FAN5421_MSK_VSP) !=
+            FAN5421_VAL_VSP_4V20)
+            error++;
 
         return error;
     };
@@ -196,12 +217,13 @@ public:
         while (charge_current_mA > 550)
         {
             charge_current_mA -= 100;
-            value             += (1<<3);
+            value += (1 << 3);
         }
 
-        i2c.writeByte(      I2C_ADDRESS, FAN5421_REG_IBAT, (value) | i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IBAT, FAN5421_MSK_ITERM));
+        i2c.writeByte(I2C_ADDRESS, FAN5421_REG_IBAT,
+                      (value) | i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IBAT, FAN5421_MSK_ITERM));
 
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IBAT, FAN5421_MSK_IOCHARGE)!= value)       error++;
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IBAT, FAN5421_MSK_IOCHARGE) != value) error++;
 
         return error;
     };
@@ -213,15 +235,17 @@ public:
 
         uint8_t value = i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IBAT, 255);
 
-        if ((value & FAN5421_MSK_IOCHARGE) == (15<<3))   return 1; // error - maximum reached
+        if ((value & FAN5421_MSK_IOCHARGE) == (15 << 3)) return 1; // error - maximum reached
 
-        value +=  (1<<3);
+        value += (1 << 3);
         value &= ~FAN5421_MSK_RESET;
 
         // watch out - dont trigger reset
-        i2c.writeByte(      I2C_ADDRESS, FAN5421_REG_IBAT, value);
+        i2c.writeByte(I2C_ADDRESS, FAN5421_REG_IBAT, value);
 
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IBAT, FAN5421_MSK_IOCHARGE)!= (value & FAN5421_MSK_IOCHARGE))     error++;
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IBAT, FAN5421_MSK_IOCHARGE) !=
+            (value & FAN5421_MSK_IOCHARGE))
+            error++;
 
         return error;
     };
@@ -233,15 +257,17 @@ public:
 
         uint8_t value = i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IBAT, 255);
 
-        if ((value & FAN5421_MSK_IOCHARGE) == 0)   return 1; // error - minimum reached
+        if ((value & FAN5421_MSK_IOCHARGE) == 0) return 1; // error - minimum reached
 
-        value -=  (1<<3);
+        value -= (1 << 3);
         value &= ~FAN5421_MSK_RESET;
 
         // watch out - dont trigger reset
-        i2c.writeByte(      I2C_ADDRESS, FAN5421_REG_IBAT, value);
+        i2c.writeByte(I2C_ADDRESS, FAN5421_REG_IBAT, value);
 
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IBAT, FAN5421_MSK_IOCHARGE)!= (value & FAN5421_MSK_IOCHARGE))     error++;
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IBAT, FAN5421_MSK_IOCHARGE) !=
+            (value & FAN5421_MSK_IOCHARGE))
+            error++;
 
         return error;
     };
@@ -250,10 +276,10 @@ public:
     // gives feedback if it charges or not
     uint8_t getChargingStatus() const
     {
-        const uint8_t status = i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL0,FAN5421_MSK_STAT);
+        const uint8_t status = i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL0, FAN5421_MSK_STAT);
 
-        if (status == FAN5421_VAL_STAT_CHARGE)   return 1;
-        else                                     return 0;
+        if (status == FAN5421_VAL_STAT_CHARGE) return 1;
+        else return 0;
     };
 
     // workaround for: chip doesn't charge when already charged and external power still present
@@ -262,8 +288,10 @@ public:
     {
         i2c.setRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_CE_N, ~enable);
 
-        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_CE_N) == (FAN5421_MSK_CE_N&(~enable)))    return 1; // charging-changed
-        else 																				                         return 0; // error
+        if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL1, FAN5421_MSK_CE_N) ==
+            (FAN5421_MSK_CE_N & (~enable)))
+            return 1;  // charging-changed
+        else return 0; // error
     };
 
 
@@ -276,19 +304,19 @@ public:
         uint8_t error = 0;
 
         //// FAN5421_REG_OREG
-        i2c.writeByte(      I2C_ADDRESS, FAN5421_REG_OREG, FAN5421_VAL_OREG_4V20);
+        i2c.writeByte(I2C_ADDRESS, FAN5421_REG_OREG, FAN5421_VAL_OREG_4V20);
 
         //if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_OREG, FAN5421_MSK_OREG) != FAN5421_VAL_OREG_4V20)          error++;
 
         //// FAN5421_REG_IBAT
-        i2c.writeByte(      I2C_ADDRESS, FAN5421_REG_IBAT, FAN5421_VAL_IO_1A45 | FAN5421_VAL_ITERM_100MA);
+        i2c.writeByte(I2C_ADDRESS, FAN5421_REG_IBAT, FAN5421_VAL_IO_1A45 | FAN5421_VAL_ITERM_100MA);
 
         //if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IBAT, FAN5421_MSK_IOCHARGE)!= FAN5421_VAL_IO_0A75)         error++;
         //if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_IBAT, FAN5421_MSK_ITERM)   != FAN5421_VAL_ITERM_100MA)     error++;
 
         //// FAN5421_REG_SP_CHARGER
         //i2c.writeByte(      I2C_ADDRESS, FAN5421_REG_SP_CHARGER, FAN5421_MSK_IO_LEVEL);
-        i2c.writeByte(      I2C_ADDRESS, FAN5421_REG_SP_CHARGER, 0 | FAN5421_VAL_VSP_4V20);
+        i2c.writeByte(I2C_ADDRESS, FAN5421_REG_SP_CHARGER, 0 | FAN5421_VAL_VSP_4V20);
 
         //if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_SP_CHARGER, FAN5421_MSK_IO_LEVEL) != 0)                    error++;
         //if (i2c.getRegister(I2C_ADDRESS, FAN5421_REG_SP_CHARGER, FAN5421_MSK_VSP) != FAN5421_VAL_VSP_4V20)      error++;
@@ -298,7 +326,7 @@ public:
 
     bool getFaultStatus(void) const
     {
-        uint8_t status = i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL0,FAN5421_MSK_STAT);
+        uint8_t status = i2c.getRegister(I2C_ADDRESS, FAN5421_REG_CONTROL0, FAN5421_MSK_STAT);
 
         //if (status == FAN5421_VAL_STAT_READY)    Serial.print("READY");
         //if (status == FAN5421_VAL_STAT_CHARGE)   Serial.print("CHARGING");
@@ -382,7 +410,6 @@ public:
         Serial.println(i2c.getRegister(    I2C_ADDRESS, FAN5421_REG_IC_INFO, FAN5421_MSK_REV));
     };
      */
-
 };
 
 #endif

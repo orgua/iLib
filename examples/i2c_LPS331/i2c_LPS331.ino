@@ -1,12 +1,12 @@
-#include <Wire.h>
 #include "i2c.h"
+#include <Wire.h>
 
 // Pressure-Sensor
 #include "i2c_LPS331.h"
 LPS331 lps331;
 
 
-void setup()
+void   setup()
 {
     Serial.begin(115200);
 
@@ -15,7 +15,7 @@ void setup()
     else
     {
         Serial.println("Sensor missing");
-        while(1) {};
+        while (1) {};
     }
 }
 

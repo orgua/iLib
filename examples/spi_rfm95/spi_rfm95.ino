@@ -1,11 +1,11 @@
-#include <SPI.h>
 #include "spi_rfm95.h"
+#include <SPI.h>
 RFM95 rfm;
 
 
-#define TIMEON   20
-#define TIMEOFF  (1000-TIMEON)
-#define LEDPINA   8
+#define TIMEON  20
+#define TIMEOFF (1000 - TIMEON)
+#define LEDPINA 8
 
 
 void setup()
@@ -18,7 +18,7 @@ void setup()
     else
     {
         Serial.println("found");
-        while(1) {};
+        while (1) {};
     }
 
     Serial.println(rfm.getFrequency());
@@ -27,7 +27,7 @@ void setup()
     //while (1) { rfm.handleIRQ(); };
 
     pinMode(LEDPINA, OUTPUT);
-    digitalWrite(LEDPINA,HIGH);
+    digitalWrite(LEDPINA, HIGH);
 }
 
 void loop()
@@ -36,12 +36,12 @@ void loop()
     delay(TIMEOFF);
     if (rfm.canSend())
     {
-        digitalWrite(LEDPINA,HIGH);
+        digitalWrite(LEDPINA, HIGH);
         rfm.sendData();
     };
 
     delay(TIMEON);
-    digitalWrite(LEDPINA,LOW);
+    digitalWrite(LEDPINA, LOW);
 }
 
 /**<

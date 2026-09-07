@@ -1,11 +1,11 @@
-#include <Wire.h>
 #include "i2c.h"
+#include <Wire.h>
 
 #include "i2c_MMA8451.h"
 MMA8451 mma8451;
 
 
-void setup()
+void    setup()
 {
     Serial.begin(115200);
 
@@ -14,7 +14,7 @@ void setup()
     else
     {
         Serial.println("Sensor missing");
-        while(1) {};
+        while (1) {};
     }
 }
 
@@ -25,14 +25,13 @@ void loop()
     mma8451.getMeasurement(xyz_g);
 
     Serial.print(" X: ");
-    Serial.print(xyz_g[0],2);
+    Serial.print(xyz_g[0], 2);
     Serial.print(" \tY: ");
-    Serial.print(xyz_g[1],2);
+    Serial.print(xyz_g[1], 2);
     Serial.print(" \tZ: ");
-    Serial.print(xyz_g[2],2);
+    Serial.print(xyz_g[2], 2);
     Serial.println("");
     delay(20);
-
 }
 
 
