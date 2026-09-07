@@ -8,17 +8,16 @@ on:
 
 jobs:
   various-tests:
-    runs-on: ubuntu-22.04 # TODO: -latest was 20.04 and had old packages
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v7
-      - name: Set up Python ${{ matrix.python-version }} 🐍
-        uses: actions/setup-python@v7
-        with:
-          python-version: "3.8"
+
       - name: Install dependencies 🔧
-        run: sudo apt install cppcheck
+        run:  |
+          sudo apt update
+          sudo apt install cppcheck
 
       - name: Run Pre-Commit Tests 🧪
-        uses: pre-commit/action@v3.0.1
+        uses: j178/prek-action@v2
