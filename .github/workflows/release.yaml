@@ -1,0 +1,31 @@
+name: Release tagged Commit
+
+on:
+  workflow_dispatch:  # manual trigger
+  push:
+    # branches: [ main ]  # this is handled as OR (push to main OR tagged)
+    tags:
+      - 'v*.*.*'
+
+permissions: {}
+
+jobs:
+  QA-tests:
+    uses: ./.github/workflows/quality-assurance.yaml
+  BuildExamples:
+    uses: ./.github/workflows/compile-examples.yaml
+  permissions:
+    contents: write
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    needs:
+      - QA-tests
+      - BuildExamples
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v7
+
+      - name: Release 🏃
+        uses: softprops/action-gh-release@v3
