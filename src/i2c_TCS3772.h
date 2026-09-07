@@ -56,7 +56,7 @@ private:
     static const uint8_t VAL_DEVICE_ID_B = (0x49); // TCS37723 & TCS37727
 
     static const uint8_t REG_STATUS      = (0x13);
-    static const uint8_t MASK_AVALID     = (bit(0)); // cylce completed since AEN=1
+    static const uint8_t MASK_AVALID     = (bit(0)); // cycle completed since AEN=1
 
     static const uint8_t REG_CLEAR_DATAL = (0x14);
     static const uint8_t REG_CLEAR_DATAH = (0x15);
