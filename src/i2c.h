@@ -83,6 +83,8 @@ WirePlus::WirePlus()
     bitSet(PORTC, 5); 	// as per note from atmega8 manual pg167
     // switch to 400KHz I2C - eheheh
     TWBR = ((F_CPU / 400000L) - 16) / 2; // see twi_init in Wire/utility/twi.c
+#else
+    Wire.setClock(400000L);
 #endif
 };
 /** ######### Public Methods ################################################################# */
