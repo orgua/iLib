@@ -58,11 +58,11 @@ repos:
       - id: zizmor
         args: ["--min-severity", "high", "--no-progress", "--fix", "."]
 
-#  - repo: https://github.com/pre-commit/mirrors-clang-format
-#    rev: 'v14.0.6'
-#    hooks:
-#      - id: clang-format
-#        types_or: [c++, c]
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: 'v23.1.0'
+    hooks:
+      - id: clang-format
+        types_or: [c++, c]
 # TODO: activate later
 
   # cpp-check comes last! fails if uninstalled
