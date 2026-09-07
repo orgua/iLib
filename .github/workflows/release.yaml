@@ -14,8 +14,6 @@ jobs:
     uses: ./.github/workflows/quality-assurance.yaml
   BuildExamples:
     uses: ./.github/workflows/compile-examples.yaml
-  permissions:
-    contents: write
   release:
     runs-on: ubuntu-latest
     permissions:
