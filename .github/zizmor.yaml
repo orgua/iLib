@@ -1,0 +1,9 @@
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        actions/*: ref-pin
+        astral-sh/*: ref-pin
+        j178/*: ref-pin
+        pypa/*: ref-pin
+        softprops/*: ref-pin
