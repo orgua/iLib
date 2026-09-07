@@ -21,4 +21,4 @@ jobs:
         run: sudo apt install cppcheck
 
       - name: Run Pre-Commit Tests 🧪
-        uses: pre-commit/action@v3.0.0
+        uses: pre-commit/action@v3.0.1
