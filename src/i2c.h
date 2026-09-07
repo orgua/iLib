@@ -7,23 +7,34 @@
 /** ######### useful defines ################################################################# */
 
 #define getmax(a,b) ((a)>(b)?(a):(b)) // TODO: implement as static const
-#define BITMASK(a)  (1<<a)
-#define BIT(a)      (1<<a)
+#ifndef BITMASK
+#define BITMASK(a)  (1ul<<(a))
+#endif
+
+#ifndef BIT
+#define BIT(a)      (1ul<<(a))
+#endif
 
 #ifndef TRUE
 #define TRUE        (1==1)
+#endif
+
+#ifndef FALSE
 #define FALSE       (1==2)
 #endif
 
+#ifndef LOW
+#define LOW         (0ul)
+#endif
+
 #ifndef HIGH
-#define LOW         (0)
-#define HIGH        (1)
+#define HIGH        (1ul)
 #endif
 
 /// are they really useful?
-#define UBLB(a,b)  ( ( (a) << 8) | (b) )
-#define UBLB19(a,b) ( ( (a) << 16 ) | (b) )
-#define UBLB32(a,b,c,d)  ((( ((a)<<24) | ((b)<<16) ) | ((c)<<8)) | (d) )
+#define UBLB(a,b)  ( ( (a) << 8ul) | (b) )
+#define UBLB19(a,b) ( ( (a) << 16ul) | (b) )
+#define UBLB32(a,b,c,d)  ((( ((a)<<24ul) | ((b)<<16ul) ) | ((c)<<8ul)) | (d) )
 
 /**< A way to get around Questions with shifting
 
@@ -67,10 +78,12 @@ private:
 WirePlus::WirePlus()
 {
     Wire.begin(); 		// I2C as Master
+#if defined(__AVR__)
     bitSet(PORTC, 4); 	// deactivate internal pull-ups for twi
     bitSet(PORTC, 5); 	// as per note from atmega8 manual pg167
     // switch to 400KHz I2C - eheheh
     TWBR = ((F_CPU / 400000L) - 16) / 2; // see twi_init in Wire/utility/twi.c
+#endif
 };
 /** ######### Public Methods ################################################################# */
 
